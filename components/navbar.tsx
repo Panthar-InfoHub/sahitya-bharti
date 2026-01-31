@@ -4,11 +4,31 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
-import { MembershipModal } from "./membership-modal"// Import MembershipModal component
+import { MembershipModal } from "./membership-modal"
+import { UserNav } from "./user-nav"
+import { createClient } from "@/lib/supabase/client"
+import { useEffect } from "react"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false) // Declare isMembershipModalOpen state
+  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        setUser({ ...user, ...profile })
+      }
+    }
+    getUser()
+  }, [])
 
   const navLinks = [
     { href: "/", label: "गृह" },
@@ -26,7 +46,7 @@ export function Navbar() {
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-14 h-14 relative flex items-center justify-center">
-              <Image src="/images/logo.jpg" alt="हिंदी साहित्य भारती" width={56} height={56} className="object-contain" />
+              <Image src="/logo.jpg" alt="हिंदी साहित्य भारती" width={56} height={56} className="object-contain" />
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="text-sm font-bold text-primary group-hover:text-accent transition-colors">
@@ -51,6 +71,16 @@ export function Navbar() {
 
           {/* Right section */}
           <div className="flex items-center gap-4">
+            {user ? (
+              <UserNav user={user} />
+            ) : (
+              <Link
+                href="/login"
+                className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                लॉग इन
+              </Link>
+            )}
             <Link
               href="/membership"
               className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
@@ -81,6 +111,28 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {user ? (
+              <>
+                <div className="px-3 py-2 text-sm font-medium text-muted-foreground border-t border-border mt-2">
+                  {user.full_name} ({user.email})
+                </div>
+                <Link
+                  href="/profile"
+                  className="block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  प्रोफाइल (Profile)
+                </Link>
+              </>
+            ) : (
+               <Link
+                href="/login"
+                className="w-full text-left block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors mt-2"
+                onClick={() => setIsOpen(false)}
+              >
+                लॉग इन
+              </Link>
+            )}
             <Link
               href="/membership"
               className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
