@@ -4,9 +4,11 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
+import { MembershipModal } from "./membership-modal"// Import MembershipModal component
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false) // Declare isMembershipModalOpen state
 
   const navLinks = [
     { href: "/", label: "गृह" },
@@ -53,7 +55,7 @@ export function Navbar() {
               href="/membership"
               className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
             >
-              नमस्कार लेखक
+              सदस्य बनें
             </Link>
 
             {/* Mobile menu button */}
@@ -81,10 +83,10 @@ export function Navbar() {
             ))}
             <Link
               href="/membership"
-              className="block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
+              className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
               onClick={() => setIsOpen(false)}
             >
-              नमस्कार लेखक
+              सदस्य बनें
             </Link>
           </div>
         )}

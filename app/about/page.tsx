@@ -1,8 +1,15 @@
+'use client';
+
+import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import Image from "next/image"
+import { useState } from "react"
+import { MembershipModal } from "@/components/membership-modal"
 
 export default function AboutPage() {
+  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false);
+
   return (
     <>
       <Navbar />
@@ -179,12 +186,12 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <h2 className="text-3xl sm:text-4xl font-bold text-white">हमारे साथ जुड़ें</h2>
             <p className="text-lg text-white/90">हिंदी साहित्य के संरक्षण और प्रचार में हमारा साथ दीजिए।</p>
-            <a
+            <Link
               href="/membership"
               className="inline-block px-10 py-4 bg-white text-primary hover:bg-white/90 font-bold text-lg rounded-lg transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1"
             >
               सदस्यता प्राप्त करें
-            </a>
+            </Link>
           </div>
         </section>
       </main>

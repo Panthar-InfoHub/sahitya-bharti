@@ -1,55 +1,34 @@
 "use client"
 
+import { FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { FormControl } from "@/components/ui/form"
+import { FormLabel } from "@/components/ui/form"
+import { FormItem } from "@/components/ui/form"
+import { FormField } from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
+import { DialogDescription } from "@/components/ui/dialog"
+import { DialogTitle } from "@/components/ui/dialog"
+import { DialogHeader } from "@/components/ui/dialog"
+import { DialogContent } from "@/components/ui/dialog"
+import { DialogTrigger } from "@/components/ui/dialog"
+import { Dialog } from "@/components/ui/dialog"
 import { useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { useForm } from "react-hook-form"
-
-interface MembershipFormData {
-  name: string
-  email: string
-  phone: string
-  city: string
-  profession: string
-}
+import { MembershipModal } from "@/components/membership-modal"
 
 export default function MembershipPage() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const form = useForm<MembershipFormData>({
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      city: "",
-      profession: "",
-    },
-  })
-
-  const onSubmit = async (data: MembershipFormData) => {
+  const [form, setForm] = useState({ control: {} }) // Declare form variable
+  const [isSubmitting, setIsSubmitting] = useState(false) // Declare isSubmitting variable
+  const onSubmit = (data : any) => {
     setIsSubmitting(true)
-    // Simulated API call - replace with actual backend integration
-    console.log("Membership application:", data)
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsOpen(false)
-      form.reset()
-      // Show success message
-      alert("आपकी सदस्यता के लिए आवेदन स्वीकार किया गया है!")
-    }, 1500)
-  }
+    console.log(data)
+    setIsSubmitting(false)
+    setIsOpen(false)
+  } // Declare onSubmit function
 
   return (
     <>
@@ -63,102 +42,13 @@ export default function MembershipPage() {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               हिंदी साहित्य भारती का सदस्य बनकर एक गौरवशाली परंपरा का हिस्सा बनें।
             </p>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-lg px-10 py-6">
-                  आवेदन शुरू करें
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl">सदस्यता फॉर्म</DialogTitle>
-                  <DialogDescription>अपनी जानकारी दर्ज करें और हमारे परिवार का हिस्सा बनें।</DialogDescription>
-                </DialogHeader>
-
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    {/* Name Field */}
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>नाम</FormLabel>
-                          <FormControl>
-                            <Input placeholder="आपका नाम" {...field} required />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Email Field */}
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ईमेल</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="आपका ईमेल" {...field} required />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Phone Field */}
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>फोन</FormLabel>
-                          <FormControl>
-                            <Input placeholder="आपका फोन नंबर" {...field} required />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* City Field */}
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>शहर</FormLabel>
-                          <FormControl>
-                            <Input placeholder="आपका शहर" {...field} required />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Profession Field */}
-                    <FormField
-                      control={form.control}
-                      name="profession"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>पेशा</FormLabel>
-                          <FormControl>
-                            <Input placeholder="आपका पेशा" {...field} required />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button type="submit" className="w-full bg-primary" disabled={isSubmitting}>
-                      {isSubmitting ? "भेज रहे हैं..." : "आवेदन भेजें"}
-                    </Button>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 text-lg px-10 py-6"
+              onClick={() => setIsOpen(true)}
+            >
+              आवेदन शुरू करें
+            </Button>
           </div>
         </section>
 
@@ -240,6 +130,9 @@ export default function MembershipPage() {
         </section>
       </main>
       <Footer />
+
+      {/* Membership Modal */}
+      <MembershipModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   )
 }
