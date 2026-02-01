@@ -5,6 +5,7 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
 import { MembershipModal } from "./membership-modal"
+import { ProfileModal } from "./profile-modal"
 import { UserNav } from "./user-nav"
 import { createClient } from "@/lib/supabase/client"
 import { useEffect } from "react"
@@ -12,6 +13,7 @@ import { useEffect } from "react"
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
@@ -46,7 +48,13 @@ export function Navbar() {
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-14 h-14 relative flex items-center justify-center">
-              <Image src="/logo.jpg" alt="हिंदी साहित्य भारती" width={56} height={56} className="object-contain" />
+              <Image
+                src="/logo.jpg"
+                alt="हिंदी साहित्य भारती"
+                width={56}
+                height={56}
+                className="object-contain w-auto h-auto max-w-full max-h-full"
+              />
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="text-sm font-bold text-primary group-hover:text-accent transition-colors">
@@ -72,7 +80,7 @@ export function Navbar() {
           {/* Right section */}
           <div className="flex items-center gap-4">
             {user ? (
-              <UserNav user={user} />
+              <UserNav user={user} onOpenProfile={() => setIsProfileModalOpen(true)} />
             ) : (
               <Link
                 href="/login"
@@ -116,13 +124,15 @@ export function Navbar() {
                 <div className="px-3 py-2 text-sm font-medium text-muted-foreground border-t border-border mt-2">
                   {user.full_name} ({user.email})
                 </div>
-                <Link
-                  href="/profile"
-                  className="block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
-                  onClick={() => setIsOpen(false)}
+                <button
+                  className="w-full text-left block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
+                  onClick={() => {
+                    setIsOpen(false)
+                    setIsProfileModalOpen(true)
+                  }}
                 >
                   प्रोफाइल (Profile)
-                </Link>
+                </button>
               </>
             ) : (
                <Link
@@ -142,6 +152,8 @@ export function Navbar() {
             </Link>
           </div>
         )}
+        <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} />
+        <ProfileModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} user={user} />
       </div>
     </nav>
   )

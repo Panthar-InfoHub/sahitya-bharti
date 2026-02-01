@@ -2,20 +2,31 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, Upload } from "lucide-react"
 import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { useRouter } from "next/navigation"
 
-export default function ProfilePage() {
+interface ProfileModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  user: any
+}
+
+export function ProfileModal({ open, onOpenChange, user }: ProfileModalProps) {
   const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<any>(user)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
     full_name: "",
@@ -26,33 +37,16 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
-    const getUser = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push("/login")
-        return
-      }
-
-      const { data: profile } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-      if (profile) {
-        setUser({ ...user, ...profile })
+    if (user) {
+        setCurrentUser(user)
         setFormData({
-            full_name: profile.full_name || "",
-            email: user.email || "",
-            phone_number: profile.phone_number || "",
-            address: profile.address || "",
+            full_name: user?.full_name || "",
+            email: user?.email || "",
+            phone_number: user?.phone_number || "",
+            address: user?.address || "",
         })
-      }
-      setLoading(false)
     }
-    getUser()
-  }, [router])
+  }, [user, open])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -67,7 +61,7 @@ export default function ProfilePage() {
 
       const file = e.target.files[0]
       const fileExt = file.name.split(".").pop()
-      const filePath = `${user.id}-${Math.random()}.${fileExt}`
+      const filePath = `${currentUser.id}-${Math.random()}.${fileExt}`
       const supabase = createClient()
 
       const { error: uploadError } = await supabase.storage
@@ -85,14 +79,15 @@ export default function ProfilePage() {
       const { error: updateError } = await supabase
         .from("users")
         .update({ avatar_url: publicUrl })
-        .eq("id", user.id)
+        .eq("id", currentUser.id)
 
       if (updateError) {
         throw updateError
       }
 
-      setUser({ ...user, avatar_url: publicUrl })
+      setCurrentUser({ ...currentUser, avatar_url: publicUrl })
       toast.success("Profile image updated successfully")
+      router.refresh()
     } catch (error: any) {
         toast.error(error.message || "Error uploading image")
     } finally {
@@ -112,11 +107,12 @@ export default function ProfilePage() {
           phone_number: formData.phone_number,
           address: formData.address,
         })
-        .eq("id", user.id)
+        .eq("id", currentUser.id)
 
       if (error) throw error
       toast.success("Profile updated successfully")
       router.refresh()
+      onOpenChange(false)
     } catch (error: any) {
       toast.error(error.message || "Error updating profile")
     } finally {
@@ -124,27 +120,19 @@ export default function ProfilePage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
-
   return (
-    <div className="container max-w-2xl py-10">
-      <Card>
-        <CardHeader>
-            <CardTitle>प्रोफाइल (Profile)</CardTitle>
-            <CardDescription>अपनी व्यक्तिगत जानकारी प्रबंधित करें (Manage your personal information)</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Avatar Section */}
-          <div className="flex flex-col items-center gap-4">
-            <Avatar className="h-32 w-32">
-              <AvatarImage src={user?.avatar_url} />
-              <AvatarFallback className="text-4xl">{user?.full_name?.charAt(0) || "U"}</AvatarFallback>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>प्रोफाइल (Profile)</DialogTitle>
+          <DialogDescription>
+            अपनी व्यक्तिगत जानकारी प्रबंधित करें (Manage your personal information)
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col items-center gap-4 py-4">
+            <Avatar className="h-24 w-24">
+              <AvatarImage src={currentUser?.avatar_url} />
+              <AvatarFallback className="text-2xl">{currentUser?.full_name?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
             <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" className="relative cursor-pointer" disabled={uploading}>
@@ -204,13 +192,14 @@ export default function ProfilePage() {
               />
             </div>
 
-            <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              परिवर्तन संचित करें (Save Changes)
-            </Button>
+            <div className="flex justify-end pt-4">
+                <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                परिवर्तन संचित करें (Save)
+                </Button>
+            </div>
           </form>
-        </CardContent>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

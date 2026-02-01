@@ -1,7 +1,7 @@
 
 "use client"
 
-import { LogOut, User } from "lucide-react"
+import { LogOut, User, Users } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -23,9 +23,10 @@ interface UserNavProps {
     full_name?: string | null
     avatar_url?: string | null
   }
+  onOpenProfile: () => void
 }
 
-export function UserNav({ user }: UserNavProps) {
+export function UserNav({ user, onOpenProfile }: UserNavProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -52,14 +53,18 @@ export function UserNav({ user }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/profile" className="flex items-center">
+        <DropdownMenuItem onClick={onOpenProfile} className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
             <span>प्रोफाइल (Profile)</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/members" className="flex items-center cursor-pointer">
+            <Users className="mr-2 h-4 w-4" />
+            <span>सदस्य (Members)</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
+        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600 cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           <span>लॉग आउट (Log out)</span>
         </DropdownMenuItem>

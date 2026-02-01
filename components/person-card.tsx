@@ -28,10 +28,15 @@ export function PersonCard({ person }: PersonCardProps) {
         >
           <div className="relative h-full">
             {/* Image */}
-            <Image src={person.imageUrl || "/placeholder.svg"} alt={person.nameHi} fill className="object-cover" />
+            {/* Image */}
+            <img
+              src={person.imageUrl || "/placeholder.svg"}
+              alt={person.nameHi}
+              className="h-full w-full object-cover"
+            />
 
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-primary/80 via-transparent to-transparent"></div>
 
             {/* Content */}
             <div className="absolute bottom-0 left-0 right-0 p-4 text-white space-y-2">
@@ -70,7 +75,7 @@ export function PersonCard({ person }: PersonCardProps) {
                 className="flex items-start gap-3 hover:opacity-80 transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Mail className="w-4 h-4 mt-0.5 shrink-0" />
                 <span className="break-all">{person.email}</span>
               </a>
 
@@ -79,12 +84,12 @@ export function PersonCard({ person }: PersonCardProps) {
                 className="flex items-start gap-3 hover:opacity-80 transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
-                <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <Phone className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>{person.phone}</span>
               </a>
 
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>
                   {person.city}, {person.state}
                 </span>
