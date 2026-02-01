@@ -1,31 +1,36 @@
+import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-
-export async function getUserProfile() {
+export async function getSession() {
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
+  try {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    return session
+  } catch (error) {
+    console.error("Error:", error)
     return null
   }
+}
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', user.id)
-    .single()
-
-  return { user, profile }
+export async function getUser() {
+  const supabase = await createClient()
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    return user
+  } catch (error) {
+    console.error("Error:", error)
+    return null
+  }
 }
 
 export async function requireUser() {
-  const data = await getUserProfile()
-  if (!data) {
-    redirect('/login')
+  const user = await getUser()
+  if (!user) {
+    redirect("/login")
   }
-  return data
+  return user
 }

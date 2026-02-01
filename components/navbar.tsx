@@ -48,13 +48,7 @@ export function Navbar() {
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-14 h-14 relative flex items-center justify-center">
-              <Image
-                src="/logo.jpg"
-                alt="हिंदी साहित्य भारती"
-                width={56}
-                height={56}
-                className="object-contain w-auto h-auto max-w-full max-h-full"
-              />
+              <Image src="/logo.jpg" alt="हिंदी साहित्य भारती" width={56} height={56} className="object-contain" />
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="text-sm font-bold text-primary group-hover:text-accent transition-colors">
@@ -66,6 +60,16 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
+            {/* Admin Link */}
+            {user?.role === 'admin' && (
+              <Link
+                href="/members"
+                className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
+              >
+                सदस्य (Members)
+              </Link>
+            )}
+
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -92,6 +96,7 @@ export function Navbar() {
             <Link
               href="/membership"
               className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
+              onClick={() => setIsMembershipModalOpen(true)}
             >
               सदस्य बनें
             </Link>
@@ -109,6 +114,17 @@ export function Navbar() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden pb-4 space-y-1 border-t border-border">
+            {/* Admin Link Mobile */}
+            {user?.role === 'admin' && (
+              <Link
+                href="/members"
+                className="block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                सदस्य (Members)
+              </Link>
+            )}
+            
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -146,7 +162,10 @@ export function Navbar() {
             <Link
               href="/membership"
               className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                  setIsOpen(false)
+                  setIsMembershipModalOpen(true)
+              }}
             >
               सदस्य बनें
             </Link>

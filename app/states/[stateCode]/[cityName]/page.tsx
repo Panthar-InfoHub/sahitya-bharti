@@ -108,13 +108,18 @@ export default async function CityPage({ params }: PageProps) {
   // We can't strictly use positionsMock if users type random positions.
   // Let's group by the distinct positions found in the data.
   
-  const uniquePositions = Array.from(new Set(peopleInCity.map((p: any) => p.position)))
+
   
+  // Transliterate positions
+  const uniquePositions = Array.from(new Set(peopleInCity.map((p: any) => p.position))) as string[]
+  const posTransliteration = await transliterateText(uniquePositions);
+
   const peopleByPosition = uniquePositions.map(pos => {
+      const localizedPos = posTransliteration[pos] || pos;
       return {
           position: {
               id: pos,
-              positionHi: pos, // Display entered position
+              positionHi: localizedPos, // Use transliterated Hindi
               positionEn: pos
           },
           people: peopleInCity.filter((p: any) => p.position === pos)
