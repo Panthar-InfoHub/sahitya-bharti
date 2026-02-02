@@ -44,6 +44,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "गृह" },
+    { href: "/events", label: "कार्यक्रम (Events)" },
     { href: "/images-gallery", label: "चित्र दीर्घा" },
     { href: "/videos-gallery", label: "वीडियो दीर्घा" },
     { href: "/kendriya", label: "केंद्रीय" },

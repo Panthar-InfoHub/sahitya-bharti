@@ -1,7 +1,7 @@
 
 "use client"
 
-import { LogOut, User, Users } from "lucide-react"
+import { LogOut, User, Users, LayoutDashboard } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -69,9 +69,9 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
 
         {user.role === "admin" && (
             <DropdownMenuItem asChild>
-              <Link href="/members" className="flex items-center cursor-pointer">
-                <Users className="mr-2 h-4 w-4" />
-                <span>सदस्य (Members)</span>
+              <Link href="/dashboard" className="flex items-center cursor-pointer">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>डैशबोर्ड (Dashboard)</span>
               </Link>
             </DropdownMenuItem>
         )}
