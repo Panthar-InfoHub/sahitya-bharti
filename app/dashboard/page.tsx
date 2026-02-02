@@ -110,20 +110,37 @@ export default function DashboardOverviewPage() {
         <CardContent className="pl-2">
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={graphData}>
+              <LineChart data={graphData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis 
+                    dataKey="date" 
+                    stroke="#888888" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false} 
+                    tickMargin={10}
+                    minTickGap={30}
+                />
+                <YAxis 
+                    stroke="#888888" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false} 
+                    allowDecimals={false}
+                />
                 <Tooltip 
-                    contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                    contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     itemStyle={{ color: 'hsl(var(--primary))', fontWeight: 'bold' }}
-                    labelStyle={{ display: 'none' }} // Hide date in tooltip list header, or keep it.
+                    labelStyle={{ color: '#64748b', marginBottom: '0.5rem' }}
                     cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
                 />
                 <Line 
-                    type="monotone" 
+                    type="natural" 
                     dataKey="users" 
                     stroke="hsl(var(--primary))" 
                     strokeWidth={3} 
-                    dot={false}
-                    activeDot={{ r: 6, fill: 'hsl(var(--primary))', strokeWidth: 0 }}
+                    dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "white" }}
+                    activeDot={{ r: 6, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "white" }}
                     name="Total Users"
                     animationDuration={1000}
                 />

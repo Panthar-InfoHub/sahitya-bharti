@@ -192,9 +192,17 @@ export function Navbar() {
             </Link>
           </div>
         )}
-        <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} />
+        <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} user={user} />
         {isProfileModalOpen && (
-          <ProfileModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} user={user} />
+          <ProfileModal 
+            open={isProfileModalOpen} 
+            onOpenChange={setIsProfileModalOpen} 
+            user={user}
+            onOpenMembership={() => {
+                setIsProfileModalOpen(false)
+                setIsMembershipModalOpen(true)
+            }} 
+          />
         )}
       </div>
     </nav>
