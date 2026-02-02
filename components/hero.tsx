@@ -60,7 +60,7 @@ export function Hero({ directorImage }: HeroProps) {
               <div className="flex items-start gap-4">
                 <div className="w-20 h-20 relative flex items-center justify-center flex-shrink-0">
                   <Image
-                    src="/images/logo.jpg"
+                    src="/logo.jpg"
                     alt="हिंदी साहित्य भारती"
                     width={80}
                     height={80}
