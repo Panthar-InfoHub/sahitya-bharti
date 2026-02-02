@@ -22,6 +22,7 @@ interface UserNavProps {
     email?: string | null
     full_name?: string | null
     avatar_url?: string | null
+    role?: string | null
   }
   onOpenProfile: () => void
 }
@@ -29,10 +30,10 @@ interface UserNavProps {
 export function UserNav({ user, onOpenProfile }: UserNavProps) {
   const router = useRouter()
   const supabase = createClient()
-
+  console.log("UserNav Rendered. User Role:", user.role)
   const handleSignOut = async () => {
     await supabase.auth.signOut()
-    router.refresh()
+    window.location.href = "/"
   }
 
   return (
@@ -53,16 +54,28 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onOpenProfile} className="cursor-pointer">
+        <DropdownMenuItem 
+          onSelect={() => {
+             // Allow dropdown to close, then open modal
+             setTimeout(() => {
+               onOpenProfile()
+             }, 0)
+          }}  
+          className="cursor-pointer"
+        >
             <User className="mr-2 h-4 w-4" />
             <span>प्रोफाइल (Profile)</span>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/members" className="flex items-center cursor-pointer">
-            <Users className="mr-2 h-4 w-4" />
-            <span>सदस्य (Members)</span>
-          </Link>
-        </DropdownMenuItem>
+
+        {user.role === "admin" && (
+            <DropdownMenuItem asChild>
+              <Link href="/members" className="flex items-center cursor-pointer">
+                <Users className="mr-2 h-4 w-4" />
+                <span>सदस्य (Members)</span>
+              </Link>
+            </DropdownMenuItem>
+        )}
+
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600 cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
