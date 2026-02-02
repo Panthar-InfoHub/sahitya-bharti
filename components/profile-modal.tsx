@@ -47,7 +47,7 @@ export function ProfileModal({ open, onOpenChange, user }: ProfileModalProps) {
         })
     }
   }, [user, open])
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }

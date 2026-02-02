@@ -32,6 +32,16 @@ export function Navbar() {
     getUser()
   }, [])
 
+  const handleLogin = async () => {
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${location.origin}/auth/callback`,
+      },
+    })
+  }
+
   const navLinks = [
     { href: "/", label: "गृह" },
     { href: "/images-gallery", label: "चित्र दीर्घा" },
@@ -149,6 +159,16 @@ export function Navbar() {
                 >
                   प्रोफाइल (Profile)
                 </button>
+                <button
+                  className="w-full text-left block px-3 py-2 text-sm font-medium text-red-600 hover:bg-accent/10 rounded-md transition-colors"
+                  onClick={async () => {
+                    const supabase = createClient()
+                    await supabase.auth.signOut()
+                    window.location.href = "/"
+                  }}
+                >
+                  लॉग आउट (Log out)
+                </button>
               </>
             ) : (
                <Link
@@ -172,7 +192,9 @@ export function Navbar() {
           </div>
         )}
         <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} />
-        <ProfileModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} user={user} />
+        {isProfileModalOpen && (
+          <ProfileModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} user={user} />
+        )}
       </div>
     </nav>
   )
