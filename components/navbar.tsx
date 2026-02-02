@@ -44,6 +44,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "गृह" },
+    { href: "/events", label: "कार्यक्रम (Events)" },
     { href: "/images-gallery", label: "चित्र दीर्घा" },
     { href: "/videos-gallery", label: "वीडियो दीर्घा" },
     { href: "/kendriya", label: "केंद्रीय" },
@@ -191,9 +192,17 @@ export function Navbar() {
             </Link>
           </div>
         )}
-        <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} />
+        <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} user={user} />
         {isProfileModalOpen && (
-          <ProfileModal open={isProfileModalOpen} onOpenChange={setIsProfileModalOpen} user={user} />
+          <ProfileModal 
+            open={isProfileModalOpen} 
+            onOpenChange={setIsProfileModalOpen} 
+            user={user}
+            onOpenMembership={() => {
+                setIsProfileModalOpen(false)
+                setIsMembershipModalOpen(true)
+            }} 
+          />
         )}
       </div>
     </nav>
