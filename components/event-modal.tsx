@@ -49,10 +49,6 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
   const [date, setDate] = useState<Date | undefined>(eventToEdit?.date ? new Date(eventToEdit.date) : new Date())
   const [imageFile, setImageFile] = useState<File | null>(null)
 
-  // Reset form when opening modal (handles case where modal is reused)
-  // However, simple way is relying on key or just explicit useEffect if needed.
-  // For now, initial state is enough if component re-mounts or we separate Edit/Create instances.
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
@@ -61,6 +57,14 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
     e.preventDefault()
     if (!date) {
         toast.error("कृपया तारीख चुनें (Please select a date)")
+        return
+    }
+    if (formData.seats && parseInt(formData.seats) < 0) {
+        toast.error("सीटें नकारात्मक नहीं हो सकतीं (Seats cannot be negative)")
+        return
+    }
+    if (formData.fee && parseFloat(formData.fee) < 0) {
+        toast.error("शुल्क नकारात्मक नहीं हो सकता (Fee cannot be negative)")
         return
     }
     setSaving(true)
@@ -188,13 +192,13 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
 
                 {/* Column 2: Details */}
                 <div className="space-y-4">
-                    <div className="space-y-2">
+                     <div className="space-y-2">
                         <Label htmlFor="seats">कुल सीटें (Total Seats)</Label>
-                        <Input id="seats" name="seats" type="number" value={formData.seats} onChange={handleChange} placeholder="उदाहरण: 100" />
+                        <Input id="seats" name="seats" type="number" min="0" value={formData.seats} onChange={handleChange} placeholder="उदाहरण: 100" />
                     </div>
                      <div className="space-y-2">
                          <Label htmlFor="fee">प्रवेश शुल्क (Entry Fee) (₹)</Label>
-                         <Input id="fee" name="fee" type="number" value={formData.fee} onChange={handleChange} placeholder="0 (Free)" />
+                         <Input id="fee" name="fee" type="number" min="0" value={formData.fee} onChange={handleChange} placeholder="0 (Free)" />
                      </div>
                     <div className="space-y-2">
                         <Label htmlFor="prizes">पुरस्कार (Prizes)</Label>

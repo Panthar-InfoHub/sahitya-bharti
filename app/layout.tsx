@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { Toaster } from "sonner"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,6 +29,7 @@ export default function RootLayout({
       <body className={`font-serif antialiased bg-background text-foreground`}>
         {children}
         <Analytics />
+        <Toaster />
       </body>
     </html>
   )
