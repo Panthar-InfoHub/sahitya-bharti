@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { EventDetailsModal } from "@/components/event-details-modal"
 import { RefundRequestModal } from "@/components/refund-request-modal"
+import { EventModal } from "@/components/event-modal"
 import {
   AlertDialog,
   AlertDialogAction,
