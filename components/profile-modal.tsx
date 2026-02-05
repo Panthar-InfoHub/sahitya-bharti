@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Loader2, Upload, Calendar, MapPin, ArrowRight } from "lucide-react"
+import { Loader2, Upload, Calendar, MapPin, ArrowRight, FileText, CreditCard } from "lucide-react"
 import { toast } from "sonner"
 import {
   Dialog,
@@ -184,21 +183,45 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
                 {/* Membership Plan Section */}
                 <div className={`p-4 rounded-xl border w-full text-center shadow-sm ${
                     currentUser?.plan === 'premium' ? 'bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200' : 
-                    currentUser?.plan === 'silver' ? 'bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200' : 'bg-gray-50 border-gray-100'
+                    'bg-gray-50 border-gray-100'
                 }`}>
-                    <p className="text-sm font-medium text-muted-foreground mb-1 uppercase tracking-wider">Current Membership</p>
-                    <p className={`text-xl font-bold capitalize mb-3 ${
-                        currentUser?.plan === 'premium' ? 'text-yellow-800' : 
-                        currentUser?.plan === 'silver' ? 'text-slate-800' : 'text-gray-800'
-                    }`}>
-                        {currentUser?.plan || "Free"} Plan
-                    </p>
-                    {(!currentUser?.plan || currentUser?.plan === 'free') && (
+                    {currentUser?.plan === 'premium' ? (
+                        <>
+                            <p className="text-sm font-medium text-muted-foreground mb-1 uppercase tracking-wider">वर्तमान सदस्यता (Current Membership)</p>
+                            <p className="text-xl font-bold capitalize mb-3 text-yellow-800">
+                                प्रीमियम योजना (Premium Plan)
+                            </p>
+                            <div className="flex flex-col gap-2 w-full">
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    asChild 
+                                    className="w-full border-yellow-300 text-yellow-800 hover:bg-yellow-100 hover:text-yellow-900"
+                                >
+                                    <Link href="/certificate" target="_blank">
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        सर्टिफिकेट डाउनलोड करें (Certificate)
+                                    </Link>
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    asChild
+                                    className="w-full border-blue-300 text-blue-800 hover:bg-blue-100 hover:text-blue-900"
+                                >
+                                    <Link href="/id-card" target="_blank">
+                                        <CreditCard className="mr-2 h-4 w-4" />
+                                        आईडी कार्ड देखें (View ID Card)
+                                    </Link>
+                                </Button>
+                            </div>
+                        </>
+                    ) : (
                         <Button 
                             className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white border-0 shadow-md"
                             onClick={onOpenMembership}
                         >
-                            अपग्रेड करें (Upgrade Now)
+                            प्रीमियम सदस्यता लें (Upgrade to Premium) - ₹1000
                         </Button>
                     )}
                 </div>
@@ -233,7 +256,7 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
 
             {/* Right Column: Events */}
             <div className="md:col-span-1 border-l pl-0 md:pl-8 pt-8 md:pt-0">
-                <h3 className="font-semibold text-lg border-b pb-2 mb-4 flex items-center justify-between">
+                <h3 className="font-semibold text-lg border-b pb-2 mb-4 flex items-center justify-center space-x-2 md:justify-start">
                     <span>मेरे कार्यक्रम (My Events)</span>
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                 </h3>
@@ -265,7 +288,7 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
                             <p className="text-sm text-muted-foreground">आपने किसी भी कार्यक्रम में पंजीकरण नहीं कराया है।</p>
                             <Button variant="outline" size="sm" asChild className="w-full">
                                 <Link href="/events" onClick={() => onOpenChange(false)}>
-                                    Register for Upcoming Events <ArrowRight className="ml-1 h-3 w-3" />
+                                    आगामी कार्यक्रमों के लिए पंजीकरण करें <ArrowRight className="ml-1 h-3 w-3" />
                                 </Link>
                             </Button>
                         </div>

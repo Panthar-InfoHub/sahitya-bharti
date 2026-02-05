@@ -49,14 +49,13 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
     position: "", // Will be selected from dropdown
   })
 
-  // Location State
-  const [selectedStateCode, setSelectedStateCode] = useState("")
-  // Derived cities from mock
-  const cities = statesMock.find(s => s.code === selectedStateCode)?.cities || []
+  // Dynamic Data State
+  const [allPositions, setAllPositions] = useState<any[]>([])
+  const [availableStates, setAvailableStates] = useState<string[]>([])
+  const [availableCities, setAvailableCities] = useState<string[]>([])
+  const [availablePositionNames, setAvailablePositionNames] = useState<string[]>([])
 
-  // Dynamic Positions State
-  const [fetchingPositions, setFetchingPositions] = useState(false)
-  const [availablePositions, setAvailablePositions] = useState<any[]>([])
+  const [loadingData, setLoadingData] = useState(false)
 
   // Phone state
   const [phoneIso, setPhoneIso] = useState("IN")
@@ -83,11 +82,7 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
       setAvatarUrl(member.profile_picture || null)
 
       // Initial State/City setup from Member data using Match logic
-      // Note: DB stores English names. Mock has English names.
-      const mockState = statesMock.find(s => s.nameEn === member.state)
-      if (mockState) {
-          setSelectedStateCode(mockState.code)
-      }
+      // Note: DB stores English names directly now
 
       // Parse Phone
       if (member.phone_number) {
@@ -103,53 +98,78 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
         })
         setAvatarUrl(null)
         setPhoneNumber("")
-        setSelectedStateCode("")
     }
   }, [member, isOpen])
 
-  // Fetch Positions when City Changes
+  // Fetch all positions on mount/open to derive available locations
   useEffect(() => {
-      const fetchPositions = async () => {
-          if (!formData.state || !formData.city) {
-              setAvailablePositions([])
-              return
-          }
-          
-          setFetchingPositions(true)
-          const supabase = createClient()
-          const { data } = await supabase
+    if (!isOpen) return
+
+    const fetchAllData = async () => {
+        setLoadingData(true)
+        const supabase = createClient()
+        // Fetch all defined positions
+        const { data } = await supabase
             .from('positions')
             .select('*')
-            .eq('state', formData.state)
-            .eq('city', formData.city)
-            .order('name')
-          
-          setAvailablePositions(data || [])
-          setFetchingPositions(false)
-      }
+        
+        if (data) {
+            setAllPositions(data)
+            
+            // Extract Unique States
+            // Normalize state names if needed, but assuming consistency from DB
+            const states = Array.from(new Set(data.map(p => p.state))).sort()
+            setAvailableStates(states)
+        }
+        setLoadingData(false)
+    }
 
-      fetchPositions()
-  }, [formData.state, formData.city])
+    fetchAllData()
+  }, [isOpen])
+
+  // Filter Cities when State changes
+  useEffect(() => {
+    if (formData.state) {
+        // Filter positions for this state
+        const statePositions = allPositions.filter(p => p.state === formData.state)
+        // Extract Unique Cities
+        const cities = Array.from(new Set(statePositions.map(p => p.city))).sort()
+        setAvailableCities(cities)
+    } else {
+        setAvailableCities([])
+    }
+  }, [formData.state, allPositions])
+
+  // Filter Positions when City changes
+  useEffect(() => {
+      if (formData.state && formData.city) {
+          const validPositions = allPositions
+            .filter(p => p.state === formData.state && p.city === formData.city)
+            .map(p => p.name)
+            .sort()
+          setAvailablePositionNames(validPositions)
+      } else {
+          setAvailablePositionNames([])
+      }
+  }, [formData.state, formData.city, allPositions])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleStateChange = (code: string) => {
-      setSelectedStateCode(code)
-      const stateObj = statesMock.find(s => s.code === code)
+  const handleStateChange = (val: string) => {
       setFormData(prev => ({ 
           ...prev, 
-          state: stateObj?.nameEn || "", 
+          state: val, 
           city: "", // Reset city
           position: "" // Reset position
       }))
   }
 
-  const handleCityChange = (cityNameEn: string) => {
+  const handleCityChange = (val: string) => {
       setFormData(prev => ({ 
           ...prev, 
-          city: cityNameEn,
+          city: val,
           position: "" // Reset position
       }))
   }
@@ -270,11 +290,11 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg border">
             <div className="space-y-2">
                <Label>राज्य (State) *</Label>
-               <Select value={selectedStateCode} onValueChange={handleStateChange}>
+               <Select value={formData.state} onValueChange={handleStateChange} disabled={loadingData}>
                     <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
                     <SelectContent>
-                        {statesMock.map(s => (
-                            <SelectItem key={s.code} value={s.code}>{s.nameHi} ({s.nameEn})</SelectItem>
+                        {availableStates.map(s => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
                         ))}
                     </SelectContent>
                </Select>
@@ -282,11 +302,11 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
 
              <div className="space-y-2">
                <Label>शहर (City) *</Label>
-               <Select value={formData.city} onValueChange={handleCityChange} disabled={!selectedStateCode}>
+               <Select value={formData.city} onValueChange={handleCityChange} disabled={!formData.state}>
                     <SelectTrigger><SelectValue placeholder="Select City" /></SelectTrigger>
                     <SelectContent>
-                        {cities.map(c => (
-                            <SelectItem key={c.nameEn} value={c.nameEn}>{c.nameHi} ({c.nameEn})</SelectItem>
+                        {availableCities.map(c => (
+                            <SelectItem key={c} value={c}>{c}</SelectItem>
                         ))}
                     </SelectContent>
                </Select>
@@ -299,14 +319,14 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
                <Select 
                     value={formData.position} 
                     onValueChange={(val) => setFormData(prev => ({...prev, position: val}))}
-                    disabled={!formData.city || fetchingPositions}
+                    disabled={!formData.city}
                >
                     <SelectTrigger>
-                        <SelectValue placeholder={fetchingPositions ? "Loading..." : "Select Position"} />
+                        <SelectValue placeholder="Select Position" />
                     </SelectTrigger>
                     <SelectContent>
-                        {availablePositions.length > 0 ? availablePositions.map(p => (
-                            <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
+                        {availablePositionNames.length > 0 ? availablePositionNames.map(p => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
                         )) : (
                             <div className="p-2 text-sm text-center text-muted-foreground">
                                 No positions found. Add one in "Manage Positions".

@@ -6,9 +6,10 @@ import Image from "next/image"
 
 interface HeroProps {
   directorImage?: string
+  isPremium?: boolean
 }
 
-export function Hero({ directorImage }: HeroProps) {
+export function Hero({ directorImage, isPremium }: HeroProps) {
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
@@ -87,14 +88,16 @@ export function Hero({ directorImage }: HeroProps) {
             </p>
 
             {/* CTA Button */}
-            <div className="pt-4">
-              <Link
-                href="/membership"
-                className="inline-block px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 transform hover:-translate-y-1"
-              >
-                साहित्य से जुड़ें
-              </Link>
-            </div>
+            {!isPremium && (
+              <div className="pt-4">
+                <Link
+                  href="/membership"
+                  className="inline-block px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 transform hover:-translate-y-1"
+                >
+                  साहित्य से जुड़ें
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Right Column - Image carousel with scroll animation */}

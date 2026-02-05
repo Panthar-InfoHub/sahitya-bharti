@@ -13,15 +13,21 @@ interface MembershipModalProps {
   user?: any
 }
 
-// Plan details
-const PLANS = {
-  silver: { name: "Silver Plan", price: 1000, label: "सिल्वर प्लान" },
-  premium: { name: "Premium Plan", price: 2500, label: "प्रीमियम प्लान" }
-}
+// Plan details - Only Premium as per request
+const PREMIUM_PLAN = { name: "Premium Membership", price: 1000, label: "प्रीमियम सदस्यता (Premium Membership)" }
+
+const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+    });
+};
 
 export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps) {
   const [step, setStep] = useState<'form' | 'processing' | 'receipt'>('form')
-  const [selectedPlan, setSelectedPlan] = useState<'silver' | 'premium'>('silver')
   const [formData, setFormData] = useState({
     name: user?.full_name?.split(" ")[0] || "",
     surname: user?.full_name?.split(" ")[1] || "",
@@ -33,7 +39,7 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
   
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const selectedState = statesMock.find((s) => s.id === formData.state) || statesMock[0] // fallback or handle proper matching if ID/Name differs
+  const selectedState = statesMock.find((s) => s.id === formData.state) || statesMock[0]
   const cities = selectedState?.cities || []
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -58,51 +64,111 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
   }
 
   const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!validateForm()) return
+      e.preventDefault()
+      if (!validateForm()) return
 
-    if (!user) {
-        toast.error("कृपया पहले लॉग इन करें (Please login first)")
-        return
-    }
 
     setStep('processing')
 
-    // Simulate Payment Delay
-    setTimeout(async () => {
-        try {
-            const supabase = createClient()
-            
-            // 1. Update User Plan in DB
-            const { error } = await supabase
-                .from('users')
-                .update({ 
-                    plan: selectedPlan,
-                    phone_number: formData.phone, // Update contact info too
-                    full_name: `${formData.name} ${formData.surname}`.trim()
-                })
-                .eq('id', user.id)
+    const isScriptLoaded = await loadRazorpayScript();
+    if (!isScriptLoaded) {
+        toast.error("Failed to load Razorpay SDK. Please check your internet.");
+        setStep('form');
+        return;
+    }
 
-            if (error) throw error
+    try {
+        // 1. Create Order
+        const response = await fetch("/api/razorpay/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                amount: PREMIUM_PLAN.price,
+                notes: { 
+                    userId: user.id,
+                    plan: 'premium',
+                    type: 'membership' // Helpful for filtering
+                }
+            }),
+        });
 
-            // 2. Generate Receipt Data
-            const receipt = {
-                id: `RCPT-${Math.floor(Math.random() * 1000000)}`,
-                date: new Date().toLocaleDateString(),
-                amount: PLANS[selectedPlan].price,
-                plan: PLANS[selectedPlan].name,
-                user: `${formData.name} ${formData.surname}`
-            }
-            setReceiptData(receipt)
-            setStep('receipt')
-            toast.success("सदस्यता सफल! (Membership Successful!)")
-            
-        } catch (error: any) {
-            console.error("Payment Error:", error)
-            toast.error("Transaction Failed. Try again.")
-            setStep('form')
-        }
-    }, 2000)
+        const orderData = await response.json();
+        if (orderData.error) throw new Error(orderData.error);
+    
+        // 2. Open Razorpay Checkout
+        const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: "Sahitya Bharti",
+            description: PREMIUM_PLAN.name,
+            image: "/logo.png", // Ensure logo exists or remove
+            order_id: orderData.id,
+            handler: async function (response: any) {
+                // 3. Verify Payment
+                try {
+                    const verifyResponse = await fetch("/api/razorpay/verify", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                             razorpay_order_id: response.razorpay_order_id,
+                             razorpay_payment_id: response.razorpay_payment_id,
+                             razorpay_signature: response.razorpay_signature,
+                        }),
+                    });
+
+                    const verifyResult = await verifyResponse.json();
+                    if (!verifyResult.success) throw new Error(verifyResult.message);
+
+                    // 4. Update Database
+                    const supabase = createClient()
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ 
+                            plan: 'premium',
+                            phone_number: formData.phone,
+                            full_name: `${formData.name} ${formData.surname}`.trim()
+                        })
+                        .eq('id', user.id)
+
+                    if (error) throw error
+
+                    // 5. Show Receipt
+                    const receipt = {
+                        id: response.razorpay_payment_id,
+                        date: new Date().toLocaleDateString(),
+                        amount: PREMIUM_PLAN.price,
+                        plan: PREMIUM_PLAN.name,
+                        user: `${formData.name} ${formData.surname}`
+                    }
+                    setReceiptData(receipt)
+                    setStep('receipt')
+                    toast.success("सदस्यता सफल! (Membership Successful!)")
+
+                } catch (verifyError: any) {
+                    console.error("Verification Failed:", verifyError);
+                    toast.error("Payment Verification Failed");
+                    setStep('form');
+                }
+            },
+            prefill: {
+                name: `${formData.name} ${formData.surname}`,
+                email: user.email,
+                contact: formData.phone,
+            },
+            theme: {
+                color: "#F37254",
+            },
+        };
+
+        const paymentObject = new (window as any).Razorpay(options);
+        paymentObject.open();
+
+    } catch (error: any) {
+        console.error("Payment Initialization Error:", error);
+        toast.error("Could not initiate payment. Try again.");
+        setStep('form');
+    }
   }
 
   if (!isOpen) return null
@@ -123,15 +189,34 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
 
         {/* Content */}
         <div className="p-6">
-            {step === 'processing' && (
+            {!user ? (
+                <div className="flex flex-col items-center justify-center py-8 space-y-4 text-center">
+                    <div className="p-4 bg-orange-100 rounded-full">
+                         <Loader2 className="h-8 w-8 text-orange-600" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900">कृपया लॉग इन करें (Please Login)</h3>
+                        <p className="text-sm text-gray-500 mt-1">सदस्यता लेने के लिए आपको लॉग इन करना होगा।</p>
+                    </div>
+                    <Button 
+                        onClick={() => {
+                            onClose();
+                            // Redirect to login or open login modal if available?
+                            // Navbar handles login, but we can redirect.
+                            window.location.href = "/login";
+                        }}
+                        className="w-full"
+                    >
+                        Login Now
+                    </Button>
+                </div>
+            ) : step === 'processing' ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                     <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                    <p className="text-lg font-medium">भुगतान संसाधित हो रहा है...</p>
-                    <p className="text-sm text-muted-foreground">कृपया प्रतीक्षा करें | Processing Payment...</p>
+                    <p className="text-lg font-medium">भुगतान शुरू किया जा रहा है...</p>
+                    <p className="text-sm text-muted-foreground">Initializing Razorpay Secure Payment...</p>
                 </div>
-            )}
-
-            {step === 'receipt' && receiptData && (
+            ) : step === 'receipt' && receiptData ? (
                 <div className="text-center space-y-6 animate-in fade-in zoom-in duration-300">
                     <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                         <CheckCircle className="h-10 w-10 text-green-600" />
@@ -143,7 +228,7 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                     
                     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-left space-y-3 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Receipt ID:</span>
+                            <span className="text-muted-foreground">Transaction ID:</span>
                             <span className="font-mono font-medium">{receiptData.id}</span>
                         </div>
                         <div className="flex justify-between">
@@ -165,29 +250,14 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                         Download Receipt
                     </Button>
                 </div>
-            )}
-
-            {step === 'form' && (
+            ) : (
                 <form onSubmit={handlePayment} className="space-y-5">
                     
-                    {/* Plan Selection */}
-                    <div className="grid grid-cols-2 gap-4">
-                        {(['silver', 'premium'] as const).map((plan) => (
-                            <div 
-                                key={plan}
-                                onClick={() => setSelectedPlan(plan)}
-                                className={`cursor-pointer border-2 rounded-lg p-3 text-center transition-all ${
-                                    selectedPlan === plan 
-                                    ? 'border-primary bg-primary/5 shadow-md' 
-                                    : 'border-muted hover:border-primary/50'
-                                }`}
-                            >
-                                <div className={`font-bold ${plan === 'premium' ? 'text-yellow-600' : 'text-slate-600'}`}>
-                                    {PLANS[plan].label}
-                                </div>
-                                <div className="text-xl font-bold mt-1">₹{PLANS[plan].price}</div>
-                            </div>
-                        ))}
+                    {/* Plan Information */}
+                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg text-center">
+                        <h3 className="font-bold text-lg text-primary mb-1">{PREMIUM_PLAN.label}</h3>
+                        <p className="text-2xl font-extrabold text-foreground">₹{PREMIUM_PLAN.price}</p>
+                        <p className="text-sm text-muted-foreground mt-2">Unlock all premium features • Priority Support • Exclusive Content</p>
                     </div>
 
                     <div className="space-y-4">
@@ -224,20 +294,15 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                         </div>
                     </div>
 
-                    <div className="bg-accent/10 border border-accent rounded-md p-4 flex justify-between items-center">
-                        <span className="font-medium">Total Amount:</span>
-                        <span className="text-xl font-bold text-primary">₹{PLANS[selectedPlan].price}</span>
-                    </div>
-
-                    <button
+                    <Button
                         type="submit"
-                        className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-all transform active:scale-95"
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-all transform active:scale-95 shadow-lg"
                     >
-                        Secure Pay ₹{PLANS[selectedPlan].price}
-                    </button>
+                        Pay ₹{PREMIUM_PLAN.price} Securely
+                    </Button>
                     
                     <p className="text-xs text-center text-muted-foreground flex justify-center items-center gap-1">
-                        🔒 Secured by Razorpay (Test Mode)
+                        🔒 Secured by Razorpay
                     </p>
                 </form>
             )}
