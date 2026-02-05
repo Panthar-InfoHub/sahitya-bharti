@@ -50,7 +50,7 @@ export default async function CertificatePage() {
       </div>
 
       {/* Certificate Container */}
-      <div className="bg-white p-2 shadow-xl print:shadow-none w-full max-w-[800px] md:aspect-[1.414/1] aspect-auto print:w-[297mm] print:h-[210mm] print:max-w-none mx-auto">
+      <div className="bg-white p-2 shadow-xl print:shadow-none w-full max-w-[800px] print:w-[297mm] print:h-[210mm] print:max-w-none mx-auto">
          <div className="border-[6px] md:border-[10px] border-double border-[#8B4513] h-full p-4 md:p-6 relative flex flex-col items-center text-center">
             
             {/* Corner Decorations */}

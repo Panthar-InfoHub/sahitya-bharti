@@ -9,7 +9,8 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { EventModal } from "@/components/event-modal"
+import { EventDetailsModal } from "@/components/event-details-modal"
+import { RefundRequestModal } from "@/components/refund-request-modal"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,8 @@ interface EventCardProps {
 export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   const router = useRouter()
   const [joining, setJoining] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
+  const [showRefundModal, setShowRefundModal] = useState(false)
   
   const isJoined = event.event_participants?.some((p: any) => p.user_id === currentUserId)
   const participantsCount = event.event_participants?.length || 0
@@ -59,7 +62,14 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
     
     try {
         if (isJoined) {
-             // Leave event
+             // Leave event or Refund Request
+             if (event.fee && event.fee > 0) {
+                 // Paid event -> Refund Request
+                 setShowRefundModal(true)
+                 return
+             }
+             
+             // Free event -> Direct leave
             const { error } = await supabase
                 .from("event_participants")
                 .delete()
@@ -186,14 +196,18 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full">
-      <div className="relative h-48 w-full bg-slate-100">
+    <>
+    <div className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group">
+      <div 
+        className="relative h-48 w-full bg-slate-100 cursor-pointer"
+        onClick={() => setShowDetails(true)}
+      >
         {event.image_url ? (
           <Image 
             src={event.image_url} 
             alt={event.title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             unoptimized
           />
         ) : (
@@ -202,18 +216,23 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
            </div>
         )}
         {seatsAvailable !== null && (
-            <Badge variant={isFull ? "destructive" : "secondary"} className="absolute top-2 right-2">
+            <Badge variant={isFull ? "destructive" : "secondary"} className="absolute top-2 right-2 z-10">
                 {isFull ? "कोई सीट नहीं (No Seats Left)" : `${seatsAvailable} सीटें बची हैं (Seats Left)`}
             </Badge>
         )}
-        <Badge variant="default" className="absolute top-2 left-2 bg-primary/90 hover:bg-primary">
+        <Badge variant="default" className="absolute top-2 left-2 bg-primary/90 hover:bg-primary z-10">
              {event.fee > 0 ? `₹ ${event.fee}` : "निःशुल्क (Free)"}
         </Badge>
       </div>
 
       <div className="p-5 flex-1 flex flex-col gap-4">
         <div>
-            <h3 className="text-xl font-bold line-clamp-2 mb-2">{event.title}</h3>
+            <h3 
+                className="text-xl font-bold line-clamp-2 mb-2 cursor-pointer hover:text-primary transition-colors"
+                onClick={() => setShowDetails(true)}
+            >
+                {event.title}
+            </h3>
             <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-primary" />
@@ -305,5 +324,28 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
         </div>
       </div>
     </div>
+    <EventDetailsModal 
+        event={event} 
+        open={showDetails} 
+        onOpenChange={setShowDetails} 
+        onJoin={handleJoin}
+        onLeave={handleJoin} // handleJoin handles both toggle for generic logic, or specific updates
+        joining={joining}
+        isJoined={isJoined}
+        isFull={isFull}
+    />
+    {currentUserId && (
+        <RefundRequestModal 
+            event={event}
+            open={showRefundModal}
+            onOpenChange={setShowRefundModal}
+            currentUserId={currentUserId}
+            onSuccess={() => {
+                // Should we optimistically update? Or just wait for admin?
+                // For now, we just close. Admin needs to approve.
+            }}
+        />
+    )}
+    </>
   )
 }

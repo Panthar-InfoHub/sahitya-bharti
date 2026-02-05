@@ -29,6 +29,7 @@ export default function DashboardPositionsPage() {
   
   const [selectedStateCode, setSelectedStateCode] = useState("")
   const [selectedCityName, setSelectedCityName] = useState("")
+  const [customCityName, setCustomCityName] = useState("") // Manual entry
   const [newPosition, setNewPosition] = useState("")
   
   const [positions, setPositions] = useState<any[]>([])
@@ -37,19 +38,25 @@ export default function DashboardPositionsPage() {
   const selectedState = statesMock.find(s => s.code === selectedStateCode)
   const cities = selectedState?.cities || []
 
+  // Derived logic
+  // If "other" is selected, we rely on customCityName. 
+  // Otherwise we try to match the selectedCityName to the mock, but to be consistent with DB, we just use the string.
+  // The mock uses 'nameEn' as value.
+  const effectiveCityName = selectedCityName === "other" ? customCityName.trim() : selectedCityName
+
   useEffect(() => {
-    if (selectedStateCode && selectedCityName) {
+    if (selectedStateCode && effectiveCityName) {
       fetchPositions()
     } else {
         setPositions([])
     }
-  }, [selectedStateCode, selectedCityName])
+  }, [selectedStateCode, effectiveCityName])
 
   const fetchPositions = async () => {
       setFetching(true)
       const supabase = createClient()
       const stateName = selectedState?.nameEn
-      const cityName = cities.find(c => c.nameEn === selectedCityName)?.nameEn
+      const cityName = effectiveCityName
       
       if (!stateName || !cityName) {
           setFetching(false)
@@ -80,7 +87,7 @@ export default function DashboardPositionsPage() {
     try {
       const supabase = createClient()
       const stateName = selectedState?.nameEn
-      const cityName = cities.find(c => c.nameEn === selectedCityName)?.nameEn
+      const cityName = effectiveCityName
 
       if (!stateName || !cityName) throw new Error("Invalid location selection")
 
@@ -175,8 +182,21 @@ export default function DashboardPositionsPage() {
                                         {c.nameHi} ({c.nameEn})
                                     </SelectItem>
                                 ))}
+                                <SelectItem value="other" className="font-semibold text-primary">
+                                    अन्य (Other / Manual Entry)
+                                </SelectItem>
                             </SelectContent>
                         </Select>
+                        {selectedCityName === "other" && (
+                            <div className="pt-2 animate-in fade-in slide-in-from-top-1">
+                                <Label className="text-xs text-muted-foreground pb-1 block">City Name (Manual)</Label>
+                                <Input 
+                                    placeholder="Enter city name..." 
+                                    value={customCityName}
+                                    onChange={(e) => setCustomCityName(e.target.value)}
+                                />
+                            </div>
+                        )}
                     </div>
               </CardContent>
           </Card>
@@ -186,11 +206,11 @@ export default function DashboardPositionsPage() {
               <CardHeader>
                   <CardTitle>पदों का प्रबंधन (Manage Positions)</CardTitle>
                   <CardDescription>
-                      {selectedCityName ? `${selectedCityName} में पद` : "शहर चुनें (Select a city)"}
+                      {effectiveCityName ? `${effectiveCityName} में पद` : "शहर चुनें (Select a city)"}
                   </CardDescription>
               </CardHeader>
               <CardContent>
-                  {!selectedCityName ? (
+                  {!effectiveCityName ? (
                       <div className="h-40 flex items-center justify-center text-muted-foreground border-2 border-dashed rounded-lg">
                           शुरू करने के लिए स्थान चुनें (Select location)
                       </div>

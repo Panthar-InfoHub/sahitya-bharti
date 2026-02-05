@@ -1,10 +1,47 @@
-"use client"
-
 import Link from "next/link"
 import { statesMock } from "@/mock/statesMock"
+import { createClient } from "@/lib/supabase/server"
 
-export function BranchesSection() {
-  const displayStates = statesMock.slice(0, 6)
+export async function BranchesSection() {
+  const supabase = await createClient()
+
+  // Fetch all members' locations to calculate counts
+  const { data: members } = await supabase
+    .from("members")
+    .select("state, city")
+
+  // Calculate unique cities per state
+  const stateCityMap = new Map<string, Set<string>>()
+
+  if (members) {
+    members.forEach((m) => {
+       if (m.state && m.city) {
+           const stateKey = m.state.toLowerCase()
+           if (!stateCityMap.has(stateKey)) {
+               stateCityMap.set(stateKey, new Set())
+           }
+           stateCityMap.get(stateKey)?.add(m.city.toLowerCase())
+       }
+    })
+  }
+
+  // Filter states that have at least one city
+  const activeStates = statesMock
+      .map((state) => {
+        const stateKey = state.nameEn.toLowerCase()
+        const uniqueCityCount = stateCityMap.get(stateKey)?.size || 0
+        return { ...state, uniqueCityCount }
+      })
+      .filter((state) => state.uniqueCityCount > 0)
+      
+  // Limit to 6 for the landing page
+  const displayStates = activeStates.slice(0, 6)
+
+  // If no states are active yet, maybe show some default ones or empty state?
+  // But strictly following user Request: "only show the states which exists with positions"
+  // So if 0, show 0.
+
+  if (displayStates.length === 0) return null
 
   return (
     <section className="py-16 sm:py-20 bg-card/50">
@@ -23,28 +60,32 @@ export function BranchesSection() {
           <span className="text-2xl text-primary">✦</span>
         </div>
 
-        {/* States Grid - 6 items only */}
+        {/* States Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayStates.map((state) => (
             <Link key={state.id} href={`/states/${state.code.toLowerCase()}`} className="group">
-              <div className="relative overflow-hidden rounded-lg h-48 bg-gradient-to-br from-muted to-muted/50 border border-border hover:border-primary/50 transition-all duration-300">
-                {/* Blurred background state map effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors duration-300"></div>
+              <div className="relative bg-card border border-border rounded-lg p-6 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 overflow-hidden h-full">
+                {/* Background gradient */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors duration-300"></div>
 
-                {/* Hover scale and shadow effect */}
-                <div className="absolute inset-0 flex items-center justify-center p-4 group-hover:scale-105 transition-transform duration-300">
-                  <div className="text-center space-y-2">
-                    <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
-                      {state.nameHi}
-                    </h3>
-                    <p className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {state.cities.length} शहर
-                    </p>
+                {/* Content */}
+                <div className="relative z-10 space-y-4">
+                  {/* State name */}
+                  <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                    {state.nameHi}
+                  </h3>
+
+                  {/* English name */}
+                  <p className="text-sm text-muted-foreground">{state.nameEn}</p>
+
+                  {/* Cities count */}
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-xs font-semibold text-primary uppercase">शहर: {state.uniqueCityCount}</span>
+                    <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      →
+                    </span>
                   </div>
                 </div>
-
-                {/* Soft shadow effect on hover */}
-                <div className="absolute inset-0 group-hover:shadow-lg group-hover:shadow-primary/20 rounded-lg transition-all duration-300"></div>
               </div>
             </Link>
           ))}

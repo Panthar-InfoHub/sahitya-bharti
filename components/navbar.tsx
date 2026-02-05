@@ -104,13 +104,15 @@ export function Navbar() {
                 लॉग इन
               </Link>
             )}
-            <Link
-              href="/membership"
-              className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
-              onClick={() => setIsMembershipModalOpen(true)}
-            >
-              सदस्य बनें
-            </Link>
+            {(!user || user.plan !== 'premium') && (
+              <Link
+                href="/membership"
+                className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
+                onClick={() => setIsMembershipModalOpen(true)}
+              >
+                सदस्य बनें
+              </Link>
+            )}
 
             {/* Mobile menu button */}
             <button
@@ -180,16 +182,18 @@ export function Navbar() {
                 लॉग इन
               </Link>
             )}
-            <Link
-              href="/membership"
-              className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
-              onClick={() => {
-                  setIsOpen(false)
-                  setIsMembershipModalOpen(true)
-              }}
-            >
-              सदस्य बनें
-            </Link>
+            {(!user || user.plan !== 'premium') && (
+              <Link
+                href="/membership"
+                className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
+                onClick={() => {
+                    setIsOpen(false)
+                    setIsMembershipModalOpen(true)
+                }}
+              >
+                सदस्य बनें
+              </Link>
+            )}
           </div>
         )}
         <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} user={user} />
