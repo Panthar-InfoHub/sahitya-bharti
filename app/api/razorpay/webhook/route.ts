@@ -2,14 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
-// Init Supabase Admin Client (Service Role) - to bypass RLS for DB updates
-const supabase = createClient(
-  process.env.SUPABASE_URL || "",
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-);
-
 export async function POST(req: NextRequest) {
   try {
+    // Init Supabase Admin Client (Service Role) - to bypass RLS for DB updates
+    const supabase = createClient(
+      process.env.SUPABASE_URL || "",
+      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+    );
     const rawBody = await req.text();
     const signature = req.headers.get("x-razorpay-signature");
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import { createClient } from "@/lib/supabase/client"
 
 interface HeroProps {
   directorImage?: string
@@ -12,21 +13,29 @@ interface HeroProps {
 export function Hero({ directorImage, isPremium }: HeroProps) {
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [carouselImages, setCarouselImages] = useState<string[]>([
+    "/images/director.jpg", // Fallback default image
+  ])
 
   const taglines = ["मानव बन जाए जाग सारा, यही है संकल्प हमारा।"]
 
-  const carouselImages = [
-    "/images/director.jpg",
-    "/hindi-literature-event.jpg",
-    "/poetry-recitation-gathering.jpg",
-    "/authors-meeting-conference.jpg",
-    "/literary-conference-event.jpg",
-    "/young-writers-workshop.jpg",
-    "/book-exhibition-display.jpg",
-    "/author-interview.jpg",
-    "/literary-discussion-group.jpg",
-    "/ancient-hindi-literature-manuscript.jpg",
-  ]
+  // Fetch carousel images from database
+  useEffect(() => {
+    const fetchCarouselImages = async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('gallery_images')
+        .select('image_url')
+        .contains('tags', ['carousel'])
+        .order('created_at', { ascending: false })
+      
+      if (data && data.length > 0) {
+        setCarouselImages(data.map(img => img.image_url))
+      }
+    }
+    
+    fetchCarouselImages()
+  }, [])
 
   useEffect(() => {
     const taglineInterval = setInterval(() => {
@@ -40,7 +49,7 @@ export function Hero({ directorImage, isPremium }: HeroProps) {
       setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length)
     }, 4000)
     return () => clearInterval(imageInterval)
-  }, [])
+  }, [carouselImages.length])
 
   const finalDirectorImage = directorImage || "/images/director.jpg"
 

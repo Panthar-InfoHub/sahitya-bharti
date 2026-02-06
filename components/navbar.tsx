@@ -105,13 +105,12 @@ export function Navbar() {
               </Link>
             )}
             {(!user || user.plan !== 'premium') && (
-              <Link
-                href="/membership"
+              <button
                 className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
                 onClick={() => setIsMembershipModalOpen(true)}
               >
                 सदस्य बनें
-              </Link>
+              </button>
             )}
 
             {/* Mobile menu button */}
@@ -183,8 +182,7 @@ export function Navbar() {
               </Link>
             )}
             {(!user || user.plan !== 'premium') && (
-              <Link
-                href="/membership"
+              <button
                 className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
                 onClick={() => {
                     setIsOpen(false)
@@ -192,7 +190,7 @@ export function Navbar() {
                 }}
               >
                 सदस्य बनें
-              </Link>
+              </button>
             )}
           </div>
         )}

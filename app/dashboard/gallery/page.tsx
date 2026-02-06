@@ -6,26 +6,58 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Loader2, Trash2, Upload, Copy, Info, Image as ImageIcon } from "lucide-react"
+import { Loader2, Trash2, Upload, Copy, Info, Image as ImageIcon, Filter } from "lucide-react"
 import { toast } from "sonner"
-import Image from "next/image"
+import NextImage from "next/image"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+
+// Available tags for categorizing images
+const AVAILABLE_TAGS = [
+  { value: 'carousel', label: 'Carousel (Home Page)' },
+  { value: 'gallery', label: 'Gallery Page' },
+  { value: 'featured', label: 'Featured' },
+]
 
 export default function GalleryPage() {
   const [images, setImages] = useState<any[]>([])
   const [uploading, setUploading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [caption, setCaption] = useState("")
+  const [selectedTags, setSelectedTags] = useState<string[]>(['gallery'])
+  const [filterTag, setFilterTag] = useState<string>('all')
+  const [showDimensionWarning, setShowDimensionWarning] = useState(false)
+  const [dimensionWarningMessage, setDimensionWarningMessage] = useState('')
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
 
   useEffect(() => {
     fetchImages()
   }, [])
 
-  const fetchImages = async () => {
+  const fetchImages = async (tag?: string) => {
     const supabase = createClient()
-    const { data, error } = await supabase
+    let query = supabase
       .from("gallery_images")
       .select("*")
       .order("created_at", { ascending: false })
+    
+    // Filter by tag if specified
+    if (tag && tag !== 'all') {
+      query = query.contains('tags', [tag])
+    }
+
+    const { data, error } = await query
 
     if (error) {
       toast.error("Failed to load gallery")
@@ -44,6 +76,74 @@ export default function GalleryPage() {
 
     setUploading(true)
     try {
+      // Validate image dimensions based on tags
+      const img = new Image()
+      const imageUrl = URL.createObjectURL(file)
+      
+      const dimensionCheck = await new Promise<{proceed: boolean, message: string | null}>((resolve) => {
+        img.onload = () => {
+          const width = img.width
+          const height = img.height
+          
+          // Check dimensions based on selected tags
+          const hasCarousel = selectedTags.includes('carousel')
+          const hasGallery = selectedTags.includes('gallery')
+          
+          let warningMessage = null
+          
+          if (hasCarousel && !hasGallery) {
+            // Carousel images should be around 5317x3543 (portrait, ~1.5:1 ratio)
+            const expectedRatio = 5317 / 3543
+            const actualRatio = height / width
+            const tolerance = 0.2 // 20% tolerance
+            
+            if (Math.abs(actualRatio - expectedRatio) > tolerance) {
+              warningMessage = `कैरोसेल छवियां लगभग 5317x3543px (पोर्ट्रेट) होनी चाहिए। आपकी छवि ${width}x${height}px है।`
+            }
+          } else if (hasGallery && !hasCarousel) {
+            // Gallery images should be around 1736x3528 (landscape, ~1:2 ratio)
+            const expectedRatio = 1736 / 3528
+            const actualRatio = height / width
+            const tolerance = 0.2 // 20% tolerance
+            
+            if (Math.abs(actualRatio - expectedRatio) > tolerance) {
+              warningMessage = `गैलरी छवियां लगभग 1736x3528px (लैंडस्केप) होनी चाहिए। आपकी छवि ${width}x${height}px है।`
+            }
+          }
+          
+          URL.revokeObjectURL(imageUrl)
+          resolve({ proceed: !warningMessage, message: warningMessage })
+        }
+        
+        img.onerror = () => {
+          URL.revokeObjectURL(imageUrl)
+          toast.error("छवि लोड करने में विफल")
+          resolve({ proceed: false, message: null })
+        }
+        
+        img.src = imageUrl
+      })
+
+      if (!dimensionCheck.proceed && dimensionCheck.message) {
+        // Show warning modal
+        setPendingFile(file)
+        setDimensionWarningMessage(dimensionCheck.message)
+        setShowDimensionWarning(true)
+        setUploading(false)
+        return
+      }
+
+      // Proceed with upload
+      await performUpload(file)
+    } catch (error: any) {
+      toast.error(error.message || "Upload failed")
+      setUploading(false)
+    }
+  }
+
+  const performUpload = async (file: File) => {
+    try {
+      setUploading(true)
       const supabase = createClient()
       const fileExt = file.name.split(".").pop()
       const fileName = `gallery-${Date.now()}.${fileExt}`
@@ -65,21 +165,35 @@ export default function GalleryPage() {
         .from("gallery_images")
         .insert({
             image_url: publicUrl,
-            caption: caption
+            caption: caption,
+            tags: selectedTags
         })
 
       if (dbError) throw dbError
 
       toast.success("Image added to gallery")
       setCaption("")
-      // Reset file input by form reset
-      e.currentTarget.reset()
-      fetchImages()
+      setSelectedTags(['gallery'])
+      fetchImages(filterTag)
     } catch (error: any) {
       toast.error(error.message || "Upload failed")
     } finally {
       setUploading(false)
     }
+  }
+
+  const handleConfirmUpload = async () => {
+    if (pendingFile) {
+      setShowDimensionWarning(false)
+      await performUpload(pendingFile)
+      setPendingFile(null)
+    }
+  }
+
+  const handleCancelUpload = () => {
+    setShowDimensionWarning(false)
+    setPendingFile(null)
+    setUploading(false)
   }
 
   const handleDelete = async (id: string) => {
@@ -92,13 +206,27 @@ export default function GalleryPage() {
       toast.error("Failed to delete")
     } else {
       toast.success("Deleted successfully")
-      setImages(images.filter(img => img.id !== id))
+      fetchImages(filterTag)
     }
   }
 
   const copyToClipboard = (url: string) => {
       navigator.clipboard.writeText(url)
       toast.success("Link copied!")
+  }
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    )
+  }
+
+  const handleFilterChange = (value: string) => {
+    setFilterTag(value)
+    setLoading(true)
+    fetchImages(value)
   }
 
   return (
@@ -112,27 +240,76 @@ export default function GalleryPage() {
 
       <Card>
           <CardContent className="p-4">
-              <form onSubmit={handleUpload} className="flex flex-col md:flex-row gap-4 items-end">
-                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="picture">Image</Label>
-                    <Input id="picture" name="file" type="file" accept="image/*" required disabled={uploading} />
+              <form onSubmit={handleUpload} className="space-y-4">
+                  <div className="flex flex-col md:flex-row gap-4">
+                      <div className="grid w-full max-w-sm items-center gap-1.5">
+                        <Label htmlFor="picture">Image</Label>
+                        <Input id="picture" name="file" type="file" accept="image/*" required disabled={uploading} />
+                      </div>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor="caption">Caption</Label>
+                        <Input 
+                            id="caption" 
+                            value={caption} 
+                            onChange={(e) => setCaption(e.target.value)} 
+                            placeholder="Enter image caption..." 
+                            disabled={uploading}
+                        />
+                      </div>
                   </div>
-                  <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="caption">Caption</Label>
-                    <Input 
-                        id="caption" 
-                        value={caption} 
-                        onChange={(e) => setCaption(e.target.value)} 
-                        placeholder="Enter image caption..." 
-                        disabled={uploading}
-                    />
+                  
+                  <div className="space-y-2">
+                    <Label>Tags (Select where to display this image)</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {AVAILABLE_TAGS.map(tag => (
+                        <div key={tag.value} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={tag.value}
+                            checked={selectedTags.includes(tag.value)}
+                            onCheckedChange={() => toggleTag(tag.value)}
+                            disabled={uploading}
+                          />
+                          <label
+                            htmlFor={tag.value}
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                          >
+                            {tag.label}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedTags.length === 0 && (
+                      <p className="text-sm text-red-500">Please select at least one tag</p>
+                    )}
                   </div>
-                  <Button type="submit" disabled={uploading}>
+
+                  <Button type="submit" disabled={uploading || selectedTags.length === 0}>
                       {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
                       Upload
                   </Button>
               </form>
           </CardContent>
+      </Card>
+
+      {/* Filter Section */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Label>Filter by Tag:</Label>
+            <Select value={filterTag} onValueChange={handleFilterChange}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Images</SelectItem>
+                {AVAILABLE_TAGS.map(tag => (
+                  <SelectItem key={tag.value} value={tag.value}>{tag.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
       </Card>
 
       {loading ? (
@@ -144,7 +321,7 @@ export default function GalleryPage() {
             {images.map((image) => (
                 <Card key={image.id} className="overflow-hidden group relative">
                     <div className="aspect-square relative bg-slate-100">
-                        <Image
+                        <NextImage
                             src={image.image_url}
                             alt={image.caption || "Gallery Image"}
                             fill
@@ -175,13 +352,22 @@ export default function GalleryPage() {
                             </Button>
                         </div>
                     </div>
-                    {image.caption && (
-                        <CardContent className="p-2 bg-white">
+                    <CardContent className="p-2 bg-white space-y-1">
+                        {image.caption && (
                             <p className="text-xs font-medium truncate" title={image.caption}>
                                 {image.caption}
                             </p>
-                        </CardContent>
-                    )}
+                        )}
+                        {image.tags && image.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                                {image.tags.map((tag: string) => (
+                                    <Badge key={tag} variant="secondary" className="text-xs">
+                                        {AVAILABLE_TAGS.find(t => t.value === tag)?.label || tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
                 </Card>
             ))}
             {images.length === 0 && (
@@ -192,6 +378,29 @@ export default function GalleryPage() {
             )}
         </div>
       )}
+
+      {/* Dimension Warning Modal */}
+      <AlertDialog open={showDimensionWarning} onOpenChange={setShowDimensionWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-orange-600">⚠️ चेतावनी (Warning)</AlertDialogTitle>
+            <AlertDialogDescription className="text-base space-y-2">
+              <p>{dimensionWarningMessage}</p>
+              <p className="text-sm text-muted-foreground mt-4">
+                क्या आप फिर भी अपलोड करना चाहते हैं?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelUpload}>
+              रद्द करें (Cancel)
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmUpload} className="bg-orange-600 hover:bg-orange-700">
+              हाँ, अपलोड करें (Yes, Upload)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserCheck, Calendar, Bell } from "lucide-react"
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts"
 import { Loader2 } from "lucide-react"
+import { UserAnalyticsChart } from "@/components/user-analytics-chart"
+import { UserPlanChart } from "@/components/user-plan-chart"
 
 export default function DashboardOverviewPage() {
   const [loading, setLoading] = useState(true)
@@ -48,13 +50,11 @@ export default function DashboardOverviewPage() {
             runningTotal += grouped[date]
             return {
                 date,
-                users: runningTotal, // Cumulative
-                new: grouped[date]   // Daily new
+                users: runningTotal
             }
         })
         
-        // Take last 7-14 data points if too many, or show all
-        setGraphData(data.slice(-30)) 
+        setGraphData(data) 
     }
 
     setLoading(false)
@@ -102,53 +102,18 @@ export default function DashboardOverviewPage() {
         </Card>
       </div>
 
-      {/* Graph */}
-      <Card className="col-span-4">
-        <CardHeader>
-          <CardTitle>उपयोगकर्ता वृद्धि (User Growth)</CardTitle>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={graphData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis 
-                    dataKey="date" 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickMargin={10}
-                    minTickGap={30}
-                />
-                <YAxis 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                    allowDecimals={false}
-                />
-                <Tooltip 
-                    contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                    itemStyle={{ color: 'hsl(var(--primary))', fontWeight: 'bold' }}
-                    labelStyle={{ color: '#64748b', marginBottom: '0.5rem' }}
-                    cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, strokeDasharray: '4 4' }}
-                />
-                <Line 
-                    type="natural" 
-                    dataKey="users" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3} 
-                    dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "white" }}
-                    activeDot={{ r: 6, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "white" }}
-                    name="Total Users"
-                    animationDuration={1000}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Analytics Charts */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* User Growth Line Chart - Takes 2 columns */}
+        <div className="md:col-span-2">
+          <UserAnalyticsChart />
+        </div>
+        
+        {/* User Plan Pie Chart - Takes 1 column */}
+        <div className="md:col-span-1">
+          <UserPlanChart />
+        </div>
+      </div>
     </div>
   )
 }

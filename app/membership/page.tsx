@@ -13,16 +13,35 @@ import { DialogHeader } from "@/components/ui/dialog"
 import { DialogContent } from "@/components/ui/dialog"
 import { DialogTrigger } from "@/components/ui/dialog"
 import { Dialog } from "@/components/ui/dialog"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { MembershipModal } from "@/components/membership-modal"
+import { createClient } from "@/lib/supabase/client"
 
 export default function MembershipPage() {
   const [isOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const [form, setForm] = useState({ control: {} }) // Declare form variable
   const [isSubmitting, setIsSubmitting] = useState(false) // Declare isSubmitting variable
+  
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        setUser({ ...user, ...profile })
+      }
+    }
+    getUser()
+  }, [])
+  
   const onSubmit = (data : any) => {
     setIsSubmitting(true)
     console.log(data)
@@ -132,7 +151,7 @@ export default function MembershipPage() {
       <Footer />
 
       {/* Membership Modal */}
-      <MembershipModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <MembershipModal isOpen={isOpen} onClose={() => setIsOpen(false)} user={user} />
     </>
   )
 }

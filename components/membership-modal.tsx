@@ -301,9 +301,9 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                         Pay ₹{PREMIUM_PLAN.price} Securely
                     </Button>
                     
-                    <p className="text-xs text-center text-muted-foreground flex justify-center items-center gap-1">
+                    {/* <p className="text-xs text-center text-muted-foreground flex justify-center items-center gap-1">
                         🔒 Secured by Razorpay
-                    </p>
+                    </p> */}
                 </form>
             )}
         </div>
