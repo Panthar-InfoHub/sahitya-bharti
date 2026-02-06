@@ -21,6 +21,7 @@ export default function PublicGalleryPage() {
     const { data } = await supabase
       .from("gallery_images")
       .select("*")
+      .contains('tags', ['gallery'])
       .order("created_at", { ascending: false })
 
     if (data) {
