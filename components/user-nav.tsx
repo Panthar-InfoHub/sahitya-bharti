@@ -1,7 +1,8 @@
 
 "use client"
 
-import { LogOut, User, Users, LayoutDashboard, Crown } from "lucide-react"
+import { useState } from "react"
+import { LogOut, User, Users, LayoutDashboard, Crown, Receipt } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { createClient } from "@/lib/supabase/client"
 import { Badge } from "@/components/ui/badge"
+import { TransactionsModal } from "@/components/transactions-modal"
 
 interface UserNavProps {
   user: {
@@ -32,6 +34,7 @@ interface UserNavProps {
 export function UserNav({ user, onOpenProfile }: UserNavProps) {
   const router = useRouter()
   const supabase = createClient()
+  const [isTransactionsOpen, setIsTransactionsOpen] = useState(false)
   console.log("UserNav Rendered. User Role:", user.role, "Plan:", user.plan)
   
   const handleSignOut = async () => {
@@ -60,6 +63,7 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
   }
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={`relative h-10 w-10 rounded-full ${getPlanStyles(user.plan)}`}>
@@ -98,6 +102,18 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
             <span>प्रोफाइल (Profile)</span>
         </DropdownMenuItem>
 
+        <DropdownMenuItem 
+          onSelect={() => {
+             setTimeout(() => {
+               setIsTransactionsOpen(true)
+             }, 0)
+          }}  
+          className="cursor-pointer"
+        >
+            <Receipt className="mr-2 h-4 w-4" />
+            <span>लेनदेन (Transactions)</span>
+        </DropdownMenuItem>
+
         {user.role === "admin" && (
             <DropdownMenuItem asChild>
               <Link href="/dashboard" className="flex items-center cursor-pointer">
@@ -114,5 +130,12 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    {/* Transactions Modal */}
+    <TransactionsModal 
+      open={isTransactionsOpen} 
+      onOpenChange={setIsTransactionsOpen} 
+    />
+    </>
   )
 }

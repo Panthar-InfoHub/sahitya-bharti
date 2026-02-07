@@ -27,8 +27,8 @@ export function ImageGalleryPreview() {
       setLoading(false)
   }
 
-  const visibleImages = images.slice(0, 6)
-
+  const visibleImages = images.slice(0, 6).filter((item) => item.tags.includes('gallery'))
+  
   return (
     <section className="py-16 sm:py-20 bg-slate-50/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
