@@ -1,8 +1,10 @@
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { statesMock } from "@/mock/statesMock"
+import { transliterateText } from "@/lib/transliterate"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
 
 interface PageProps {
   params: Promise<{
@@ -13,9 +15,13 @@ interface PageProps {
 export default async function StatePage({ params }: PageProps) {
   const { stateCode } = await params
 
-  const state = statesMock.find((s) => s.code.toLowerCase() === stateCode.toLowerCase())
+  const stateMock = statesMock.find((s) => s.code.toLowerCase() === stateCode.toLowerCase())
 
-  if (!state) {
+  // If state is not in mock, we technically could still show it if we have a generic state handler,
+  // but for now, we assume states are limited to our supported list (mock).
+  // If we want to support any state, we'd need a fallback for stateName.
+  
+  if (!stateMock) {
     return (
       <>
         <Navbar />
@@ -35,6 +41,52 @@ export default async function StatePage({ params }: PageProps) {
     )
   }
 
+  const supabase = await createClient()
+
+  // Fetch distinct cities for this state from DB
+  const { data: members } = await supabase
+    .from("members")
+    .select("city")
+    .eq("state", stateMock.nameEn) // Match valid members in this state
+
+  // Get unique cities
+  const uniqueCities = Array.from(new Set(members?.map(m => m.city).filter(Boolean) as string[]))
+
+  // Map cities to display format
+  // Try to find in mock for Hindi name, else use English name
+  
+  // 1. Identify cities that need transliteration (not in mock)
+  const citiesToTransliterate = uniqueCities.filter(cityName => {
+      const mockCity = stateMock.cities.find(c => {
+          const dbName = cityName.toLowerCase();
+          const mockName = c.nameEn.toLowerCase();
+          return dbName === mockName; // Strict match for mock
+      });
+      return !mockCity;
+  });
+
+  // 2. Fetch translations in parallel (Server Side)
+  const transliteratedMap = await transliterateText(citiesToTransliterate);
+
+  const displayCities = uniqueCities.map(cityName => {
+      // Robust matching for display
+      const mockCity = stateMock.cities.find(c => {
+          const dbName = cityName.toLowerCase();
+          const mockName = c.nameEn.toLowerCase();
+          return dbName === mockName || dbName.includes(mockName) || mockName.includes(dbName);
+      });
+      
+      const dynamicHindi = transliteratedMap[cityName];
+
+      return {
+          id: mockCity?.id || cityName, // Use ID if valid, else name as ID
+          nameEn: cityName,
+          nameHi: mockCity?.nameHi || dynamicHindi || cityName, // Priority: Mock > Dynamic > English
+          slug: cityName // Encoded in URL
+      }
+  })
+
+
   return (
     <>
       <Navbar />
@@ -52,8 +104,8 @@ export default async function StatePage({ params }: PageProps) {
           {/* Header */}
           <div className="text-center mb-16 space-y-3">
             <p className="text-sm font-semibold text-secondary uppercase tracking-wide">राज्य की जानकारी</p>
-            <h1 className="text-4xl sm:text-5xl font-bold text-foreground">{state.nameHi}</h1>
-            <p className="text-lg text-muted-foreground">{state.nameEn}</p>
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground">{stateMock.nameHi}</h1>
+            <p className="text-lg text-muted-foreground">{stateMock.nameEn}</p>
           </div>
 
           {/* Ornamental Divider */}
@@ -64,9 +116,10 @@ export default async function StatePage({ params }: PageProps) {
           {/* Cities Section */}
           <div>
             <h2 className="text-2xl font-bold text-foreground mb-8 text-center">शहर</h2>
+            {displayCities.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {state.cities.map((city) => (
-                <Link key={city.id} href={`/states/${state.code.toLowerCase()}/${city.id}`} className="group">
+              {displayCities.sort((a,b) => a.nameHi.localeCompare(b.nameHi)).map((city) => (
+                <Link key={city.nameEn} href={`/states/${stateMock.code.toLowerCase()}/${encodeURIComponent(city.nameEn)}`} className="group">
                   <div className="relative bg-card border border-border rounded-lg p-6 hover:border-secondary/50 hover:shadow-lg hover:shadow-secondary/10 transition-all duration-300 overflow-hidden">
                     {/* Background gradient */}
                     <div className="absolute top-0 right-0 w-24 h-24 bg-secondary/5 rounded-full -mr-12 -mt-12 group-hover:bg-secondary/10 transition-colors duration-300"></div>
@@ -88,6 +141,11 @@ export default async function StatePage({ params }: PageProps) {
                 </Link>
               ))}
             </div>
+            ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                    इस राज्य में अभी कोई शहर उपलब्ध नहीं है।
+                </div>
+            )}
           </div>
         </div>
       </main>

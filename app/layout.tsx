@@ -11,23 +11,13 @@ export const metadata: Metadata = {
   title: "हिंदी साहित्य भारती",
   description: "हिंदी साहित्य का संरक्षण और प्रचार",
   icons: {
-    icon: [
-      {
-        url: "/logo.jpg",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/logo.jpg",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/logo.jpg",
-        type: "image/svg+xml",
-      },
-    ],
+    icon: "/logo.jpg",
+    shortcut: "/logo.jpg",
     apple: "/logo.jpg",
   },
 }
+
+import { Toaster } from "sonner"
 
 export default function RootLayout({
   children,
@@ -39,6 +29,7 @@ export default function RootLayout({
       <body className={`font-serif antialiased bg-background text-foreground`}>
         {children}
         <Analytics />
+        <Toaster />
       </body>
     </html>
   )

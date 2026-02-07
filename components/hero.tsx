@@ -3,29 +3,39 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import { createClient } from "@/lib/supabase/client"
 
 interface HeroProps {
   directorImage?: string
+  isPremium?: boolean
 }
 
-export function Hero({ directorImage }: HeroProps) {
+export function Hero({ directorImage, isPremium }: HeroProps) {
   const [currentTaglineIndex, setCurrentTaglineIndex] = useState(0)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [carouselImages, setCarouselImages] = useState<string[]>([
+    "/images/director.jpg", // Fallback default image
+  ])
 
   const taglines = ["मानव बन जाए जाग सारा, यही है संकल्प हमारा।"]
 
-  const carouselImages = [
-    "/images/director.jpg",
-    "/hindi-literature-event.jpg",
-    "/poetry-recitation-gathering.jpg",
-    "/authors-meeting-conference.jpg",
-    "/literary-conference-event.jpg",
-    "/young-writers-workshop.jpg",
-    "/book-exhibition-display.jpg",
-    "/author-interview.jpg",
-    "/literary-discussion-group.jpg",
-    "/ancient-hindi-literature-manuscript.jpg",
-  ]
+  // Fetch carousel images from database
+  useEffect(() => {
+    const fetchCarouselImages = async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('gallery_images')
+        .select('image_url')
+        .contains('tags', ['carousel'])
+        .order('created_at', { ascending: false })
+      
+      if (data && data.length > 0) {
+        setCarouselImages(data.map(img => img.image_url))
+      }
+    }
+    
+    fetchCarouselImages()
+  }, [])
 
   useEffect(() => {
     const taglineInterval = setInterval(() => {
@@ -39,7 +49,7 @@ export function Hero({ directorImage }: HeroProps) {
       setCurrentImageIndex((prev) => (prev + 1) % carouselImages.length)
     }, 4000)
     return () => clearInterval(imageInterval)
-  }, [])
+  }, [carouselImages.length])
 
   const finalDirectorImage = directorImage || "/images/director.jpg"
 
@@ -51,7 +61,7 @@ export function Hero({ directorImage }: HeroProps) {
         <div className="absolute bottom-20 right-10 w-72 h-72 bg-accent rounded-full blur-3xl"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 md:mt-0 mt-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Left Column - Tagline and Content */}
           <div className="space-y-8">
@@ -60,7 +70,7 @@ export function Hero({ directorImage }: HeroProps) {
               <div className="flex items-start gap-4">
                 <div className="w-20 h-20 relative flex items-center justify-center flex-shrink-0">
                   <Image
-                    src="/images/logo.jpg"
+                    src="/logo.jpg"
                     alt="हिंदी साहित्य भारती"
                     width={80}
                     height={80}
@@ -87,14 +97,16 @@ export function Hero({ directorImage }: HeroProps) {
             </p>
 
             {/* CTA Button */}
-            <div className="pt-4">
-              <Link
-                href="/membership"
-                className="inline-block px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 transform hover:-translate-y-1"
-              >
-                साहित्य से जुड़ें
-              </Link>
-            </div>
+            {!isPremium && (
+              <div className="pt-4">
+                <Link
+                  href="/membership"
+                  className="inline-block px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 transform hover:-translate-y-1"
+                >
+                  साहित्य से जुड़ें
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Right Column - Image carousel with scroll animation */}

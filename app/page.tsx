@@ -7,17 +7,28 @@ import { VideoGalleryPreview } from "@/components/video-gallery-preview"
 import { DirectorIntro } from "@/components/director-intro"
 import { MembershipCTA } from "@/components/membership-cta"
 
-export default function Home() {
+import { createClient } from "@/lib/supabase/server"
+
+export default async function Home() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let isPremium = false
+  if (user) {
+    const { data: profile } = await supabase.from('users').select('plan').eq('id', user.id).single()
+    isPremium = profile?.plan === 'premium'
+  }
+
   return (
     <>
       <Navbar />
       <main>
-        <Hero directorImage="/professional-woman-portrait.png" />
+        <Hero directorImage="/professional-woman-portrait.png" isPremium={isPremium} />
         <BranchesSection />
         <ImageGalleryPreview />
         <VideoGalleryPreview />
         <DirectorIntro directorImage="/images/director.jpg" />
-        <MembershipCTA />
+        {!isPremium && <MembershipCTA />}
       </main>
       <Footer />
     </>
