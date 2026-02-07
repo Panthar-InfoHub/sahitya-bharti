@@ -37,10 +37,18 @@ export async function POST(req: NextRequest) {
       const payment = payload.payment.entity;
       const notes = payment.notes;
 
+      // Determine transaction type and details
+      let transactionType: 'membership' | 'event' = 'membership';
+      let eventId: string | null = null;
+      let plan: string | null = null;
+
       // 1. MEMBERSHIP UPGRADE
       // If notes contain 'plan' or simple login from MembershipModal
       if (notes.plan === "premium" && notes.userId) {
          console.log(`Upgrading User ${notes.userId} to Premium`);
+         transactionType = 'membership';
+         plan = 'premium';
+         
          const { error } = await supabase
             .from('users')
             .update({ plan: 'premium' })
@@ -52,6 +60,9 @@ export async function POST(req: NextRequest) {
       // 2. EVENT REGISTRATION
       if (notes.eventId && notes.userId) {
           console.log(`Registering User ${notes.userId} for Event ${notes.eventId}`);
+          transactionType = 'event';
+          eventId = notes.eventId;
+          
           // Insert, ignore conflict if already exists
           const { error } = await supabase
             .from('event_participants')
@@ -67,6 +78,40 @@ export async function POST(req: NextRequest) {
                  console.error("Failed to register user for event:", error);
               }
           }
+      }
+
+      // 3. CREATE TRANSACTION RECORD
+      if (notes.userId) {
+        const transactionData = {
+          user_id: notes.userId,
+          razorpay_payment_id: payment.id,
+          razorpay_order_id: payment.order_id,
+          amount: payment.amount / 100, // Convert from paise to rupees
+          currency: payment.currency || 'INR',
+          status: 'success',
+          type: transactionType,
+          event_id: eventId,
+          plan: plan,
+        };
+
+        console.log('Attempting to insert transaction:', JSON.stringify(transactionData, null, 2));
+
+        const { data, error: txError } = await supabase
+          .from('transactions')
+          .insert(transactionData)
+          .select();
+
+        if (txError) {
+          console.error("❌ Failed to create transaction record:");
+          console.error("Error code:", txError.code);
+          console.error("Error message:", txError.message);
+          console.error("Error details:", JSON.stringify(txError, null, 2));
+        } else {
+          console.log(`✅ Transaction recorded successfully for user ${notes.userId}`);
+          console.log('Transaction data:', JSON.stringify(data, null, 2));
+        }
+      } else {
+        console.warn('⚠️ No userId in payment notes - transaction not recorded');
       }
     }
 

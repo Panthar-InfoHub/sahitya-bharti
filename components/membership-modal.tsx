@@ -222,32 +222,31 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                         <CheckCircle className="h-10 w-10 text-green-600" />
                     </div>
                     <div>
-                        <h3 className="text-2xl font-bold text-green-700">भुगतान सफल!</h3>
-                        <p className="text-muted-foreground">Payment Successful</p>
+                        <h3 className="text-2xl font-bold text-green-700">भुगतान सफल! (Payment Successful)</h3>
+                        <p className="text-muted-foreground">आपका लेनदेन पूर्ण हो गया है</p>
                     </div>
                     
                     <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 text-left space-y-3 text-sm">
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Transaction ID:</span>
+                            <span className="text-muted-foreground">लेनदेन आईडी (Transaction ID):</span>
                             <span className="font-mono font-medium">{receiptData.id}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Date:</span>
+                            <span className="text-muted-foreground">तारीख (Date):</span>
                             <span className="font-medium">{receiptData.date}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="text-muted-foreground">Plan:</span>
+                            <span className="text-muted-foreground">योजना (Plan):</span>
                             <span className="font-bold text-primary">{receiptData.plan}</span>
                         </div>
                         <div className="border-t pt-2 mt-2 flex justify-between text-base">
-                            <span className="font-bold">Total Paid:</span>
+                            <span className="font-bold">कुल भुगतान (Total Paid):</span>
                             <span className="font-bold text-green-600">₹{receiptData.amount}</span>
                         </div>
                     </div>
 
                     <Button className="w-full gap-2" onClick={onClose}>
-                        <Download className="h-4 w-4" />
-                        Download Receipt
+                        बंद करें (Close)   
                     </Button>
                 </div>
             ) : (

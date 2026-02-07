@@ -141,7 +141,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>
             {eventToEdit ? "कार्यक्रम संपादित करें (Edit Event)" : "नया कार्यक्रम जोड़ें (Add New Event)"}

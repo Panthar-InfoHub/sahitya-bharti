@@ -37,7 +37,7 @@ export function EventDetailsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white rounded-xl">
+      <DialogContent className="max-w-[95vw] sm:max-w-3xl w-full max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white rounded-xl">
         
         {/* Header Image */}
         <div className="relative h-64 w-full bg-slate-100">
