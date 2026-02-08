@@ -63,9 +63,8 @@ export function Navbar() {
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="text-sm font-bold text-primary group-hover:text-accent transition-colors">
-                हिंदी साहित्य
+                हिंदी साहित्य भारती
               </span>
-              <span className="text-xs text-muted-foreground">भारती</span>
             </div>
           </Link>
 
