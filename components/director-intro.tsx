@@ -40,13 +40,13 @@ export function DirectorIntro({ directorImage }: DirectorIntroProps) {
           <div className="space-y-6">
             <div className="space-y-2">
               <p className="text-sm font-semibold text-primary uppercase tracking-wide">हमारे नेता</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">राज कुमार शर्मा</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground">डॉ. रविंद्र शुक्ला</h2>
               <p className="text-lg text-secondary font-semibold">संस्थापक एवं अध्यक्ष</p>
             </div>
 
             <div className="space-y-4 text-muted-foreground leading-relaxed">
               <p>
-                राज कुमार शर्मा एक प्रसिद्ध साहित्यिक विचारक और सांस्कृतिक कार्यकर्ता हैं। उन्होंने हिंदी साहित्य भारती की स्थापना की थी
+                डॉ. रविंद्र शुक्ला एक प्रसिद्ध साहित्यिक विचारक और सांस्कृतिक कार्यकर्ता हैं। उन्होंने हिंदी साहित्य भारती की स्थापना की थी
                 जिसका मुख्य उद्देश्य हिंदी भाषा और साहित्य को संरक्षित और प्रचारित करना है।
               </p>
               <p>
