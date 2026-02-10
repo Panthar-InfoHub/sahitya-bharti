@@ -198,10 +198,12 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
 
   return (
     <>
-    <div className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group">
+    <div 
+      className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group cursor-pointer"
+      onClick={() => setShowDetails(true)}
+    >
       <div 
-        className="relative h-48 w-full bg-slate-100 cursor-pointer"
-        onClick={() => setShowDetails(true)}
+        className="relative h-48 w-full bg-slate-100"
       >
         {event.image_url ? (
           <Image 
@@ -221,16 +223,29 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                 {isFull ? "कोई सीट नहीं (No Seats Left)" : `${seatsAvailable} सीटें बची हैं (Seats Left)`}
             </Badge>
         )}
-        <Badge variant="default" className="absolute top-2 left-2 bg-primary/90 hover:bg-primary z-10">
-             {event.fee > 0 ? `₹ ${event.fee}` : "निःशुल्क (Free)"}
-        </Badge>
+        <div className="absolute top-2 left-2 flex flex-col gap-2 z-10">
+          <Badge variant="default" className="bg-primary/90 hover:bg-primary">
+               {event.fee > 0 ? `₹ ${event.fee}` : "निःशुल्क (Free)"}
+          </Badge>
+          {event.status && (
+            <Badge 
+              variant="secondary" 
+              className={`${
+                event.status === 'आगामी' ? 'bg-blue-500/90 text-white hover:bg-blue-500' :
+                event.status === 'चल रहा है' ? 'bg-green-500/90 text-white hover:bg-green-500' :
+                'bg-gray-500/90 text-white hover:bg-gray-500'
+              }`}
+            >
+              {event.status}
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="p-5 flex-1 flex flex-col gap-4">
         <div>
             <h3 
-                className="text-xl font-bold line-clamp-2 mb-2 cursor-pointer hover:text-primary transition-colors"
-                onClick={() => setShowDetails(true)}
+                className="text-xl font-bold line-clamp-2 mb-2 hover:text-primary transition-colors"
             >
                 {event.title}
             </h3>
@@ -262,7 +277,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
              </div>
         )}
 
-        <div className="pt-2 flex items-center justify-between gap-2 mt-auto">
+        <div className="pt-2 flex items-center justify-between gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
              {isAdmin ? (
                  <div className="flex w-full gap-2">
                      <EventModal 
@@ -301,7 +316,16 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                 <Button 
                     variant={isJoined ? "outline" : "default"} 
                     className="w-full relative"
-                    onClick={handleJoin}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (isJoined) {
+                        // If already joined, handle leave directly
+                        handleJoin()
+                      } else {
+                        // If not joined, open modal to show details first
+                        setShowDetails(true)
+                      }
+                    }}
                     disabled={joining || (isFull && !isJoined)}
                 >
                     {joining ? (
@@ -316,7 +340,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                     ) : isFull ? (
                         "कोई सीट नहीं (No Seats Left)"
                     ) : event.fee > 0 ? (
-                        `Pay ₹${event.fee} & Register`
+                         `Register`
                     ) : (
                         "Join Event (Free)"
                     )}

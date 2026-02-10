@@ -78,14 +78,14 @@ export function Hero({ directorImage, isPremium }: HeroProps) {
                   />
                 </div>
                 <div className="space-y-1">
-                  <h1 className="text-4xl lg:text-5xl font-bold text-primary leading-tight">हिंदी साहित्य</h1>
-                  <p className="text-lg text-secondary font-semibold">भारती</p>
+                  <h1 className="text-4xl lg:text-5xl font-bold text-primary leading-tight">हिंदी साहित्य भारती</h1>
+                  {/* <p className="text-lg text-secondary font-semibold"></p> */}
                 </div>
               </div>
 
               <blockquote className="border-l-4 border-primary pl-6 space-y-2">
                 <p className="text-2xl lg:text-3xl font-serif italic text-foreground leading-relaxed transition-all duration-500">
-                  "मानव बन जाए जाग सारा, यही है संकल्प हमारा।"
+                  "मानव बन जाए जग सारा यह पावन संकल्प हमारा"
                 </p>
               </blockquote>
             </div>

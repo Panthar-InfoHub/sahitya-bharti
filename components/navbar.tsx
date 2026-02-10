@@ -44,7 +44,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "गृह" },
-    { href: "/events", label: "कार्यक्रम (Events)" },
+    { href: "/events", label: "कार्यक्रम" },
     { href: "/images-gallery", label: "चित्र दीर्घा" },
     { href: "/videos-gallery", label: "वीडियो दीर्घा" },
     { href: "/kendriya", label: "केंद्रीय" },
@@ -63,9 +63,8 @@ export function Navbar() {
             </div>
             <div className="hidden sm:flex flex-col">
               <span className="text-sm font-bold text-primary group-hover:text-accent transition-colors">
-                हिंदी साहित्य
+                हिंदी साहित्य भारती
               </span>
-              <span className="text-xs text-muted-foreground">भारती</span>
             </div>
           </Link>
 
@@ -77,7 +76,7 @@ export function Navbar() {
                 href="/members"
                 className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
               >
-                सदस्य (Members)
+                सदस्य
               </Link>
             )}
 
@@ -159,7 +158,7 @@ export function Navbar() {
                     setIsProfileModalOpen(true)
                   }}
                 >
-                  प्रोफाइल (Profile)
+                  प्रोफाइल
                 </button>
                 <button
                   className="w-full text-left block px-3 py-2 text-sm font-medium text-red-600 hover:bg-accent/10 rounded-md transition-colors"
@@ -169,7 +168,7 @@ export function Navbar() {
                     window.location.href = "/"
                   }}
                 >
-                  लॉग आउट (Log out)
+                  लॉग आउट
                 </button>
               </>
             ) : (
