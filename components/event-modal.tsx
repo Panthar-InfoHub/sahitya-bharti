@@ -45,6 +45,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
     fee: eventToEdit?.fee ? String(eventToEdit.fee) : "",
     prizes: eventToEdit?.prizes || "",
     rules: eventToEdit?.rules || "",
+    status: eventToEdit?.status || "आगामी",
   })
   const [date, setDate] = useState<Date | undefined>(eventToEdit?.date ? new Date(eventToEdit.date) : new Date())
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -101,6 +102,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
           prizes: formData.prizes,
           rules: formData.rules,
           image_url: imageUrl,
+          status: formData.status,
       }
 
       if (eventToEdit) {
@@ -125,7 +127,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
 
       setOpen(false)
       if (!eventToEdit) {
-         setFormData({ title: "", description: "", location: "", seats: "", fee: "", prizes: "", rules: "" })
+         setFormData({ title: "", description: "", location: "", seats: "", fee: "", prizes: "", rules: "", status: "आगामी" })
          setImageFile(null)
       }
       router.refresh()
@@ -203,6 +205,20 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
                     <div className="space-y-2">
                         <Label htmlFor="prizes">पुरस्कार (Prizes)</Label>
                         <Input id="prizes" name="prizes" value={formData.prizes} onChange={handleChange} placeholder="उदाहरण: प्रमाण पत्र, पदक..." />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="status">स्थिति (Status)</Label>
+                        <select 
+                          id="status" 
+                          name="status" 
+                          value={formData.status} 
+                          onChange={handleChange}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="आगामी">आगामी (Upcoming)</option>
+                          <option value="चल रहा है">चल रहा है (Ongoing)</option>
+                          <option value="समाप्त">समाप्त (Ended)</option>
+                        </select>
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="image">तस्वीर (Event Image)</Label>

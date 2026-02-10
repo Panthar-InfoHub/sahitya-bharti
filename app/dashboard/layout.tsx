@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { LayoutDashboard, Calendar, Users, Award, Menu, Home, Image as ImageIcon, Video, Banknote, Receipt } from "lucide-react"
+import { LayoutDashboard, Calendar, Users, Award, Menu, Home, Image as ImageIcon, Video, Banknote, Receipt, UserCog } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { NotificationNav } from "@/components/notification-nav"
 
@@ -26,6 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const sidebarLinks = [
     { href: "/dashboard", label: "अवलोकन (Overview)", icon: LayoutDashboard },
     { href: "/dashboard/events", label: "कार्यक्रम (Events)", icon: Calendar },
+    { href: "/dashboard/directors", label: "निदेशक (Directors)", icon: UserCog },
     { href: "/dashboard/gallery", label: "गैलरी (Gallery)", icon: ImageIcon },
     { href: "/dashboard/videos", label: "वीडियो (Videos)", icon: Video },
     { href: "/dashboard/members", label: "सदस्य (Members)", icon: Users },
