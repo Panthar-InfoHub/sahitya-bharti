@@ -23,20 +23,28 @@ const chartConfig = {
   users: {
     label: "Users",
   },
+  patron: {
+    label: "Patron",
+    color: "var(--chart-1)",
+  },
   premium: {
     label: "Premium",
-    color: "oklch(0.45 0.19 15)",
+    color: "var(--chart-2)",
+  },
+  standard: {
+    label: "Standard",
+    color: "var(--chart-3)",
   },
   free: {
     label: "Free",
-    color: "oklch(0.52 0.17 30)",
+    color: "var(--chart-5)", // Using chart-5 for distinct color (chart-4 is muted brown)
   },
 } satisfies ChartConfig
 
 export function UserPlanChart() {
   const [chartData, setChartData] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
-  const [percentageChange, setPercentageChange] = React.useState(0)
+  const [mainPlanPercentage, setMainPlanPercentage] = React.useState({ plan: 'Premium', percent: 0 })
 
   React.useEffect(() => {
     fetchUserPlanData()
@@ -52,27 +60,31 @@ export function UserPlanChart() {
       .select('plan')
 
     if (users) {
-      // Count premium and free users
-      const premiumCount = users.filter(u => u.plan === 'premium').length
-      const freeCount = users.filter(u => u.plan !== 'premium').length
+      const patronCount = users.filter(u => u.plan?.toLowerCase() === 'patron').length
+      const premiumCount = users.filter(u => u.plan?.toLowerCase() === 'premium').length
+      const standardCount = users.filter(u => u.plan?.toLowerCase() === 'standard').length
+      
+      // Free is anyone not in the above (assuming nullable or empty or 'free')
+      // Safe to say anyone NOT normalized to these 3 is free
+      const freeCount = users.filter(u => !['patron', 'premium', 'standard'].includes(u.plan?.toLowerCase())).length
+      
       const total = users.length
 
       setChartData([
-        { 
-          plan: "premium", 
-          users: premiumCount, 
-          fill: "var(--color-premium)" 
-        },
-        { 
-          plan: "free", 
-          users: freeCount, 
-          fill: "var(--color-free)" 
-        },
+        { plan: "patron", users: patronCount, fill: "var(--color-patron)" },
+        { plan: "premium", users: premiumCount, fill: "var(--color-premium)" },
+        { plan: "standard", users: standardCount, fill: "var(--color-standard)" },
+        { plan: "free", users: freeCount, fill: "var(--color-free)" },
       ])
 
-      // Calculate percentage of premium users
+      // Calculate percentage of most popular paid plan or just display Total Paid vs Free?
+      // Let's just show Premium % for consistency or Total Paid %
+      const totalPaid = patronCount + premiumCount + standardCount
       if (total > 0) {
-        setPercentageChange(Math.round((premiumCount / total) * 100))
+        setMainPlanPercentage({ 
+            plan: 'Paid', 
+            percent: Math.round((totalPaid / total) * 100) 
+        })
       }
     }
     
@@ -87,7 +99,7 @@ export function UserPlanChart() {
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>User Plans Distribution</CardTitle>
-        <CardDescription>Premium vs Free Users</CardDescription>
+        <CardDescription>Membership Tiers</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         {loading ? (
@@ -117,7 +129,7 @@ export function UserPlanChart() {
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 leading-none font-medium">
-          {percentageChange}% Premium Users <TrendingUp className="h-4 w-4" />
+          {mainPlanPercentage.percent}% Paid Members <TrendingUp className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none">
           Total: {totalUsers.toLocaleString()} users

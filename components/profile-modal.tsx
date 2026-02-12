@@ -115,6 +115,7 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
 
       setCurrentUser({ ...currentUser, avatar_url: publicUrl })
       toast.success("Profile image updated successfully")
+      window.dispatchEvent(new Event('user_updated'))
       router.refresh()
     } catch (error: any) {
         toast.error(error.message || "Error uploading image")
@@ -139,6 +140,7 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
 
       if (error) throw error
       toast.success("Profile updated successfully")
+      window.dispatchEvent(new Event('user_updated'))
       router.refresh()
       onOpenChange(false)
     } catch (error: any) {
@@ -182,21 +184,33 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
 
                 {/* Membership Plan Section */}
                 <div className={`p-4 rounded-xl border w-full text-center shadow-sm ${
-                    currentUser?.plan === 'premium' ? 'bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200' : 
+                    currentUser?.plan === 'patron' ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-200' :
+                    currentUser?.plan === 'premium' ? 'bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200' :
+                    currentUser?.plan === 'standard' ? 'bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200' :
                     'bg-gray-50 border-gray-100'
                 }`}>
-                    {currentUser?.plan === 'premium' ? (
+                    {['standard', 'premium', 'patron'].includes(currentUser?.plan) ? (
                         <>
                             <p className="text-sm font-medium text-muted-foreground mb-1 uppercase tracking-wider">वर्तमान सदस्यता (Current Membership)</p>
-                            <p className="text-xl font-bold capitalize mb-3 text-yellow-800">
-                                प्रीमियम योजना (Premium Plan)
+                            <p className={`text-xl font-bold capitalize mb-3 ${
+                                currentUser?.plan === 'patron' ? 'text-purple-800' :
+                                currentUser?.plan === 'premium' ? 'text-yellow-800' :
+                                'text-blue-800'
+                            }`}>
+                                {currentUser?.plan === 'Patron' ? 'संरक्षक सदस्य (Patron Member)' :
+                                 currentUser?.plan === 'Premium' ? 'विशिष्ट सदस्य (Premium Member)' :
+                                 'मानक सदस्य (Standard Member)'}
                             </p>
                             <div className="flex flex-col gap-2 w-full">
                                 <Button 
                                     variant="outline" 
                                     size="sm" 
                                     asChild 
-                                    className="w-full border-yellow-300 text-yellow-800 hover:bg-yellow-100 hover:text-yellow-900"
+                                    className={`w-full ${
+                                        currentUser?.plan === 'patron' ? 'border-purple-300 text-purple-800 hover:bg-purple-100' :
+                                        currentUser?.plan === 'premium' ? 'border-yellow-300 text-yellow-800 hover:bg-yellow-100' :
+                                        'border-blue-300 text-blue-800 hover:bg-blue-100'
+                                    }`}
                                 >
                                     <Link href="/certificate" target="_blank">
                                         <FileText className="mr-2 h-4 w-4" />
@@ -207,7 +221,11 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
                                     variant="outline" 
                                     size="sm" 
                                     asChild
-                                    className="w-full border-blue-300 text-blue-800 hover:bg-blue-100 hover:text-blue-900"
+                                    className={`w-full ${
+                                        currentUser?.plan === 'patron' ? 'border-purple-300 text-purple-800 hover:bg-purple-100' :
+                                        currentUser?.plan === 'premium' ? 'border-yellow-300 text-yellow-800 hover:bg-yellow-100' :
+                                        'border-blue-300 text-blue-800 hover:bg-blue-100'
+                                    }`}
                                 >
                                     <Link href="/id-card" target="_blank">
                                         <CreditCard className="mr-2 h-4 w-4" />
@@ -217,12 +235,15 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
                             </div>
                         </>
                     ) : (
-                        <Button 
-                            className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white border-0 shadow-md"
-                            onClick={onOpenMembership}
-                        >
-                            प्रीमियम सदस्यता लें (Upgrade to Premium) - ₹1000
-                        </Button>
+                        <div className="space-y-3">
+                            <p className="text-sm text-muted-foreground">आप अभी सदस्य नहीं हैं</p>
+                            <Button 
+                                className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white border-0 shadow-md"
+                                onClick={onOpenMembership}
+                            >
+                                सदस्यता लें (Become a Member)
+                            </Button>
+                        </div>
                     )}
                 </div>
             </div>

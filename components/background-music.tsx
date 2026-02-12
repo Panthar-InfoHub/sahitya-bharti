@@ -10,15 +10,32 @@ export function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
-    // Auto-play on component mount
+    // Attempt to play audio on mount
     const playAudio = async () => {
       if (audioRef.current) {
         try {
+          // Reset time to ensuring it starts from beginning
+          audioRef.current.currentTime = 0
           await audioRef.current.play()
           setIsPlaying(true)
         } catch (error) {
-          // Auto-play might be blocked by browser, user will need to click play
-          console.log("Auto-play blocked, user interaction required")
+          console.log("Auto-play blocked, waiting for user interaction")
+          // If auto-play fails, add a one-time click listener to the document to start playback
+          const handleInteraction = () => {
+            if (audioRef.current && audioRef.current.paused) {
+              audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch(e => console.error("Play failed after interaction:", e))
+            }
+            // Remove listeners after first interaction
+            document.removeEventListener("click", handleInteraction)
+            document.removeEventListener("scroll", handleInteraction)
+            document.removeEventListener("keydown", handleInteraction)
+          }
+
+          document.addEventListener("click", handleInteraction)
+          document.addEventListener("scroll", handleInteraction)
+          document.addEventListener("keydown", handleInteraction)
         }
       }
     }
@@ -58,6 +75,7 @@ export function BackgroundMusic() {
       <audio
         ref={audioRef}
         loop
+        autoPlay
         preload="auto"
       >
         <source src="/music/background.mp3" type="audio/mpeg" />

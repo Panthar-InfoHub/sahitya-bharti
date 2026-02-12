@@ -46,12 +46,18 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
     prizes: eventToEdit?.prizes || "",
     rules: eventToEdit?.rules || "",
     status: eventToEdit?.status || "आगामी",
+    start_time: eventToEdit?.start_time || "",
+    end_time: eventToEdit?.end_time || "",
   })
   const [date, setDate] = useState<Date | undefined>(eventToEdit?.date ? new Date(eventToEdit.date) : new Date())
   const [imageFile, setImageFile] = useState<File | null>(null)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -103,6 +109,8 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
           rules: formData.rules,
           image_url: imageUrl,
           status: formData.status,
+          start_time: formData.start_time || null,
+          end_time: formData.end_time || null,
       }
 
       if (eventToEdit) {
@@ -127,7 +135,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
 
       setOpen(false)
       if (!eventToEdit) {
-         setFormData({ title: "", description: "", location: "", seats: "", fee: "", prizes: "", rules: "", status: "आगामी" })
+         setFormData({ title: "", description: "", location: "", seats: "", fee: "", prizes: "", rules: "", status: "आगामी", start_time: "", end_time: "" })
          setImageFile(null)
       }
       router.refresh()
@@ -191,9 +199,30 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
                         </Popover>
                     </div>
                 </div>
-
                 {/* Column 2: Details */}
                 <div className="space-y-4">
+                     <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="start_time">शुरू (Start Time)</Label>
+                            <Input 
+                                id="start_time" 
+                                name="start_time" 
+                                type="time" 
+                                value={formData.start_time} 
+                                onChange={handleChange} 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="end_time">समाप्त (End Time)</Label>
+                            <Input 
+                                id="end_time" 
+                                name="end_time" 
+                                type="time" 
+                                value={formData.end_time} 
+                                onChange={handleChange} 
+                            />
+                        </div>
+                    </div>
                      <div className="space-y-2">
                         <Label htmlFor="seats">कुल सीटें (Total Seats)</Label>
                         <Input id="seats" name="seats" type="number" min="0" value={formData.seats} onChange={handleChange} placeholder="उदाहरण: 100" />

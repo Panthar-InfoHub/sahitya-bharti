@@ -13,13 +13,10 @@ import { toast } from "sonner"
 interface Director {
   id: string
   name: string
-  name_hindi: string | null
   title: string
-  title_hindi: string | null
   category: 'national' | 'international'
   photo_url: string | null
   bio: string | null
-  bio_hindi: string | null
   email: string | null
   phone: string | null
   linkedin_url: string | null
@@ -172,17 +169,11 @@ export default function DirectorsPage() {
                     <TableCell>
                       <div>
                         <p className="font-medium">{director.name}</p>
-                        {director.name_hindi && (
-                          <p className="text-sm text-muted-foreground">{director.name_hindi}</p>
-                        )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <p>{director.title}</p>
-                        {director.title_hindi && (
-                          <p className="text-sm text-muted-foreground">{director.title_hindi}</p>
-                        )}
                       </div>
                     </TableCell>
                     <TableCell>

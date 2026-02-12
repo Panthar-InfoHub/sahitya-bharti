@@ -9,24 +9,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
-import { Loader2, Upload } from "lucide-react"
+import { Loader2, Plus, X } from "lucide-react"
 import { toast } from "sonner"
 
 interface Director {
   id?: string
   name: string
-  name_hindi: string | null
   title: string
-  title_hindi: string | null
   category: 'national' | 'international'
   photo_url: string | null
   bio: string | null
-  bio_hindi: string | null
   email: string | null
   phone: string | null
   linkedin_url: string | null
   display_order: number
   is_active: boolean
+}
+
+interface Position {
+  id: string
+  title: string
+  title_hindi: string | null
+  category: 'national' | 'international'
 }
 
 interface DirectorFormModalProps {
@@ -38,13 +42,10 @@ interface DirectorFormModalProps {
 
 const emptyDirector: Director = {
   name: "",
-  name_hindi: null,
   title: "",
-  title_hindi: null,
   category: "national",
   photo_url: null,
   bio: null,
-  bio_hindi: null,
   email: null,
   phone: null,
   linkedin_url: null,
@@ -56,6 +57,12 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
   const [formData, setFormData] = useState<Director>(emptyDirector)
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
+  
+  // Position Management
+  const [positions, setPositions] = useState<Position[]>([])
+  const [isAddingPosition, setIsAddingPosition] = useState(false)
+  const [newPosition, setNewPosition] = useState({ title: "", title_hindi: "" })
+  const [loadingPositions, setLoadingPositions] = useState(false)
 
   useEffect(() => {
     if (director) {
@@ -63,7 +70,31 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
     } else {
       setFormData(emptyDirector)
     }
+    setIsAddingPosition(false)
+    setNewPosition({ title: "", title_hindi: "" })
   }, [director, open])
+
+  // Fetch positions when category changes or modal opens
+  useEffect(() => {
+    if (open) {
+      fetchPositions(formData.category)
+    }
+  }, [formData.category, open])
+
+  const fetchPositions = async (category: 'national' | 'international') => {
+    setLoadingPositions(true)
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('org_positions')
+      .select('*')
+      .eq('category', category)
+      .order('title', { ascending: true })
+    
+    if (data) {
+      setPositions(data)
+    }
+    setLoadingPositions(false)
+  }
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -78,13 +109,13 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
       const filePath = `directors/${fileName}`
 
       const { error: uploadError } = await supabase.storage
-        .from('images')
+        .from('avatars')
         .upload(filePath, file)
 
       if (uploadError) throw uploadError
 
       const { data: { publicUrl } } = supabase.storage
-        .from('images')
+        .from('avatars')
         .getPublicUrl(filePath)
 
       setFormData({ ...formData, photo_url: publicUrl })
@@ -103,11 +134,38 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
     const supabase = createClient()
 
     try {
+      // Handle logic for new position if in adding mode
+      let finalTitle = formData.title
+
+      if (isAddingPosition) {
+        // Use title_hindi as the primary source since user removed English input
+        const posTitle = newPosition.title_hindi || newPosition.title
+        if (!posTitle) throw new Error("Please enter a position title")
+        
+        // Save new position - use the same value for both if one is missing
+        const { error: posError } = await supabase
+          .from('org_positions')
+          .insert({
+            title: posTitle, // Required field
+            title_hindi: posTitle,
+            category: formData.category
+          })
+        
+        if (posError) throw posError
+        
+        finalTitle = posTitle
+      }
+
+      const directorData = {
+        ...formData,
+        title: finalTitle,
+      }
+
       if (director?.id) {
         // Update existing
         const { error } = await supabase
           .from('directors')
-          .update(formData)
+          .update(directorData)
           .eq('id', director.id)
 
         if (error) throw error
@@ -116,7 +174,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
         // Create new
         const { error } = await supabase
           .from('directors')
-          .insert([formData])
+          .insert([directorData])
 
         if (error) throw error
         toast.success("निदेशक सफलतापूर्वक बनाया गया")
@@ -128,6 +186,21 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
       toast.error("Failed to save director: " + error.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePositionSelect = (value: string) => {
+    if (value === "new") {
+      setIsAddingPosition(true)
+      setNewPosition({ title: "", title_hindi: "" })
+    } else {
+      const selectedPos = positions.find(p => p.id === value)
+      if (selectedPos) {
+        setFormData({
+          ...formData,
+          title: selectedPos.title
+        })
+      }
     }
   }
 
@@ -165,41 +238,13 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
           </div>
 
           {/* Name */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>नाम (अंग्रेजी) *</Label>
+          <div className="space-y-2">
+              <Label>नाम (Name)</Label>
               <Input
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
-            </div>
-            <div className="space-y-2">
-              <Label>नाम (हिंदी)</Label>
-              <Input
-                value={formData.name_hindi || ""}
-                onChange={(e) => setFormData({ ...formData, name_hindi: e.target.value })}
-              />
-            </div>
-          </div>
-
-          {/* Title */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>पद (अंग्रेजी) *</Label>
-              <Input
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>पद (हिंदी)</Label>
-              <Input
-                value={formData.title_hindi || ""}
-                onChange={(e) => setFormData({ ...formData, title_hindi: e.target.value })}
-              />
-            </div>
           </div>
 
           {/* Category */}
@@ -215,30 +260,83 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="national">राष्ट्रीय</SelectItem>
-                <SelectItem value="international">अंतर्राष्ट्रीय</SelectItem>
+                <SelectItem value="national">राष्ट्रीय (National)</SelectItem>
+                <SelectItem value="international">अंतर्राष्ट्रीय (International)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
+          {/* Position Section */}
+          <div className="space-y-4 border rounded-lg p-4 bg-slate-50">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">पद (Position) *</Label>
+              {isAddingPosition && (
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setIsAddingPosition(false)}
+                  className="h-8 px-2 text-destructive hover:text-destructive"
+                >
+                  <X className="w-4 h-4 mr-1" /> रद्द करें
+                </Button>
+              )}
+            </div>
+
+            {isAddingPosition ? (
+              <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                <div className="space-y-2">
+                  <Label>नया पद</Label>
+                  <Input
+                    placeholder="Ex: अध्यक्ष"
+                    value={newPosition.title_hindi}
+                    onChange={(e) => setNewPosition({ ...newPosition, title_hindi: e.target.value })}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Select 
+                  onValueChange={handlePositionSelect}
+                  // Find ID of current title if it exists in positions, else empty (handled by finding match manually if needed)
+                  value={positions.find(p => p.title === formData.title && p.category === formData.category)?.id}
+                >
+                  <SelectTrigger>
+                    {/* Show Hindi title if available in position object, else just English title */}
+                    <SelectValue placeholder={
+                        formData.title 
+                        ? (positions.find(p => p.title === formData.title)?.title_hindi ? `${positions.find(p => p.title === formData.title)?.title_hindi} (${formData.title})` : formData.title)
+                        : "पद चुनें (Select Position)"
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {positions.map((pos) => (
+                      <SelectItem key={pos.id} value={pos.id}>
+                        {pos.title_hindi ? `${pos.title_hindi} (${pos.title})` : pos.title}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="new" className="text-primary font-medium border-t mt-1">
+                      <div className="flex items-center">
+                        <Plus className="w-4 h-4 mr-2" />
+                        नया पद जोड़ें (Add New Position)
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {/* Fallback - simple validation check */}
+                 {!formData.title && <p className="text-xs text-muted-foreground mt-1">Select a position from the list</p>}
+              </div>
+            )}
+          </div>
+
           {/* Bio */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>जीवनी (अंग्रेजी)</Label>
+          <div className="space-y-2">
+              <Label>जीवनी (Bio)</Label>
               <Textarea
                 rows={4}
                 value={formData.bio || ""}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               />
-            </div>
-            <div className="space-y-2">
-              <Label>जीवनी (हिंदी)</Label>
-              <Textarea
-                rows={4}
-                value={formData.bio_hindi || ""}
-                onChange={(e) => setFormData({ ...formData, bio_hindi: e.target.value })}
-              />
-            </div>
           </div>
 
           {/* Contact */}
@@ -256,13 +354,6 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
               <Input
                 value={formData.phone || ""}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>LinkedIn URL</Label>
-              <Input
-                value={formData.linkedin_url || ""}
-                onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
               />
             </div>
           </div>

@@ -14,6 +14,7 @@ import { ImageGalleryPreview } from "@/components/image-gallery-preview"
 import { VideoGalleryPreview } from "@/components/video-gallery-preview"
 import { MembershipCTA } from "@/components/membership-cta"
 import { BackgroundMusic } from "@/components/background-music"
+import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
 
 import { createClient } from "@/lib/supabase/server"
 
@@ -72,6 +73,9 @@ export default async function Home() {
       
       {/* Background Music Player */}
       <BackgroundMusic />
+      
+      {/* Upcoming Event Popup */}
+      <UpcomingEventPopup />
     </>
   )
 }
