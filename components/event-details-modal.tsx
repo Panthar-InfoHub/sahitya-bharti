@@ -75,12 +75,22 @@ export function EventDetailsModal({
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-muted-foreground mt-2">
                     <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-primary" />
-                        <span>{format(new Date(event.date), "PPP p")}</span>
+                        <span>{format(new Date(event.date), "PPP")}</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>{event.location}</span>
                     </div>
+                    {(event.start_time || event.end_time) && (
+                        <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-primary" />
+                            <span>
+                                {event.start_time && format(new Date(`2000-01-01T${event.start_time}`), "h:mm a")}
+                                {event.start_time && event.end_time && " - "}
+                                {event.end_time && format(new Date(`2000-01-01T${event.end_time}`), "h:mm a")}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </DialogHeader>
 

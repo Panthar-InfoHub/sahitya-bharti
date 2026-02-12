@@ -9,13 +9,10 @@ import { Loader2 } from "lucide-react"
 interface Director {
   id: string
   name: string
-  name_hindi: string | null
   title: string
-  title_hindi: string | null
   category: 'national' | 'international'
   photo_url: string | null
   bio: string | null
-  bio_hindi: string | null
   email: string | null
   phone: string | null
   linkedin_url: string | null

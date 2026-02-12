@@ -5,12 +5,9 @@ import { Card, CardContent } from "@/components/ui/card"
 interface Director {
   id: string
   name: string
-  name_hindi: string | null
   title: string
-  title_hindi: string | null
   photo_url: string | null
   bio: string | null
-  bio_hindi: string | null
   email: string | null
   phone: string | null
   linkedin_url: string | null
@@ -51,11 +48,6 @@ export function DirectorCard({ director }: DirectorCardProps) {
             <h3 className="text-xl font-bold text-foreground">
               {director.name}
             </h3>
-            {director.name_hindi && (
-              <p className="text-lg text-muted-foreground">
-                {director.name_hindi}
-              </p>
-            )}
           </div>
 
           {/* Title */}
@@ -63,17 +55,12 @@ export function DirectorCard({ director }: DirectorCardProps) {
             <p className="text-sm font-medium text-primary">
               {director.title}
             </p>
-            {director.title_hindi && (
-              <p className="text-sm text-muted-foreground">
-                {director.title_hindi}
-              </p>
-            )}
           </div>
 
           {/* Bio */}
-          {(director.bio || director.bio_hindi) && (
+          {director.bio && (
             <div className="text-sm text-muted-foreground line-clamp-3">
-              {director.bio_hindi || director.bio}
+              {director.bio}
             </div>
           )}
 
