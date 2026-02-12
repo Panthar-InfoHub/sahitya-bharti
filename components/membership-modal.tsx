@@ -7,16 +7,24 @@ import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 
+interface Plan {
+  name: string
+  price: number
+  label: string
+}
+
 interface MembershipModalProps {
   isOpen: boolean
   onClose: () => void
   user?: any
+  plan?: Plan
 }
 
-// Plan details - Only Premium as per request
-const PREMIUM_PLAN = { name: "Premium Membership", price: 1000, label: "प्रीमियम सदस्यता (Premium Membership)" }
-
-const loadRazorpayScript = () => {
+export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModalProps) {
+  const [step, setStep] = useState<'form' | 'processing' | 'receipt'>('form')
+  
+  // Script loader inside or outside
+  const loadRazorpayScript = () => {
     return new Promise((resolve) => {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -24,10 +32,8 @@ const loadRazorpayScript = () => {
         script.onerror = () => resolve(false);
         document.body.appendChild(script);
     });
-};
+  };
 
-export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps) {
-  const [step, setStep] = useState<'form' | 'processing' | 'receipt'>('form')
   const [formData, setFormData] = useState({
     name: user?.full_name?.split(" ")[0] || "",
     surname: user?.full_name?.split(" ")[1] || "",
@@ -83,10 +89,10 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                amount: PREMIUM_PLAN.price,
+                amount: plan?.price || 1000,
                 notes: { 
                     userId: user.id,
-                    plan: 'premium',
+                    plan: plan?.name || 'membership',
                     type: 'membership' // Helpful for filtering
                 }
             }),
@@ -101,7 +107,7 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
             amount: orderData.amount,
             currency: orderData.currency,
             name: "Sahitya Bharti",
-            description: PREMIUM_PLAN.name,
+            description: plan?.label || "Membership",
             image: "/logo.png", // Ensure logo exists or remove
             order_id: orderData.id,
             handler: async function (response: any) {
@@ -125,7 +131,7 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                     const { error } = await supabase
                         .from('users')
                         .update({ 
-                            plan: 'premium',
+                            plan: (plan?.name || 'premium').toLowerCase(),
                             phone_number: formData.phone,
                             full_name: `${formData.name} ${formData.surname}`.trim()
                         })
@@ -133,12 +139,15 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
 
                     if (error) throw error
 
+                    // Trigger refresh in Navbar
+                    window.dispatchEvent(new Event('user_updated'))
+
                     // 5. Show Receipt
                     const receipt = {
                         id: response.razorpay_payment_id,
                         date: new Date().toLocaleDateString(),
-                        amount: PREMIUM_PLAN.price,
-                        plan: PREMIUM_PLAN.name,
+                        amount: plan?.price || 1000,
+                        plan: plan?.label || "Membership",
                         user: `${formData.name} ${formData.surname}`
                     }
                     setReceiptData(receipt)
@@ -254,8 +263,8 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                     
                     {/* Plan Information */}
                     <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg text-center">
-                        <h3 className="font-bold text-lg text-primary mb-1">{PREMIUM_PLAN.label}</h3>
-                        <p className="text-2xl font-extrabold text-foreground">₹{PREMIUM_PLAN.price}</p>
+                        <h3 className="font-bold text-lg text-primary mb-1">{plan?.label}</h3>
+                        <p className="text-2xl font-extrabold text-foreground">₹{plan?.price}</p>
                         <p className="text-sm text-muted-foreground mt-2">Unlock all premium features • Priority Support • Exclusive Content</p>
                     </div>
 
@@ -297,7 +306,7 @@ export function MembershipModal({ isOpen, onClose, user }: MembershipModalProps)
                         type="submit"
                         className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-all transform active:scale-95 shadow-lg"
                     >
-                        Pay ₹{PREMIUM_PLAN.price} Securely
+                        Pay ₹{plan?.price} Securely
                     </Button>
                     
                     {/* <p className="text-xs text-center text-muted-foreground flex justify-center items-center gap-1">

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import Image from "next/image"
-import { MembershipModal } from "./membership-modal"
+
 import { ProfileModal } from "./profile-modal"
 import { UserNav } from "./user-nav"
 import { createClient } from "@/lib/supabase/client"
@@ -12,24 +12,35 @@ import { useEffect } from "react"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
-  const [isMembershipModalOpen, setIsMembershipModalOpen] = useState(false)
+
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
 
-  useEffect(() => {
-    const getUser = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-        setUser({ ...user, ...profile })
-      }
+  const fetchUser = async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      setUser({ ...user, ...profile })
+    } else {
+      setUser(null)
     }
-    getUser()
+  }
+
+  useEffect(() => {
+    fetchUser()
+    
+    // Listen for updates from other components (e.g., membership purchase)
+    const handleUserUpdate = () => {
+      fetchUser()
+    }
+    
+    window.addEventListener('user_updated', handleUserUpdate)
+    return () => window.removeEventListener('user_updated', handleUserUpdate)
   }, [])
 
   const handleLogin = async () => {
@@ -44,7 +55,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "गृह" },
-    { href: "/events", label: "कार्यक्रम (Events)" },
+    { href: "/events", label: "कार्यक्रम" },
     { href: "/images-gallery", label: "चित्र दीर्घा" },
     { href: "/videos-gallery", label: "वीडियो दीर्घा" },
     { href: "/kendriya", label: "केंद्रीय" },
@@ -76,7 +87,7 @@ export function Navbar() {
                 href="/members"
                 className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
               >
-                सदस्य (Members)
+                सदस्य
               </Link>
             )}
 
@@ -103,13 +114,13 @@ export function Navbar() {
                 लॉग इन
               </Link>
             )}
-            {(!user || user.plan !== 'premium') && (
-              <button
+            {(!user || user.plan === 'free') && (
+              <Link
+                href="/membership"
                 className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors"
-                onClick={() => setIsMembershipModalOpen(true)}
               >
                 सदस्य बनें
-              </button>
+              </Link>
             )}
 
             {/* Mobile menu button */}
@@ -158,7 +169,7 @@ export function Navbar() {
                     setIsProfileModalOpen(true)
                   }}
                 >
-                  प्रोफाइल (Profile)
+                  प्रोफाइल
                 </button>
                 <button
                   className="w-full text-left block px-3 py-2 text-sm font-medium text-red-600 hover:bg-accent/10 rounded-md transition-colors"
@@ -168,7 +179,7 @@ export function Navbar() {
                     window.location.href = "/"
                   }}
                 >
-                  लॉग आउट (Log out)
+                  लॉग आउट
                 </button>
               </>
             ) : (
@@ -180,20 +191,18 @@ export function Navbar() {
                 लॉग इन
               </Link>
             )}
-            {(!user || user.plan !== 'premium') && (
-              <button
+            {(!user || user.plan === 'free') && (
+              <Link
+                href="/membership"
                 className="w-full text-left block px-3 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-md transition-colors mt-2"
-                onClick={() => {
-                    setIsOpen(false)
-                    setIsMembershipModalOpen(true)
-                }}
+                onClick={() => setIsOpen(false)}
               >
                 सदस्य बनें
-              </button>
+              </Link>
             )}
           </div>
         )}
-        <MembershipModal isOpen={isMembershipModalOpen} onClose={() => setIsMembershipModalOpen(false)} user={user} />
+
         {isProfileModalOpen && (
           <ProfileModal 
             open={isProfileModalOpen} 
@@ -201,7 +210,7 @@ export function Navbar() {
             user={user}
             onOpenMembership={() => {
                 setIsProfileModalOpen(false)
-                setIsMembershipModalOpen(true)
+                window.location.href = "/membership"
             }} 
           />
         )}

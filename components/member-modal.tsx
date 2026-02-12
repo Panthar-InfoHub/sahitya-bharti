@@ -65,6 +65,11 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
   const [uploading, setUploading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
+  // New Position functionality
+  const [isAddingPosition, setIsAddingPosition] = useState(false)
+  const [newPositionName, setNewPositionName] = useState("")
+  const [savingPosition, setSavingPosition] = useState(false)
+
   useEffect(() => {
     // Reset or Load member data
     if (member) {
@@ -172,6 +177,52 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
           city: val,
           position: "" // Reset position
       }))
+  }
+
+  const handlePositionSelect = (val: string) => {
+      if (val === "new_position_action") {
+          setIsAddingPosition(true)
+          setNewPositionName("")
+      } else {
+          setFormData(prev => ({ ...prev, position: val }))
+      }
+  }
+
+  const handleAddNewPosition = async () => {
+      if (!newPositionName.trim() || !formData.state || !formData.city) return
+      
+      setSavingPosition(true)
+      try {
+          const supabase = createClient()
+          
+          // Insert new position into DB
+          const { data, error } = await supabase
+            .from('positions')
+            .insert({
+                state: formData.state,
+                city: formData.city,
+                name: newPositionName.trim()
+            })
+            .select()
+            .single()
+            
+          if (error) throw error
+
+          // Update local list
+          if (data) {
+              setAllPositions(prev => [...prev, data])
+              // It will automatically update availablePositionNames via useEffect dependency
+              
+              // Select it
+              setFormData(prev => ({ ...prev, position: data.name }))
+              setIsAddingPosition(false)
+              toast.success("New position added")
+          }
+      } catch (error: any) {
+          toast.error(error.message || "Failed to add position")
+      } finally {
+          setSavingPosition(false)
+      }
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -312,28 +363,66 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
                </Select>
             </div>
 
-             <div className="space-y-2 col-span-1 sm:col-span-2">
-               <Label className={!formData.city ? "text-muted-foreground" : ""}>
-                   पद (Position) {!formData.city && "(Select City first)"} *
-               </Label>
-               <Select 
-                    value={formData.position} 
-                    onValueChange={(val) => setFormData(prev => ({...prev, position: val}))}
-                    disabled={!formData.city}
-               >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select Position" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {availablePositionNames.length > 0 ? availablePositionNames.map(p => (
-                            <SelectItem key={p} value={p}>{p}</SelectItem>
-                        )) : (
-                            <div className="p-2 text-sm text-center text-muted-foreground">
-                                No positions found. Add one in "Manage Positions".
-                            </div>
-                        )}
-                    </SelectContent>
-               </Select>
+             <div className="space-y-4 col-span-1 sm:col-span-2 bg-slate-50 p-3 rounded-md border">
+               <div className="flex items-center justify-between">
+                 <Label className={!formData.city ? "text-muted-foreground" : "font-semibold"}>
+                     पद (Position) {!formData.city && "(Select City first)"} *
+                 </Label>
+                 {isAddingPosition && (
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setIsAddingPosition(false)}
+                      className="h-8 px-2 text-destructive hover:text-destructive"
+                    >
+                      Cancel
+                    </Button>
+                 )}
+               </div>
+
+               {isAddingPosition ? (
+                  <div className="flex gap-2 animate-in fade-in slide-in-from-top-2">
+                      <Input 
+                        placeholder="Enter new position name" 
+                        value={newPositionName}
+                        onChange={(e) => setNewPositionName(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button 
+                        type="button"
+                        size="sm"
+                        onClick={handleAddNewPosition}
+                        disabled={!newPositionName.trim() || savingPosition}
+                      >
+                        {savingPosition ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+                      </Button>
+                  </div>
+               ) : (
+                   <Select 
+                        value={formData.position} 
+                        onValueChange={handlePositionSelect}
+                        disabled={!formData.city}
+                   >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select Position" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availablePositionNames.length > 0 ? availablePositionNames.map(p => (
+                                <SelectItem key={p} value={p}>{p}</SelectItem>
+                            )) : (
+                                <div className="p-2 text-sm text-center text-muted-foreground">
+                                    No positions found.
+                                </div>
+                            )}
+                            <SelectItem value="new_position_action" className="text-primary font-medium border-t mt-1 sticky bottom-0 bg-white">
+                                <div className="flex items-center">
+                                    <span className="mr-2">+</span> Add New Position
+                                </div>
+                            </SelectItem>
+                        </SelectContent>
+                   </Select>
+               )}
             </div>
           </div>
 

@@ -25,6 +25,7 @@ export default function MembershipPage() {
   const [user, setUser] = useState<any>(null)
   const [form, setForm] = useState({ control: {} }) // Declare form variable
   const [isSubmitting, setIsSubmitting] = useState(false) // Declare isSubmitting variable
+  const [selectedPlan, setSelectedPlan] = useState<any>(null)
   
   useEffect(() => {
     const getUser = async () => {
@@ -71,8 +72,75 @@ export default function MembershipPage() {
           </div>
         </section>
 
+        {/* Pricing Plans Section */}
+        <section className="py-16 sm:py-20 bg-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-center mb-4">हमारी सदस्यता योजनाएं</h2>
+            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+              जीवन भर के लिए साहित्य प्रेमी परिवार का हिस्सा बनें। अपनी पसंद की योजना चुनें।
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { 
+                  name: "Standard", 
+                  price: 1000, 
+                  label: "मानक सदस्यता (Standard)",
+                  features: ["आजीवन सदस्यता", "ई-पत्रिका का उपयोग", "कार्यक्रमों में प्रवेश", "डिजिटल सदस्य कार्ड"] 
+                },
+                { 
+                  name: "Premium", 
+                  price: 1500, 
+                  label: "विशिष्ट सदस्यता (Premium)",
+                  features: ["मानक की सभी सुविधाएं", "प्राथमिकता बैठने की व्यवस्था", "लेखक कार्यशालाओं में छूट", "भौतिक सदस्य कार्ड", "वार्षिक स्मारिका"] 
+                },
+                { 
+                  name: "Patron", 
+                  price: 100000, 
+                  label: " संरक्षक सदस्यता (Patron)",
+                  features: ["विशिष्ट की सभी सुविधाएं", "वीआईपी अतिथि सम्मान", "निर्णायक मंडल में स्थान", "विशेष रात्रिभोज आमंत्रण", "जीवन भर का सम्मान"] 
+                },
+              ].map((plan, index) => (
+                <div 
+                  key={index} 
+                  className={`relative flex flex-col p-6 rounded-2xl border ${index === 1 ? 'border-primary shadow-2xl scale-105 bg-primary/5' : 'border-border bg-card'} transition-all hover:shadow-xl`}
+                >
+                  {index === 1 && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      सर्वाधिक लोकप्रिय
+                    </div>
+                  )}
+                  <h3 className="text-xl font-bold text-foreground mb-2">{plan.label.split('(')[0]}</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold">₹{plan.price}</span>
+                    <span className="text-muted-foreground"> / आजीवन</span>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-center text-sm text-foreground/80">
+                        <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <Button 
+                    className={`w-full ${index === 1 ? 'bg-primary' : ''}`}
+                    variant={index === 1 ? 'default' : 'outline'}
+                    onClick={() => {
+                        setSelectedPlan(plan);
+                        setIsOpen(true);
+                    }}
+                  >
+                    चुनें
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Benefits Section */}
-        <section className="py-16 sm:py-20">
+        <section className="py-16 sm:py-20 bg-card/30">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-center mb-12">सदस्यों के लाभ</h2>
 
@@ -151,7 +219,8 @@ export default function MembershipPage() {
       <Footer />
 
       {/* Membership Modal */}
-      <MembershipModal isOpen={isOpen} onClose={() => setIsOpen(false)} user={user} />
+      {/* Membership Modal */}
+      <MembershipModal isOpen={isOpen} onClose={() => setIsOpen(false)} user={user} plan={selectedPlan} />
     </>
   )
 }

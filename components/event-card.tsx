@@ -12,6 +12,7 @@ import { useState } from "react"
 import { EventDetailsModal } from "@/components/event-details-modal"
 import { RefundRequestModal } from "@/components/refund-request-modal"
 import { EventModal } from "@/components/event-modal"
+import { EventRegistrationModal } from "@/components/event-registration-modal"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -35,6 +36,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   const [joining, setJoining] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
   const [showRefundModal, setShowRefundModal] = useState(false)
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   
   const isJoined = event.event_participants?.some((p: any) => p.user_id === currentUserId)
   const participantsCount = event.event_participants?.length || 0
@@ -51,6 +53,81 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
     });
   };
 
+
+  const initiatePayment = async () => {
+     setJoining(true)
+     try {
+         const isScriptLoaded = await loadRazorpayScript();
+         if (!isScriptLoaded) {
+             toast.error("Payment Gateway failed to load");
+             setJoining(false);
+             return;
+         }
+
+         // Create Order
+         const response = await fetch("/api/razorpay/order", {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify({ 
+                 amount: event.fee,
+                 notes: { eventId: event.id, userId: currentUserId }
+             }),
+         });
+
+         const orderData = await response.json();
+         if (orderData.error) throw new Error(orderData.error);
+
+         const options = {
+             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+             amount: orderData.amount,
+             currency: orderData.currency,
+             name: "Sahitya Bharti",
+             description: `Registration: ${event.title}`,
+             order_id: orderData.id,
+             handler: async function (response: any) {
+                 // Verify
+                 try {
+                     const verifyResponse = await fetch("/api/razorpay/verify", {
+                         method: "POST",
+                         headers: { "Content-Type": "application/json" },
+                         body: JSON.stringify({
+                             razorpay_order_id: response.razorpay_order_id,
+                             razorpay_payment_id: response.razorpay_payment_id,
+                             razorpay_signature: response.razorpay_signature,
+                         }),
+                     });
+                     const verifyResult = await verifyResponse.json();
+                     if (!verifyResult.success) throw new Error(verifyResult.message);
+
+                     // Insert Participation
+                     const supabase = createClient()
+                     const { error: joinError } = await supabase
+                        .from("event_participants")
+                        .insert({
+                            event_id: event.id,
+                            user_id: currentUserId
+                        })
+                    
+                     if (joinError) throw joinError;
+
+                     toast.success("पंजीकरण सफल! (Registration Successful!)");
+                     router.refresh();
+                 } catch (e: any) {
+                     toast.error("Verification failed: " + e.message);
+                 }
+             },
+             prefill: { name: "", contact: "" },
+             theme: { color: "#F37254" }
+         };
+
+         const paymentObject = new (window as any).Razorpay(options);
+         paymentObject.open();
+     } catch (error: any) {
+         toast.error(error.message || "Payment initialization failed")
+         setJoining(false)
+     }
+  }
+
   const handleJoin = async () => {
     console.log("Event", event)
     if (!currentUserId) {
@@ -58,15 +135,16 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
         return
     }
 
-    setJoining(true)
     const supabase = createClient()
     
     try {
         if (isJoined) {
+             setJoining(true)
              // Leave event or Refund Request
              if (event.fee && event.fee > 0) {
                  // Paid event -> Refund Request
                  setShowRefundModal(true)
+                 setJoining(false)
                  return
              }
              
@@ -80,85 +158,15 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
             if (error) throw error
             toast.success("आप कार्यक्रम से हट गए हैं (Left event)")
             router.refresh()
+            setJoining(false)
         } else {
              // Join event
              // Check if paid event
              if (event.fee && event.fee > 0) {
-                 const isScriptLoaded = await loadRazorpayScript();
-                 if (!isScriptLoaded) {
-                     toast.error("Payment Gatewa y failed to load");
-                     setJoining(false);
-                     return;
-                 }
-
-                 // Create Order
-                 const response = await fetch("/api/razorpay/order", {
-                     method: "POST",
-                     headers: { "Content-Type": "application/json" },
-                     body: JSON.stringify({ 
-                         amount: event.fee,
-                         notes: { eventId: event.id, userId: currentUserId }
-                     }),
-                 });
-
-                 const orderData = await response.json();
-                 if (orderData.error) throw new Error(orderData.error);
-
-                 const options = {
-                     key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                     amount: orderData.amount,
-                     currency: orderData.currency,
-                     name: "Sahitya Bharti",
-                     description: `Registration: ${event.title}`,
-                     order_id: orderData.id,
-                     handler: async function (response: any) {
-                         // Verify
-                         try {
-                             const verifyResponse = await fetch("/api/razorpay/verify", {
-                                 method: "POST",
-                                 headers: { "Content-Type": "application/json" },
-                                 body: JSON.stringify({
-                                     razorpay_order_id: response.razorpay_order_id,
-                                     razorpay_payment_id: response.razorpay_payment_id,
-                                     razorpay_signature: response.razorpay_signature,
-                                 }),
-                             });
-                             const verifyResult = await verifyResponse.json();
-                             if (!verifyResult.success) throw new Error(verifyResult.message);
-
-                             // Insert Participation
-                             const { error: joinError } = await supabase
-                                .from("event_participants")
-                                .insert({
-                                    event_id: event.id,
-                                    user_id: currentUserId
-                                })
-                            
-                             if (joinError) throw joinError;
-
-                             toast.success("पंजीकरण सफल! (Registration Successful!)");
-                             router.refresh();
-                         } catch (e: any) {
-                             toast.error("Verification failed: " + e.message);
-                         }
-                     },
-                     prefill: { name: "", contact: "" }, // Can autofill if user data available
-                     theme: { color: "#F37254" }
-                 };
-
-                 const paymentObject = new (window as any).Razorpay(options);
-                 paymentObject.open();
-
-                 // We keep joining=true until Razorpay closes or succeeds? 
-                 // Actually Razorpay is modal. If user closes, we might need to reset joining.
-                 // Razorpay has 'modal.ondismiss' but SDK logic here is simple.
-                 // We'll setJoining(false) in finally doesn't work well with async handler.
-                 // So we set it to false if error, but if success it refreshes.
-                 // Let's set it false after `paymentObject.open()`? No, it should stay spinning?
-                 // Simple approach: Set false after a timeout? Or just leave it. 
-                 // Better: Add checking for modal close. For now, simple.
-                 
+                 // Open Registration Modal instead of direct payment
+                 setShowRegistrationModal(true)
              } else {
+                setJoining(true)
                 // Free Join
                 const { error } = await supabase
                     .from("event_participants")
@@ -170,18 +178,12 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                 if (error) throw error
                 toast.success("सफलतापूर्वक शामिल हुए! (Successfully joined!)")
                 router.refresh()
+                setJoining(false)
              }
         }
     } catch (error: any) {
         toast.error(error.message || "Failed to update participation")
-    } finally {
-        if (!event.fee || event.fee <= 0) {
-             setJoining(false)
-        } else {
-            // For paid events, we turn off loader after initiating (since popup opens)
-            // or we could keep it if we can track modal.
-            setJoining(false) 
-        }
+        setJoining(false)
     }
   }
 
@@ -198,10 +200,12 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
 
   return (
     <>
-    <div className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group">
+    <div 
+      className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group cursor-pointer"
+      onClick={() => setShowDetails(true)}
+    >
       <div 
-        className="relative h-48 w-full bg-slate-100 cursor-pointer"
-        onClick={() => setShowDetails(true)}
+        className="relative h-48 w-full bg-slate-100"
       >
         {event.image_url ? (
           <Image 
@@ -221,28 +225,51 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                 {isFull ? "कोई सीट नहीं (No Seats Left)" : `${seatsAvailable} सीटें बची हैं (Seats Left)`}
             </Badge>
         )}
-        <Badge variant="default" className="absolute top-2 left-2 bg-primary/90 hover:bg-primary z-10">
-             {event.fee > 0 ? `₹ ${event.fee}` : "निःशुल्क (Free)"}
-        </Badge>
+        <div className="absolute top-2 left-2 flex flex-col gap-2 z-10">
+          <Badge variant="default" className="bg-primary/90 hover:bg-primary">
+               {event.fee > 0 ? `₹ ${event.fee}` : "निःशुल्क (Free)"}
+          </Badge>
+          {event.status && (
+            <Badge 
+              variant="secondary" 
+              className={`${
+                event.status === 'आगामी' ? 'bg-blue-500/90 text-white hover:bg-blue-500' :
+                event.status === 'चल रहा है' ? 'bg-green-500/90 text-white hover:bg-green-500' :
+                'bg-gray-500/90 text-white hover:bg-gray-500'
+              }`}
+            >
+              {event.status}
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="p-5 flex-1 flex flex-col gap-4">
         <div>
             <h3 
-                className="text-xl font-bold line-clamp-2 mb-2 cursor-pointer hover:text-primary transition-colors"
-                onClick={() => setShowDetails(true)}
+                className="text-xl font-bold line-clamp-2 mb-2 hover:text-primary transition-colors"
             >
                 {event.title}
             </h3>
             <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-primary" />
-                    <span>{format(new Date(event.date), "PPP p")}</span>
+                    <span>{format(new Date(event.date), "PPP")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-primary" />
                     <span className="line-clamp-1">{event.location}</span>
                 </div>
+                 {(event.start_time || event.end_time) && (
+                    <div className="flex items-center gap-2 text-primary/80">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                            {event.start_time && format(new Date(`2000-01-01T${event.start_time}`), "h:mm a")}
+                            {event.start_time && event.end_time && " - "}
+                            {event.end_time && format(new Date(`2000-01-01T${event.end_time}`), "h:mm a")}
+                        </span>
+                    </div>
+                 )}
                  {event.prizes && (
                     <div className="flex items-start gap-2">
                         <Trophy className="h-4 w-4 text-primary mt-0.5" />
@@ -262,7 +289,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
              </div>
         )}
 
-        <div className="pt-2 flex items-center justify-between gap-2 mt-auto">
+        <div className="pt-2 flex items-center justify-between gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
              {isAdmin ? (
                  <div className="flex w-full gap-2">
                      <EventModal 
@@ -301,7 +328,16 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                 <Button 
                     variant={isJoined ? "outline" : "default"} 
                     className="w-full relative"
-                    onClick={handleJoin}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (isJoined) {
+                        // If already joined, handle leave directly
+                        handleJoin()
+                      } else {
+                        // If not joined, open modal to show details first
+                        setShowDetails(true)
+                      }
+                    }}
                     disabled={joining || (isFull && !isJoined)}
                 >
                     {joining ? (
@@ -316,7 +352,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                     ) : isFull ? (
                         "कोई सीट नहीं (No Seats Left)"
                     ) : event.fee > 0 ? (
-                        `Pay ₹${event.fee} & Register`
+                         `Register`
                     ) : (
                         "Join Event (Free)"
                     )}
@@ -347,6 +383,13 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
             }}
         />
     )}
+    <EventRegistrationModal 
+        open={showRegistrationModal}
+        onOpenChange={setShowRegistrationModal}
+        event={event}
+        user={{ id: currentUserId }} 
+        onConfirm={initiatePayment} 
+    />
     </>
   )
 }

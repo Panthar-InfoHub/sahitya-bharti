@@ -44,10 +44,12 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
 
   const getPlanStyles = (plan?: string | null) => {
     switch (plan) {
+      case "patron":
+        return "ring-2 ring-purple-500 ring-offset-2"
       case "premium":
         return "ring-2 ring-yellow-500 ring-offset-2"
-      case "silver":
-        return "ring-2 ring-slate-400 ring-offset-2"
+      case "standard":
+        return "ring-2 ring-blue-500 ring-offset-2"
       default:
         // Free user - minimal or no ring
         return ""
@@ -56,8 +58,9 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
 
   const getPlanLabel = (plan?: string | null) => {
      switch (plan) {
+      case "patron": return "Patron Member"
       case "premium": return "Premium Member"
-      case "silver": return "Silver Member"
+      case "standard": return "Standard Member"
       default: return "Free Plan"
     }
   }
@@ -78,11 +81,11 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
                 <p className="text-sm font-medium leading-none">{user.full_name}</p>
-                {user.plan === 'premium' && <Crown className="h-3 w-3 text-yellow-500" fill="currentColor" />}
+                {(user.plan === 'premium' || user.plan === 'patron') && <Crown className={`h-3 w-3 ${user.plan === 'patron' ? 'text-purple-500' : 'text-yellow-500'}`} fill="currentColor" />}
             </div>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
             <div className="pt-1">
-                <Badge variant={user.plan === 'premium' ? 'default' : user.plan === 'silver' ? 'secondary' : 'outline'} className="text-[10px] h-5 px-1.5">
+                <Badge variant={user.plan === 'patron' ? 'default' : user.plan === 'premium' ? 'default' : user.plan === 'standard' ? 'secondary' : 'outline'} className={`text-[10px] h-5 px-1.5 ${user.plan === 'patron' ? 'bg-purple-600 hover:bg-purple-700' : ''}`}>
                     {getPlanLabel(user.plan)}
                 </Badge>
             </div>
