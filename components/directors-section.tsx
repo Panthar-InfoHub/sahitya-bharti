@@ -47,13 +47,18 @@ export function DirectorsSection() {
   return (
     <section className="py-16 bg-gradient-to-b from-white to-orange-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-center mb-2">
-          निदेशक मंडल
-        </h2>
-        <p className="text-center text-muted-foreground mb-8">
-          हमारे राष्ट्रीय और अंतर्राष्ट्रीय निदेशक
-        </p></div>
+        <div className="text-center mb-16 space-y-4">
+          <div className="inline-block px-4 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold uppercase tracking-widest">
+            Leadership Board
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black text-stone-900">
+            निदेशक मंडल
+          </h2>
+          <div className="w-24 h-1.5 bg-gradient-to-r from-orange-400 to-amber-400 mx-auto rounded-full" />
+          <p className="max-w-2xl mx-auto text-stone-500 font-medium">
+            हिंदी साहित्य भारती को वैश्विक ऊंचाइयों तक ले जाने वाले हमारे सम्मानित राष्ट्रीय एवं अंतर्राष्ट्रीय पदाधिकारी
+          </p>
+        </div>
 
         <Tabs defaultValue="national" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
@@ -66,15 +71,15 @@ export function DirectorsSection() {
           </TabsList>
 
           <TabsContent value="national">
-              {loading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                  <span className="ml-2">लोड हो रहा है...</span>
-                </div>
-              ) : nationalDirectors.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">
-                  कोई राष्ट्रीय निदेशक नहीं मिला
-                </p>
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <span className="ml-2">लोड हो रहा है...</span>
+              </div>
+            ) : nationalDirectors.length === 0 ? (
+              <p className="text-center text-muted-foreground py-12">
+                कोई राष्ट्रीय निदेशक नहीं मिला
+              </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {nationalDirectors.map((director) => (
@@ -85,15 +90,15 @@ export function DirectorsSection() {
           </TabsContent>
 
           <TabsContent value="international">
-              {loading ? (
-                <div className="flex justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                  <span className="ml-2">लोड हो रहा है...</span>
-                </div>
-              ) : internationalDirectors.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">
-                  कोई अंतर्राष्ट्रीय निदेशक नहीं मिला
-                </p>
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <span className="ml-2">लोड हो रहा है...</span>
+              </div>
+            ) : internationalDirectors.length === 0 ? (
+              <p className="text-center text-muted-foreground py-12">
+                कोई अंतर्राष्ट्रीय निदेशक नहीं मिला
+              </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {internationalDirectors.map((director) => (

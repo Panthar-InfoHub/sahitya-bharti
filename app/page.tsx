@@ -34,46 +34,46 @@ export default async function Home() {
       <main>
         {/* 1. Hero Section - Organization Name, Vision, Mission, Purpose */}
         <OrganizationHero />
-        
+
+        {/* Leadership - Founder & Director Profile */}
+        <DirectorProfile />
+
+        {/* Directors Section - National & International Board Members */}
+        <DirectorsSection />
+
         {/* 2. About the Organization - Establishment, Registration, Office, Work Areas */}
         <AboutOrganization />
-        
+
         {/* 3. Objectives - Main organizational goals */}
         <ObjectivesSection />
-        
+
         {/* 4. Key Activities - Programs and initiatives */}
         <ActivitiesSection />
-        
-        {/* 5. Leadership - Founder & Director Profile */}
-        <DirectorProfile />
-        
-        {/* 6. Directors Section - National & International Board Members */}
-        <DirectorsSection />
-        
+
         {/* 7. Upcoming Events - Next 3 upcoming events */}
         <UpcomingEventsPreview />
-        
+
         {/* 8. Achievements & Recognition */}
         <AchievementsSection />
-        
+
         {/* 9. Branches & Presence */}
         <BranchesSection />
-        
+
         {/* 10. Gallery Previews */}
         <ImageGalleryPreview />
         <VideoGalleryPreview />
-        
+
         {/* 11. Contact Section */}
         <ContactSection />
-        
+
         {/* 12. Membership CTA (if not premium) */}
         {!isPremium && <MembershipCTA />}
       </main>
       <Footer />
-      
+
       {/* Background Music Player */}
       <BackgroundMusic />
-      
+
       {/* Upcoming Event Popup */}
       <UpcomingEventPopup />
     </>
