@@ -42,7 +42,7 @@ export function ActivitiesSection() {
             <h2 className="text-4xl font-bold text-foreground mb-4">
               प्रमुख गतिविधियाँ
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
+            <div className="w-24 h-1 bg-linear-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
               हमारे संगठन द्वारा संचालित विविध साहित्यिक, शैक्षिक और सामाजिक कार्यक्रम
             </p>
@@ -55,11 +55,11 @@ export function ActivitiesSection() {
               return (
                 <div
                   key={index}
-                  className="bg-gradient-to-br from-orange-50 to-amber-50 p-8 rounded-2xl border-2 border-orange-100 hover:border-orange-300 hover:shadow-lg transition-all group"
+                  className="bg-linear-to-br from-orange-50 to-amber-50 p-8 rounded-2xl border-2 border-orange-100 hover:border-orange-300 hover:shadow-lg transition-all group"
                 >
                   <div className="flex items-start gap-4">
                     {/* Icon */}
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="w-14 h-14 bg-linear-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                       <Icon className="w-7 h-7 text-white" />
                     </div>
 
@@ -94,7 +94,8 @@ export function ActivitiesSection() {
             </p>
             <button 
               onClick={() => setShowContactPopup(true)}
-              className="px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow"
+              suppressHydrationWarning
+              className="px-8 py-3 bg-linear-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow"
             >
               अधिक जानकारी के लिए संपर्क करें
             </button>

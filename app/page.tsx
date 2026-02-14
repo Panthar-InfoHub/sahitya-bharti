@@ -14,6 +14,7 @@ import { ImageGalleryPreview } from "@/components/image-gallery-preview"
 import { VideoGalleryPreview } from "@/components/video-gallery-preview"
 import { MembershipCTA } from "@/components/membership-cta"
 import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
+import { BackgroundMusic } from "@/components/background-music"
 
 import { createClient } from "@/lib/supabase/server"
 
