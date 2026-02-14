@@ -90,11 +90,11 @@ export function DirectorCard({ director }: DirectorCardProps) {
       </div>
 
       {/* Bottom Action */}
-      <div className="w-full pt-4 border-t border-stone-50">
+      {/* <div className="w-full pt-4 border-t border-stone-50">
         <button className="text-[10px] font-black uppercase tracking-widest text-stone-400 group-hover:text-orange-600 flex items-center justify-center gap-2 mx-auto transition-colors duration-300">
           परिचय देखें <ExternalLink className="w-3 h-3" />
         </button>
-      </div>
+      </div> */}
     </div>
   )
 }
