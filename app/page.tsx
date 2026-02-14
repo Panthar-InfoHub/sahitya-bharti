@@ -71,10 +71,7 @@ export default async function Home() {
       </main>
       <Footer />
 
-      {/* Background Music Player */}
-      <BackgroundMusic />
 
-      {/* Upcoming Event Popup */}
       <UpcomingEventPopup />
     </>
   )

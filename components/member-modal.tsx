@@ -106,57 +106,95 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
     }
   }, [member, isOpen])
 
-  // Fetch all positions on mount/open to derive available locations
+  // Fetch all positions on mount/open
   useEffect(() => {
     if (!isOpen) return
 
     const fetchAllData = async () => {
         setLoadingData(true)
         const supabase = createClient()
-        // Fetch all defined positions
-        const { data } = await supabase
-            .from('positions')
-            .select('*')
         
-        if (data) {
-            setAllPositions(data)
-            
-            // Extract Unique States
-            // Normalize state names if needed, but assuming consistency from DB
-            const states = Array.from(new Set(data.map(p => p.state))).sort()
-            setAvailableStates(states)
+        // Fetch domestic positions
+        const { data: domestic } = await supabase.from('positions').select('*')
+        
+        // Fetch international positions
+        const { data: international } = await supabase.from('international_positions').select('*')
+        
+        const combined = []
+        if (domestic) {
+            combined.push(...domestic.map(p => ({ ...p, country: 'India' }))) // Ensure country is set
         }
+        if (international) {
+            // Map title->name, and ensure country/city/state
+            // international table: id, country, city, title
+            combined.push(...international.map(p => ({
+                ...p,
+                name: p.title,
+                state: null // No state for international
+            })))
+        }
+
+        setAllPositions(combined)
         setLoadingData(false)
     }
 
     fetchAllData()
   }, [isOpen])
 
-  // Filter Cities when State changes
+  // Filter States when Country changes (or init)
   useEffect(() => {
-    if (formData.state) {
-        // Filter positions for this state
-        const statePositions = allPositions.filter(p => p.state === formData.state)
-        // Extract Unique Cities
-        const cities = Array.from(new Set(statePositions.map(p => p.city))).sort()
-        setAvailableCities(cities)
+    if (!allPositions.length) return
+
+    const selectedCountry = formData.nation
+    
+    if (selectedCountry === "India") {
+        const countryPositions = allPositions.filter(p => (p.country || "India") === "India")
+        const states = Array.from(new Set(countryPositions.map(p => p.state))).filter(Boolean).sort()
+        setAvailableStates(states)
     } else {
-        setAvailableCities([])
+        setAvailableStates([])
     }
-  }, [formData.state, allPositions])
+  }, [formData.nation, allPositions])
+
+  // Filter Cities when State (India) or Country (International) changes
+  useEffect(() => {
+    const selectedCountry = formData.nation
+    
+    if (selectedCountry === "India") {
+        if (formData.state) {
+            const statePositions = allPositions.filter(p => (p.country || "India") === "India" && p.state === formData.state)
+            const cities = Array.from(new Set(statePositions.map(p => p.city))).sort()
+            setAvailableCities(cities)
+        } else {
+            setAvailableCities([])
+        }
+    } else {
+        // International: Cities come directly from filtered positions
+        const countryPositions = allPositions.filter(p => p.country === selectedCountry)
+        const cities = Array.from(new Set(countryPositions.map(p => p.city))).sort()
+        setAvailableCities(cities)
+    }
+  }, [formData.nation, formData.state, allPositions])
 
   // Filter Positions when City changes
   useEffect(() => {
-      if (formData.state && formData.city) {
-          const validPositions = allPositions
-            .filter(p => p.state === formData.state && p.city === formData.city)
-            .map(p => p.name)
-            .sort()
-          setAvailablePositionNames(validPositions)
+      const selectedCountry = formData.nation
+
+      if (formData.city) {
+          let validPositions = []
+          if (selectedCountry === "India") {
+             if (formData.state) {
+                validPositions = allPositions.filter(p => (p.country || "India") === "India" && p.state === formData.state && p.city === formData.city)
+             }
+          } else {
+             validPositions = allPositions.filter(p => p.country === selectedCountry && p.city === formData.city)
+          }
+          
+          setAvailablePositionNames(validPositions.map(p => p.name).sort())
       } else {
           setAvailablePositionNames([])
       }
-  }, [formData.state, formData.city, allPositions])
+  }, [formData.nation, formData.state, formData.city, allPositions])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -188,33 +226,54 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
       }
   }
 
+
   const handleAddNewPosition = async () => {
-      if (!newPositionName.trim() || !formData.state || !formData.city) return
+      // Validate input based on country
+      if (!newPositionName.trim() || !formData.city) return
+      if (formData.nation === "India" && !formData.state) return
       
       setSavingPosition(true)
       try {
           const supabase = createClient()
           
-          // Insert new position into DB
-          const { data, error } = await supabase
-            .from('positions')
-            .insert({
-                state: formData.state,
-                city: formData.city,
-                name: newPositionName.trim()
-            })
-            .select()
-            .single()
-            
-          if (error) throw error
+          let newData = null
+
+          if (formData.nation === "India") {
+              // Insert into 'positions'
+              const { data, error } = await supabase
+                .from('positions')
+                .insert({
+                    state: formData.state,
+                    city: formData.city,
+                    name: newPositionName.trim()
+                })
+                .select()
+                .single()
+             
+             if (error) throw error
+             newData = { ...data, country: 'India' }
+          } else {
+              // Insert into 'international_positions'
+              const { data, error } = await supabase
+                .from('international_positions')
+                .insert({
+                    country: formData.nation,
+                    city: formData.city,
+                    title: newPositionName.trim()
+                })
+                .select()
+                .single()
+             
+             if (error) throw error
+             // Map title -> name for local state
+             newData = { ...data, name: data.title, state: null }
+          }
 
           // Update local list
-          if (data) {
-              setAllPositions(prev => [...prev, data])
-              // It will automatically update availablePositionNames via useEffect dependency
-              
+          if (newData) {
+              setAllPositions(prev => [...prev, newData])
               // Select it
-              setFormData(prev => ({ ...prev, position: data.name }))
+              setFormData(prev => ({ ...prev, position: newData.name }))
               setIsAddingPosition(false)
               toast.success("New position added")
           }
@@ -340,20 +399,36 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
           {/* Location & Position Logic */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-lg border">
             <div className="space-y-2">
-               <Label>राज्य (State) *</Label>
-               <Select value={formData.state} onValueChange={handleStateChange} disabled={loadingData}>
-                    <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
+               <Label>देश (Country) *</Label>
+               <Select value={formData.nation} onValueChange={(val) => {
+                   setFormData({ ...formData, nation: val, state: "", city: "", position: "" })
+               }}>
+                    <SelectTrigger><SelectValue placeholder="Select Country" /></SelectTrigger>
                     <SelectContent>
-                        {availableStates.map(s => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                        {countries.map(c => (
+                            <SelectItem key={c.isoCode} value={c.name}>{c.name}</SelectItem>
                         ))}
                     </SelectContent>
                </Select>
             </div>
+            
+            {formData.nation === "India" && (
+                <div className="space-y-2">
+                   <Label>राज्य (State) *</Label>
+                   <Select value={formData.state} onValueChange={handleStateChange} disabled={loadingData}>
+                        <SelectTrigger><SelectValue placeholder="Select State" /></SelectTrigger>
+                        <SelectContent>
+                            {availableStates.map(s => (
+                                <SelectItem key={s} value={s}>{s}</SelectItem>
+                            ))}
+                        </SelectContent>
+                   </Select>
+                </div>
+            )}
 
-             <div className="space-y-2">
+            <div className="space-y-2">
                <Label>शहर (City) *</Label>
-               <Select value={formData.city} onValueChange={handleCityChange} disabled={!formData.state}>
+               <Select value={formData.city} onValueChange={handleCityChange} disabled={formData.nation === "India" && !formData.state}>
                     <SelectTrigger><SelectValue placeholder="Select City" /></SelectTrigger>
                     <SelectContent>
                         {availableCities.map(c => (

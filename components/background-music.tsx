@@ -7,14 +7,18 @@ export function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(0.3) // 30% volume by default
+  const [userHasPaused, setUserHasPaused] = useState(false)
   const audioRef = useRef<HTMLAudioElement>(null)
 
   const attemptPlay = async () => {
-    if (!audioRef.current) return
+    if (!audioRef.current || userHasPaused) return
 
     try {
-      await audioRef.current.play()
-      setIsPlaying(true)
+      if (audioRef.current.paused) {
+        audioRef.current.volume = volume // Ensure volume is set
+        await audioRef.current.play()
+        setIsPlaying(true)
+      }
     } catch (error) {
       console.log("Playback failed or was interrupted:", error)
       setIsPlaying(false)
@@ -24,7 +28,7 @@ export function BackgroundMusic() {
   useEffect(() => {
     // Initial auto-play attempt
     const initAudio = async () => {
-      if (!audioRef.current) return
+      if (!audioRef.current || userHasPaused) return
       
       // Try to play immediately
       try {
@@ -46,56 +50,60 @@ export function BackgroundMusic() {
       }
     }
 
-    // Attempt to play on mount
-    initAudio()
+    // Attempt to play on mount only if user hasn't paused
+    if (!userHasPaused) {
+      initAudio()
+    }
+  }, [userHasPaused])
 
-    // Also add a global listener to ensure it starts on first interaction if it hasn't already
+
+  // Simplified interaction logic: just unmute or play if not playing
+  useEffect(() => {
+    if (!audioRef.current || userHasPaused) return
+
     const handleInteraction = async () => {
-      if (!audioRef.current) return
-
-      // If already playing and unmuted, we are good
-      if (!audioRef.current.paused && !audioRef.current.muted) {
-         return
+      if (!audioRef.current || userHasPaused) return
+      
+      // If paused, try to play
+      if (audioRef.current.paused) {
+          attemptPlay()
       }
-
-      // If playing but muted, unmute
-      if (!audioRef.current.paused && audioRef.current.muted) {
-         audioRef.current.muted = false
-         audioRef.current.volume = volume
-         setIsMuted(false)
-      } 
-      // If paused, play
-      else if (audioRef.current.paused) {
-          try {
-            await audioRef.current.play()
-            setIsPlaying(true)
-          } catch (e) {
-            console.error("Interaction play failed", e)
-          }
+      // If muted, unmute
+      if (audioRef.current.muted && !isMuted) {
+          // If state says not muted but element is muted (maybe browser policy), unmute it
+           audioRef.current.muted = false
+           audioRef.current.volume = volume
       }
     }
 
-    // Add listeners for common interactions
-    window.addEventListener("click", handleInteraction)
-    window.addEventListener("touchstart", handleInteraction)
-    window.addEventListener("keydown", handleInteraction)
-    window.addEventListener("scroll", handleInteraction)
+    // Add listeners
+    window.addEventListener("click", handleInteraction, { once: true })
+    window.addEventListener("touchstart", handleInteraction, { once: true })
+    window.addEventListener("keydown", handleInteraction, { once: true })
 
     return () => {
       window.removeEventListener("click", handleInteraction)
       window.removeEventListener("touchstart", handleInteraction)
       window.removeEventListener("keydown", handleInteraction)
-      window.removeEventListener("scroll", handleInteraction)
     }
-  }, [])
+  }, [userHasPaused, volume, isMuted])
 
   const togglePlay = async () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause()
         setIsPlaying(false)
+        setUserHasPaused(true) // Mark that user explicitly paused
       } else {
-        await attemptPlay()
+        setUserHasPaused(false) // User explicitly played
+        try {
+            if (audioRef.current.paused) {
+                await audioRef.current.play()
+            }
+          setIsPlaying(true)
+        } catch (error) {
+          console.error("Play failed", error)
+        }
       }
     }
   }
@@ -113,8 +121,10 @@ export function BackgroundMusic() {
     setVolume(newVolume)
     if (audioRef.current) {
       audioRef.current.volume = newVolume
-      audioRef.current.muted = false // Unmute if volume is adjusted
-      setIsMuted(false)
+      if (newVolume > 0 && isMuted) {
+           audioRef.current.muted = false // Unmute if volume is adjusted
+           setIsMuted(false)
+      }
     }
   }
 
