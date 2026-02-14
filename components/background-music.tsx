@@ -9,55 +9,87 @@ export function BackgroundMusic() {
   const [volume, setVolume] = useState(0.3) // 30% volume by default
   const audioRef = useRef<HTMLAudioElement>(null)
 
-  useEffect(() => {
-    // Attempt to play audio on mount
-    const playAudio = async () => {
-      if (audioRef.current) {
-        try {
-          // Reset time to ensuring it starts from beginning
-          audioRef.current.currentTime = 0
-          await audioRef.current.play()
-          setIsPlaying(true)
-        } catch (error) {
-          console.log("Auto-play blocked, waiting for user interaction")
-          // If auto-play fails, add a one-time click listener to the document to start playback
-          const handleInteraction = () => {
-            if (audioRef.current && audioRef.current.paused) {
-              audioRef.current.play()
-                .then(() => setIsPlaying(true))
-                .catch(e => console.error("Play failed after interaction:", e))
-            }
-            // Remove listeners after first interaction
-            document.removeEventListener("click", handleInteraction)
-            document.removeEventListener("scroll", handleInteraction)
-            document.removeEventListener("keydown", handleInteraction)
-          }
+  const attemptPlay = async () => {
+    if (!audioRef.current) return
 
-          document.addEventListener("click", handleInteraction)
-          document.addEventListener("scroll", handleInteraction)
-          document.addEventListener("keydown", handleInteraction)
+    try {
+      await audioRef.current.play()
+      setIsPlaying(true)
+    } catch (error) {
+      console.log("Playback failed or was interrupted:", error)
+      setIsPlaying(false)
+    }
+  }
+
+  useEffect(() => {
+    // Initial auto-play attempt
+    const initAudio = async () => {
+      if (!audioRef.current) return
+      
+      audioRef.current.volume = volume // Set initial volume
+
+      try {
+        await audioRef.current.play()
+        setIsPlaying(true)
+      } catch (error) {
+        console.log("Auto-play blocked, waiting for user interaction")
+        
+        // Fallback: Try muted autoplay
+        try {
+           audioRef.current.muted = true
+           await audioRef.current.play()
+           setIsPlaying(true)
+           setIsMuted(true)
+        } catch (mutedError) {
+           console.log("Muted auto-play also blocked")
         }
+
+        // Enable audio on first interaction
+        const handleInteraction = () => {
+          if (!audioRef.current) return
+
+          // If playing muted, unmute and reset volume
+          if (audioRef.current.muted && !audioRef.current.paused) {
+             audioRef.current.muted = false
+             audioRef.current.volume = volume
+             setIsMuted(false)
+          } 
+          // If paused (failed autoplay), try to play
+          else if (audioRef.current.paused) {
+              attemptPlay()
+          }
+          
+          // Remove listeners
+          window.removeEventListener("click", handleInteraction, true)
+          window.removeEventListener("scroll", handleInteraction, true)
+          window.removeEventListener("keydown", handleInteraction, true)
+        }
+
+        window.addEventListener("click", handleInteraction, true)
+        window.addEventListener("scroll", handleInteraction, true)
+        window.addEventListener("keydown", handleInteraction, true)
       }
     }
 
-    playAudio()
-  }, [])
+    initAudio()
+  }, []) // Empty dependency array ensures this runs once on mount
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause()
+        setIsPlaying(false)
       } else {
-        audioRef.current.play()
+        await attemptPlay()
       }
-      setIsPlaying(!isPlaying)
     }
   }
 
   const toggleMute = () => {
     if (audioRef.current) {
-      audioRef.current.muted = !isMuted
-      setIsMuted(!isMuted)
+      const newMuted = !isMuted
+      audioRef.current.muted = newMuted
+      setIsMuted(newMuted)
     }
   }
 
@@ -66,6 +98,8 @@ export function BackgroundMusic() {
     setVolume(newVolume)
     if (audioRef.current) {
       audioRef.current.volume = newVolume
+      audioRef.current.muted = false // Unmute if volume is adjusted
+      setIsMuted(false)
     }
   }
 
@@ -84,18 +118,18 @@ export function BackgroundMusic() {
       </audio>
 
       {/* Floating Music Control */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border-2 border-orange-200 p-4 flex items-center gap-3">
+      <div className="fixed bottom-4 right-4 z-50">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-orange-200 p-2 flex items-center gap-2">
           {/* Play/Pause Button */}
           <button
             onClick={togglePlay}
-            className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+            className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
             aria-label={isPlaying ? "Pause music" : "Play music"}
           >
             {isPlaying ? (
-              <Pause className="w-6 h-6 text-white" />
+              <Pause className="w-4 h-4 text-white" />
             ) : (
-              <Play className="w-6 h-6 text-white ml-0.5" />
+              <Play className="w-4 h-4 text-white ml-0.5" />
             )}
           </button>
 
@@ -104,13 +138,13 @@ export function BackgroundMusic() {
             {/* Mute/Unmute Button */}
             <button
               onClick={toggleMute}
-              className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"
+              className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? (
-                <VolumeX className="w-5 h-5 text-orange-600" />
+                <VolumeX className="w-4 h-4 text-orange-600" />
               ) : (
-                <Volume2 className="w-5 h-5 text-orange-600" />
+                <Volume2 className="w-4 h-4 text-orange-600" />
               )}
             </button>
 
@@ -122,15 +156,15 @@ export function BackgroundMusic() {
               step="0.1"
               value={volume}
               onChange={handleVolumeChange}
-              className="w-24 h-2 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+              className="w-20 h-1.5 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
               aria-label="Volume control"
             />
           </div>
 
           {/* Music Label */}
           <div className="hidden sm:block pl-2 border-l border-orange-200">
-            <p className="text-xs font-semibold text-orange-600">संगीत</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] font-semibold text-orange-600">संगीत</p>
+            <p className="text-[10px] text-muted-foreground">
               {isPlaying ? "चल रहा है" : "रुका हुआ"}
             </p>
           </div>

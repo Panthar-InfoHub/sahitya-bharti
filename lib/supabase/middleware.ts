@@ -46,6 +46,10 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname !== '/' && // Allow landing page
     !request.nextUrl.pathname.startsWith('/states') && // Allow public viewing
     !request.nextUrl.pathname.startsWith('/events') && // Allow public events
+    !request.nextUrl.pathname.startsWith('/images-gallery') && // Allow image gallery
+    !request.nextUrl.pathname.startsWith('/videos-gallery') && // Allow video gallery
+    !request.nextUrl.pathname.startsWith('/kendriya') && // Allow central committee
+    !request.nextUrl.pathname.startsWith('/about') && // Allow about page
     !request.nextUrl.pathname.startsWith('/api') // Allow API routes
   ) {
     // no user, potentially respond by redirecting the user to the login page

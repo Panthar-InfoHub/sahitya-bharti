@@ -25,7 +25,7 @@ export function OrganizationHero() {
 
           {/* Organization Name */}
           <div className="space-y-2">
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+            <h1 className="pt-3 text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
               हिंदी साहित्य भारती
             </h1>
           </div>
