@@ -39,7 +39,7 @@ export default function PublicGalleryPage() {
             {/* Header */}
             <div className="text-center space-y-3">
                 <p className="text-sm font-semibold text-primary uppercase tracking-wide">हमारी यादें</p>
-                <h1 className="text-4xl font-bold text-slate-900">सम्पूर्ण चित्र दीर्घा (Full Gallery)</h1>
+                <h1 className="text-4xl font-bold text-slate-900">सम्पूर्ण चित्र दीर्घा </h1>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                     साहित्य भारती के सभी यादगार पलों का संग्रह।
                 </p>

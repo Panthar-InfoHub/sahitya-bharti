@@ -13,7 +13,6 @@ import { BranchesSection } from "@/components/branches-section"
 import { ImageGalleryPreview } from "@/components/image-gallery-preview"
 import { VideoGalleryPreview } from "@/components/video-gallery-preview"
 import { MembershipCTA } from "@/components/membership-cta"
-import { BackgroundMusic } from "@/components/background-music"
 import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
 
 import { createClient } from "@/lib/supabase/server"

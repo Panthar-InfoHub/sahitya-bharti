@@ -19,6 +19,7 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { MembershipModal } from "@/components/membership-modal"
 import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner"
 
 export default function MembershipPage() {
   const [isOpen, setIsOpen] = useState(false)
@@ -127,11 +128,46 @@ export default function MembershipPage() {
                     className={`w-full ${index === 1 ? 'bg-primary' : ''}`}
                     variant={index === 1 ? 'default' : 'outline'}
                     onClick={() => {
+                        // Plan Hierarchy
+                        const planLevels: Record<string, number> = {
+                          'free': 0,
+                          'standard': 1,
+                          'premium': 2,
+                          'patron': 3
+                        }
+                        
+                        const currentPlan = user?.plan?.toLowerCase() || 'free'
+                        const selectedPlanName = plan.name.toLowerCase()
+                        
+                        const currentLevel = planLevels[currentPlan] || 0
+                        const selectedLevel = planLevels[selectedPlanName] || 0
+
+                        if (selectedLevel <= currentLevel) {
+                           toast.info("आपके पास पहले से ही यह (या इससे उच्च) सदस्यता है।", {
+                             description: "आप केवल अपनी सदस्यता को अपग्रेड कर सकते हैं।"
+                           })
+                           return
+                        }
+
                         setSelectedPlan(plan);
                         setIsOpen(true);
                     }}
                   >
-                    चुनें
+                    {(() => {
+                        const planLevels: Record<string, number> = {
+                          'free': 0,
+                          'standard': 1,
+                          'premium': 2,
+                          'patron': 3
+                        }
+                        const currentPlan = user?.plan?.toLowerCase() || 'free'
+                        const selectedPlanName = plan.name.toLowerCase()
+                        const currentLevel = planLevels[currentPlan] || 0
+                        const selectedLevel = planLevels[selectedPlanName] || 0
+                        
+                        if (selectedLevel <= currentLevel) return "वर्तमान योजना (Current)"
+                        return "चुनें"
+                    })()}
                   </Button>
                 </div>
               ))}

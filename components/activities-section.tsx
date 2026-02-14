@@ -1,6 +1,11 @@
+"use client"
+import { useState } from "react"
 import { Users, Award, BookText, Heart } from "lucide-react"
+import { ContactPopup } from "@/components/contact-popup"
 
 export function ActivitiesSection() {
+  const [showContactPopup, setShowContactPopup] = useState(false)
+
   const activities = [
     {
       icon: Users,
@@ -87,12 +92,20 @@ export function ActivitiesSection() {
             <p className="text-lg text-muted-foreground mb-6">
               हमारी गतिविधियों में भाग लेने या सहयोग करने के लिए संपर्क करें
             </p>
-            <button className="px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow">
+            <button 
+              onClick={() => setShowContactPopup(true)}
+              className="px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow"
+            >
               अधिक जानकारी के लिए संपर्क करें
             </button>
           </div>
         </div>
       </div>
+      
+      <ContactPopup 
+        open={showContactPopup} 
+        onOpenChange={setShowContactPopup} 
+      />
     </section>
   )
 }

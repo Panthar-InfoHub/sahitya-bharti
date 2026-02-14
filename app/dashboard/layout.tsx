@@ -25,6 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const sidebarLinks = [
     { href: "/dashboard", label: "अवलोकन (Overview)", icon: LayoutDashboard },
+    { href: "/dashboard/contacts", label: "संपर्क अनुरोध (Contact Requests)", icon: Menu },
     { href: "/dashboard/events", label: "कार्यक्रम (Events)", icon: Calendar },
     { href: "/dashboard/directors", label: "निदेशक (Directors)", icon: UserCog },
     { href: "/dashboard/gallery", label: "गैलरी (Gallery)", icon: ImageIcon },

@@ -38,10 +38,12 @@ export function OrganizationHero() {
               </div>
             </div>
 
-            <div className="space-y-10">
-              <h1 className="text-5xl md:text-8xl font-black text-orange-950 tracking-tight leading-tight">
-                हिंदी साहित्य भारती
-              </h1>
+          {/* Organization Name */}
+          <div className="space-y-2">
+            <h1 className="pt-3 text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+              हिंदी साहित्य भारती
+            </h1>
+          </div>
 
               {/* Motto Section - Directly below Heading */}
               <div className="inline-block relative animate-in fade-in slide-in-from-bottom-4 duration-1000">

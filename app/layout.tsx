@@ -20,6 +20,8 @@ export const metadata: Metadata = {
 
 import { Toaster } from "sonner"
 
+import { BackgroundMusic } from "@/components/background-music"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,11 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="hi">
-      <body className={`font-serif antialiased bg-background text-foreground`}>
+      <body className={`font-serif antialiased bg-background text-foreground`} suppressHydrationWarning>
         <Preloader />
         {children}
         <Analytics />
         <Toaster />
+        <BackgroundMusic />
       </body>
     </html>
   )
