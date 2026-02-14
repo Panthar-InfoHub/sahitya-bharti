@@ -23,17 +23,27 @@ export default async function CertificatePage() {
     .eq("id", user.id)
     .single()
 
-  // 3. Check Premium Status
-  if (!profile || profile.plan !== 'premium') {
+  // 3. Check Membership Status
+  const paidPlans = ['standard', 'premium', 'patron']
+  if (!profile || !paidPlans.includes(profile.plan?.toLowerCase())) {
       return (
           <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
               <h1 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h1>
-              <p className="text-gray-600 mb-4">यह प्रमाण पत्र केवल प्रीमियम सदस्यों के लिए उपलब्ध है। (This certificate is available for Premium members only.)</p>
+              <p className="text-gray-600 mb-4">यह प्रमाण पत्र केवल भुगतान किए गए सदस्यों (Standard, Premium, Patron) के लिए उपलब्ध है।</p>
               <Link href="/">
                 <Button>Go Home</Button>
               </Link>
           </div>
       )
+  }
+
+  const getPlanLabel = (plan: string) => {
+    switch (plan?.toLowerCase()) {
+      case 'standard': return "मानक सदस्य"
+      case 'premium': return "विशिष्ट सदस्य"
+      case 'patron': return "संरक्षक सदस्य"
+      default: return "सदस्य"
+    }
   }
 
   return (
@@ -78,23 +88,15 @@ export default async function CertificatePage() {
 
                 <p className="text-sm md:text-xl text-gray-600 font-serif px-2 leading-relaxed">
                    <span className="text-lg md:text-2xl font-bold text-[#8B4513]">साहित्य भारती</span> के एक सम्मानित <br/>
-                    <strong className="text-base md:text-2xl text-[#DAA520]">प्रीमियम सदस्य (Premium Member)</strong> हैं।
+                    <strong className="text-base md:text-2xl text-[#DAA520]">{getPlanLabel(profile.plan)}</strong> हैं।
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-24 md:gap-y-8 text-center md:text-left max-w-2xl mx-auto w-full mt-6 md:mt-12 text-sm md:text-lg text-gray-700 pb-4 md:pb-0">
-                    <div className="border-b md:border-0 pb-2 md:pb-0">
-                        <span className="font-bold block text-xs md:text-sm uppercase tracking-wide text-gray-400 mb-1">फोन (Phone)</span>
-                        {profile.phone || "N/A"}
-                    </div>
-                    <div className="border-b md:border-0 pb-2 md:pb-0">
-                        <span className="font-bold block text-xs md:text-sm uppercase tracking-wide text-gray-400 mb-1">स्थान (Location)</span>
-                        {profile.city || "N/A"}, {profile.state || "N/A"}
-                    </div>
-                     <div className="border-b md:border-0 pb-2 md:pb-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-0 md:gap-y-8 max-w-xl mx-auto w-full mt-6 md:mt-12 text-sm md:text-lg text-gray-700 pb-4 md:pb-0">
+                     <div className="border-b md:border-0 pb-2 md:pb-0 text-center md:text-left">
                         <span className="font-bold block text-xs md:text-sm uppercase tracking-wide text-gray-400 mb-1">सदस्यता तिथि (Member Since)</span>
-                        {new Date(profile.created_at).toLocaleDateString("hi-IN")}
+                        {new Date(profile.created_at).toLocaleDateString("en-GB")}
                     </div>
-                     <div>
+                     <div className="text-center md:text-right">
                         <span className="font-bold block text-xs md:text-sm uppercase tracking-wide text-gray-400 mb-1">वैधता (Valid Until)</span>
                         आजीवन (Lifetime)
                     </div>

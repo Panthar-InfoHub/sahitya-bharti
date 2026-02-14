@@ -2,7 +2,6 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { OrganizationHero } from "@/components/organization-hero"
 import { AboutOrganization } from "@/components/about-organization"
-import { ObjectivesSection } from "@/components/objectives-section"
 import { ActivitiesSection } from "@/components/activities-section"
 import { DirectorProfile } from "@/components/director-profile"
 import { DirectorsSection } from "@/components/directors-section"
@@ -13,8 +12,8 @@ import { BranchesSection } from "@/components/branches-section"
 import { ImageGalleryPreview } from "@/components/image-gallery-preview"
 import { VideoGalleryPreview } from "@/components/video-gallery-preview"
 import { MembershipCTA } from "@/components/membership-cta"
-import { BackgroundMusic } from "@/components/background-music"
 import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
+import { BackgroundMusic } from "@/components/background-music"
 
 import { createClient } from "@/lib/supabase/server"
 
@@ -32,49 +31,65 @@ export default async function Home() {
     <>
       <Navbar />
       <main>
-        {/* 1. Hero Section - Organization Name, Vision, Mission, Purpose */}
-        <OrganizationHero />
-        
-        {/* 2. About the Organization - Establishment, Registration, Office, Work Areas */}
-        <AboutOrganization />
-        
-        {/* 3. Objectives - Main organizational goals */}
-        <ObjectivesSection />
-        
-        {/* 4. Key Activities - Programs and initiatives */}
-        <ActivitiesSection />
-        
-        {/* 5. Leadership - Founder & Director Profile */}
-        <DirectorProfile />
-        
-        {/* 6. Directors Section - National & International Board Members */}
-        <DirectorsSection />
-        
-        {/* 7. Upcoming Events - Next 3 upcoming events */}
-        <UpcomingEventsPreview />
-        
-        {/* 8. Achievements & Recognition */}
-        <AchievementsSection />
-        
-        {/* 9. Branches & Presence */}
-        <BranchesSection />
-        
-        {/* 10. Gallery Previews */}
-        <ImageGalleryPreview />
-        <VideoGalleryPreview />
-        
+        {/* 1. Hero Section */}
+        <section id="home">
+          <OrganizationHero />
+        </section>
+
+        {/* 2. Director Profile */}
+          <DirectorProfile />
+
+        {/* 3. Directors Section */}
+        <section id="leadership">
+          <DirectorsSection />
+        </section>
+
+        {/* 4. About the Organization */}
+        <section id="about">
+          <AboutOrganization />
+        </section>
+
+        {/* 5. Activities Section */}
+        <section id="activities">
+          <ActivitiesSection />
+        </section>
+
+        {/* 6. Branches Section */}
+        <section id="branches">
+          <BranchesSection />
+        </section>
+
+        {/* 7. Upcoming Events */}
+        <section id="events">
+          <UpcomingEventsPreview />
+        </section>
+
+        {/* 8. Achievements Section */}
+        <section id="achievements">
+          <AchievementsSection />
+        </section>
+
+        {/* 9. Image Gallery */}
+        <section id="gallery">
+          <ImageGalleryPreview />
+        </section>
+
+        {/* 10. Video Gallery */}
+        <section id="videos">
+          <VideoGalleryPreview />
+        </section>
+
         {/* 11. Contact Section */}
-        <ContactSection />
-        
+        <section id="contact">
+          <ContactSection />
+        </section>
+
         {/* 12. Membership CTA (if not premium) */}
         {!isPremium && <MembershipCTA />}
       </main>
       <Footer />
-      
-      {/* Background Music Player */}
-      <BackgroundMusic />
-      
-      {/* Upcoming Event Popup */}
+
+
       <UpcomingEventPopup />
     </>
   )

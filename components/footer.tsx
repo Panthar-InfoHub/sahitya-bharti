@@ -61,7 +61,7 @@ export function Footer() {
 
           {/* Social Links */}
           <div className="space-y-4">
-            <h4 className="font-semibold">सोशल मीडिया</h4>
+            <h4 className="font-semibold">सामाजिक मंच</h4>
             <div className="flex gap-4">
               <a
                 href="#"

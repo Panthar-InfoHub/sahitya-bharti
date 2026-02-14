@@ -1,4 +1,10 @@
+"use client"
+
 import { Phone, Mail, MapPin, Globe, Facebook, Twitter, Youtube } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner"
+import { useState } from "react"
+
 
 export function ContactSection() {
   const contactInfo = [
@@ -35,7 +41,7 @@ export function ContactSection() {
   ]
 
   return (
-    <section className="py-16 bg-gradient-to-br from-orange-50 via-white to-amber-50">
+    <section className="py-16 bg-linear-to-br from-orange-50 via-white to-amber-50">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
@@ -43,7 +49,7 @@ export function ContactSection() {
             <h2 className="text-4xl font-bold text-foreground mb-4">
               संपर्क करें
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
+            <div className="w-24 h-1 bg-linear-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
               हमसे जुड़ने या अधिक जानकारी के लिए संपर्क करें
             </p>
@@ -60,7 +66,7 @@ export function ContactSection() {
                 const Icon = contact.icon
                 const content = (
                   <div className="flex items-start gap-4 p-6 bg-white rounded-xl border border-orange-100 hover:shadow-lg transition-shadow">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-linear-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
                       <Icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -95,7 +101,7 @@ export function ContactSection() {
                       <a
                         key={index}
                         href={social.link}
-                        className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center hover:scale-110 transition-transform"
+                        className="w-12 h-12 bg-linear-to-br from-orange-500 to-amber-500 rounded-lg flex items-center justify-center hover:scale-110 transition-transform"
                         aria-label={social.label}
                       >
                         <Icon className="w-6 h-6 text-white" />
@@ -112,13 +118,60 @@ export function ContactSection() {
                 संदेश भेजें
               </h3>
               
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={async (e) => {
+                e.preventDefault()
+                const form = e.target as HTMLFormElement
+                const formData = new FormData(form)
+                const data = {
+                  name: formData.get('name') as string,
+                  email: formData.get('email') as string,
+                  subject: formData.get('subject') as string,
+                  message: formData.get('message') as string,
+                }
+
+                // Basic validation
+                if (!data.name || !data.email || !data.subject || !data.message) {
+                  toast.error("कृपया सभी आवश्यक फ़ील्ड भरें (Please fill all fields)")
+                  return
+                }
+
+                const toastId = toast.loading("संदेश भेजा जा रहा है... (Sending message...)")
+
+                try {
+                  const supabase = createClient()
+                  
+                  // Get current user (optional)
+                  const { data: { user } } = await supabase.auth.getUser()
+
+                  const { error } = await supabase
+                    .from('contacts')
+                    .insert({
+                      ...data,
+                      user_id: user?.id || null // Link to user if logged in
+                    })
+
+                  if (error) throw error
+
+                  toast.success("संदेश सफलतापूर्वक भेजा गया! (Message sent successfully!)", {
+                    id: toastId
+                  })
+                  form.reset()
+                } catch (error) {
+                  console.error('Error sending message:', error)
+                  toast.error("संदेश भेजने में विफल। कृपया पुन: प्रयास करें। (Failed to send message)", {
+                    id: toastId
+                  })
+                }
+              }}>
                 <div>
                   <label className="block text-sm font-semibold text-foreground mb-2">
                     नाम
                   </label>
                   <input
+                    name="name"
                     type="text"
+                    required
+                    suppressHydrationWarning
                     className="w-full px-4 py-3 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="आपका नाम"
                   />
@@ -129,7 +182,10 @@ export function ContactSection() {
                     ई-मेल
                   </label>
                   <input
+                    name="email"
                     type="email"
+                    required
+                    suppressHydrationWarning
                     className="w-full px-4 py-3 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="आपका ई-मेल"
                   />
@@ -140,7 +196,10 @@ export function ContactSection() {
                     विषय
                   </label>
                   <input
+                    name="subject"
                     type="text"
+                    required
+                    suppressHydrationWarning
                     className="w-full px-4 py-3 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="संदेश का विषय"
                   />
@@ -151,7 +210,10 @@ export function ContactSection() {
                     संदेश
                   </label>
                   <textarea
+                    name="message"
                     rows={4}
+                    required
+                    suppressHydrationWarning
                     className="w-full px-4 py-3 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="अपना संदेश लिखें"
                   ></textarea>
@@ -159,7 +221,8 @@ export function ContactSection() {
 
                 <button
                   type="submit"
-                  className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow"
+                  suppressHydrationWarning
+                  className="w-full px-6 py-3 bg-linear-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow"
                 >
                   संदेश भेजें
                 </button>

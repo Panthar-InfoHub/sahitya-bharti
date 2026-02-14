@@ -63,7 +63,7 @@ export default function DirectorsPage() {
     if (error) {
       toast.error("Failed to delete director")
     } else {
-      toast.success("निदेशक सफलतापूर्वक हटाया गया")
+      toast.success("निर्देशक सफलतापूर्वक हटाया गया")
       fetchDirectors()
     }
   }
@@ -79,7 +79,7 @@ export default function DirectorsPage() {
   }
 
   const filteredDirectors = directors.filter((director) => {
-    const matchesSearch = 
+    const matchesSearch =
       director.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       director.title.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = categoryFilter === "all" || director.category === categoryFilter
@@ -90,12 +90,12 @@ export default function DirectorsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">निदेशक प्रबंधन</h1>
-          <p className="text-muted-foreground">राष्ट्रीय और अंतर्राष्ट्रीय निदेशकों का प्रबंधन करें</p>
+          <h1 className="text-3xl font-bold">निर्देशक प्रबंधन</h1>
+          <p className="text-muted-foreground">राष्ट्रीय और अंतर्राष्ट्रीय निर्देशकों का प्रबंधन करें</p>
         </div>
         <Button onClick={handleAdd} className="gap-2">
           <Plus className="h-4 w-4" />
-          निदेशक जोड़ें
+          निर्देशक जोड़ें
         </Button>
       </div>
 
@@ -133,19 +133,19 @@ export default function DirectorsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>फोटो</TableHead>
-              <TableHead>नाम</TableHead>
-              <TableHead>पद</TableHead>
-              <TableHead>श्रेणी</TableHead>
-              <TableHead>क्रम</TableHead>
-              <TableHead>स्थिति</TableHead>
-              <TableHead className="text-right">कार्य</TableHead>
+                <TableHead>नाम</TableHead>
+                <TableHead>पद</TableHead>
+                <TableHead>श्रेणी</TableHead>
+                <TableHead>क्रम</TableHead>
+                <TableHead>स्थिति</TableHead>
+                <TableHead className="text-right">कार्य</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredDirectors.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    कोई निदेशक नहीं मिला
+                    कोई निर्देशक नहीं मिला
                   </TableCell>
                 </TableRow>
               ) : (
@@ -177,21 +177,19 @@ export default function DirectorsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        director.category === 'national' 
-                          ? 'bg-blue-100 text-blue-700' 
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${director.category === 'national'
+                          ? 'bg-blue-100 text-blue-700'
                           : 'bg-purple-100 text-purple-700'
-                      }`}>
+                        }`}>
                         {director.category === 'national' ? 'राष्ट्रीय' : 'अंतर्राष्ट्रीय'}
                       </span>
                     </TableCell>
                     <TableCell>{director.display_order}</TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        director.is_active 
-                          ? 'bg-green-100 text-green-700' 
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${director.is_active
+                          ? 'bg-green-100 text-green-700'
                           : 'bg-gray-100 text-gray-700'
-                      }`}>
+                        }`}>
                         {director.is_active ? 'सक्रिय' : 'निष्क्रिय'}
                       </span>
                     </TableCell>

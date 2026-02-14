@@ -1,98 +1,232 @@
-import { Users, Award, BookText, Heart } from "lucide-react"
+"use client"
+import { useState } from "react"
+import {
+  Trophy, Globe2, BookOpen, Megaphone,
+  MessageSquare, Sparkles, MoveRight,
+  MapPin, GraduationCap, Library,
+  Flag, Award, Star, Languages,
+  Zap, Compass
+} from "lucide-react"
+import { ContactPopup } from "@/components/contact-popup"
 
 export function ActivitiesSection() {
-  const activities = [
-    {
-      icon: Users,
-      title: "राष्ट्रीय / अंतरराष्ट्रीय संगोष्ठियाँ",
-      description: "साहित्यिक एवं सांस्कृतिक विषयों पर राष्ट्रीय और अंतरराष्ट्रीय स्तर की संगोष्ठियों का आयोजन।",
-      stats: "50+ वार्षिक कार्यक्रम",
-    },
-    {
-      icon: Award,
-      title: "साहित्यिक आयोजन व सम्मान समारोह",
-      description: "कवि सम्मेलन, मुशायरे, साहित्यिक पुरस्कार वितरण और लेखकों को सम्मानित करने के कार्यक्रम।",
-      stats: "100+ सम्मानित साहित्यकार",
-    },
-    {
-      icon: BookText,
-      title: "शोध पत्र, पत्रिका एवं पुस्तक प्रकाशन",
-      description: "शोध पत्रिकाओं का प्रकाशन, साहित्यिक पुस्तकों का प्रकाशन और नवीन लेखकों को प्रोत्साहन।",
-      stats: "200+ प्रकाशित कृतियाँ",
-    },
-    {
-      icon: Heart,
-      title: "सामाजिक एवं शैक्षिक परियोजनाएँ",
-      description: "ग्रामीण क्षेत्रों में शिक्षा प्रसार, पुस्तकालय स्थापना और साक्षरता अभियान।",
-      stats: "30+ सक्रिय परियोजनाएँ",
-    },
+  const [showContactPopup, setShowContactPopup] = useState(false)
+
+  const internationalUnits = [
+    { country: "कनाडा", detail: "कनाडा हिंदी महोत्सव एवं अंतरराष्ट्रीय कवि सम्मेलन", color: "from-red-500 to-rose-500" },
+    { country: "रूस", detail: "विश्वविद्यालयी संगोष्ठियाँ एवं साहित्य अनुवाद कार्यशाला", color: "from-blue-500 to-blue-600" },
+    { country: "मॉरीशस", detail: "विश्व हिंदी सचिवालय के साथ सांस्कृतिक आदान-प्रदान", color: "from-amber-400 to-orange-500" },
+    { country: "इज़राइल", detail: "भारतीय दूतावास के साथ हिंदी दिवस एवं सांस्कृतिक संध्या", color: "from-cyan-500 to-blue-500" },
+    { country: "दुबई / नाइजीरिया", detail: "व्यापारिक हिंदी एवं साहित्यिक गोष्ठियों का आयोजन", color: "from-emerald-500 to-teal-600" },
   ]
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+    <section className="py-24 bg-white relative overflow-hidden">
+      {/* Dynamic Background */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-orange-50/50 rounded-full blur-[120px] -mr-96 -mt-96 animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-50/50 rounded-full blur-[100px] -ml-64 -mb-64" />
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto">
           {/* Section Header */}
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              प्रमुख गतिविधियाँ
-            </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
-            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-              हमारे संगठन द्वारा संचालित विविध साहित्यिक, शैक्षिक और सामाजिक कार्यक्रम
-            </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+            <div className="max-w-2xl text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-100 text-orange-700 text-xs font-black mb-6 tracking-widest uppercase shadow-sm">
+                <Zap className="w-3 h-3 text-orange-600" />
+                <span>प्रभाव एवं कीर्तिमान</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-[1.1]">
+                सांस्कृतिक <span className="text-orange-600 underline decoration-orange-200 decoration-8 underline-offset-4">सक्रियता</span><br />
+                एवं उपलब्धियाँ
+              </h2>
+              <p className="text-lg text-slate-500 font-medium">
+                हिंदी को वैश्विक स्तर पर 'संस्कार और संस्कृति की भाषा' के रूप में स्थापित करने का हमारा सफर।
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="hidden md:block h-20 w-[1px] bg-orange-200" />
+              <div className="flex flex-col">
+                <span className="text-3xl font-black text-orange-600 italic">35+ देश</span>
+                <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">वैश्विक उपस्थिति</span>
+              </div>
+            </div>
           </div>
 
-          {/* Activities Grid */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {activities.map((activity, index) => {
-              const Icon = activity.icon
-              return (
-                <div
-                  key={index}
-                  className="bg-gradient-to-br from-orange-50 to-amber-50 p-8 rounded-2xl border-2 border-orange-100 hover:border-orange-300 hover:shadow-lg transition-all group"
-                >
-                  <div className="flex items-start gap-4">
-                    {/* Icon */}
-                    <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                      <Icon className="w-7 h-7 text-white" />
+          {/* Bento Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
+
+            {/* 1. Guinness World Record (Featured Card) */}
+            <div className="md:col-span-8 group relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-100 rounded-[3rem] p-10 min-h-[400px] flex flex-col justify-end transition-all hover:bg-white hover:shadow-2xl hover:shadow-orange-200/50">
+              <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
+                <Trophy className="w-80 h-80 text-orange-600 pointer-events-none" />
+              </div>
+              <div className="absolute top-10 left-10">
+                <div className="flex items-center gap-3 bg-orange-600 text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+                  <Award className="w-4 h-4" />
+                  गिनीज विश्व कीर्तिमान 2024
+                </div>
+              </div>
+              <div className="relative z-10 max-w-xl">
+                <h3 className="text-4xl font-black text-slate-900 mb-4 leading-tight">
+                  सब में राम शाश्वत श्री राम: <br />
+                  <span className="text-orange-600">विश्व कीर्तिमान</span>
+                </h3>
+                <p className="text-slate-600 text-lg font-medium leading-relaxed mb-8">
+                  मुम्बई में आयोजित कार्यक्रम में चीन का रिकॉर्ड तोड़कर भगवान राम को हज़ारों पोस्टकार्ड लिखकर गिनीज बुक में नाम दर्ज कराया।
+                </p>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white rounded-2xl shadow-md flex items-center justify-center border border-orange-100">
+                    <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
+                  </div>
+                  <span className="font-bold text-slate-700">संस्था की अब तक की सबसे बड़ी उपलब्धि</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Magazine / Publication (Secondary Card) */}
+            <div className="md:col-span-4 bg-white rounded-[3rem] p-8 relative overflow-hidden group border border-orange-100 shadow-sm hover:shadow-xl transition-all">
+              <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:-rotate-12 transition-transform duration-500">
+                <Library className="w-48 h-48 text-orange-600" />
+              </div>
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 border border-orange-100/50">
+                  <BookOpen className="w-7 h-7 text-orange-600" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">'काव्य भारती' <br />एवं प्रकाशन</h3>
+                <p className="text-slate-600 text-sm font-medium leading-relaxed mb-8">
+                  प्रतिभाशाली लेखकों को मंच प्रदान करना जिनकी रचनाएं संसाधनों के अभाव में प्रकाशित नहीं हो पातीं।
+                </p>
+                <div className="mt-auto flex items-center gap-2 text-sm font-black text-orange-600 group-hover:gap-4 transition-all pointer-events-none">
+                  पत्रिका विवरण देखें <MoveRight className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* 3. International Map/List Section (Grid Layout) */}
+            <div className="md:col-span-12 lg:col-span-7 bg-slate-50/50 border border-slate-200 rounded-[3.5rem] p-10">
+              <div className="flex items-center justify-between mb-10">
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 mb-2">अंतरराष्ट्रीय शाखाएं</h3>
+                  <p className="text-sm font-bold text-orange-600 uppercase tracking-widest flex items-center gap-2">
+                    <Globe2 className="w-4 h-4" /> वैश्विक अध्याय
+                  </p>
+                </div>
+                <div className="hidden sm:block">
+                  <div className="px-5 py-2 bg-white rounded-2xl border border-orange-100 text-xs font-bold text-orange-700 shadow-sm">
+                    35+ देशों में सक्रिय
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {internationalUnits.map((item, i) => (
+                  <div key={i} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-orange-200 hover:shadow-xl hover:shadow-orange-500/5 transition-all">
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${item.color} animate-pulse`} />
+                      <h4 className="font-black text-slate-900 text-lg">{item.country}</h4>
                     </div>
+                    <p className="text-slate-500 text-xs font-semibold leading-relaxed group-hover:text-slate-900 transition-colors">
+                      {item.detail}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                    <div className="flex-1">
-                      {/* Title */}
-                      <h3 className="text-xl font-bold text-foreground mb-3 leading-snug">
-                        {activity.title}
-                      </h3>
+            {/* 4. Future Initiatives */}
+            <div className="md:col-span-12 lg:col-span-5 bg-gradient-to-br from-orange-100 via-white to-amber-50 rounded-[3.5rem] p-10 relative overflow-hidden group border border-orange-200 shadow-sm">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(249,115,22,0.1),transparent)] opacity-100" />
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+                  <Compass className="w-7 h-7 text-orange-600" />
+                  भविष्य की योजनाएँ
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-5 group/item">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-orange-100 flex-shrink-0 flex items-center justify-center group-hover/item:border-orange-400 group-hover/item:shadow-lg transition-all">
+                      <Languages className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900 mb-1">हिंदी विश्वविद्यालय सञ्जाल</h4>
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed">दुनिया भर के हिंदी शिक्षण संस्थाओं को एक साझा मंच पर लाना।</p>
+                    </div>
+                  </div>
 
-                      {/* Description */}
-                      <p className="text-muted-foreground leading-relaxed mb-4">
-                        {activity.description}
-                      </p>
-
-                      {/* Stats */}
-                      <div className="inline-block bg-white px-4 py-2 rounded-full border border-orange-200">
-                        <p className="text-sm font-semibold text-primary">
-                          {activity.stats}
-                        </p>
-                      </div>
+                  <div className="flex items-start gap-5 group/item">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-orange-100 flex-shrink-0 flex items-center justify-center group-hover/item:border-orange-400 group-hover/item:shadow-lg transition-all">
+                      <Library className="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900 mb-1">अंकीय ग्रंथागार</h4>
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed">हिंदी के दुर्लभ ग्रंथों को वैश्विक स्तर पर सुलभ बनाना।</p>
                     </div>
                   </div>
                 </div>
-              )
-            })}
+
+                <div className="mt-12 pt-8 border-t border-orange-100">
+                  <p className="text-sm italic text-orange-700 font-bold">
+                    "हम केवल आज का नहीं, हिंदी के स्वर्णिम कल का निर्माण कर रहे हैं।"
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Call to Action */}
-          <div className="mt-12 text-center">
-            <p className="text-lg text-muted-foreground mb-6">
-              हमारी गतिविधियों में भाग लेने या सहयोग करने के लिए संपर्क करें
-            </p>
-            <button className="px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:shadow-lg transition-shadow">
-              अधिक जानकारी के लिए संपर्क करें
-            </button>
+          {/* National Activities Stripes */}
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <div className="flex items-center gap-6 p-8 bg-white rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center flex-shrink-0 border border-orange-100/50">
+                <Flag className="w-8 h-8 text-orange-600" />
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-slate-900 mb-1">राष्ट्र वंदन अभियान</h4>
+                <p className="text-sm text-orange-600 font-bold uppercase tracking-widest">राष्ट्रीय अनुगूंज</p>
+                <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed">भारत के हर राज्य में सांस्कृतिक राष्ट्रवाद का प्रचार।</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6 p-8 bg-white rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-100/50">
+                <GraduationCap className="w-8 h-8 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-slate-900 mb-1">युवा प्रोत्साहन</h4>
+                <p className="text-sm text-amber-600 font-bold uppercase tracking-widest">युवा सशक्तिकरण</p>
+                <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed">कॉलेजों में वाद-विवाद और कविता प्रतियोगिताओं का आयोजन।</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Final Vision Banner */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-amber-400 rounded-[3rem] blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200" />
+            <div className="relative bg-white rounded-[3rem] p-12 text-center border-2 border-orange-100 overflow-hidden">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
+              <h3 className="text-3xl font-black text-slate-900 mb-6">हिंदी को संयुक्त राष्ट्र की आधिकारिक भाषा बनाना</h3>
+              <p className="text-slate-600 text-lg mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
+                हमारा संकल्प हिंदी को संयुक्त राष्ट्र की आधिकारिक भाषा के रूप में देखना है। इस वैश्विक जनमत संग्रह का हिस्सा बनें।
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  onClick={() => setShowContactPopup(true)}
+                  className="w-full sm:w-auto px-10 py-5 bg-orange-600 text-white font-black rounded-2xl hover:bg-orange-700 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-orange-200"
+                >
+                  अभियान का समर्थन करें
+                </button>
+                <button className="w-full sm:w-auto px-10 py-5 bg-white text-orange-600 border-2 border-orange-600 font-black rounded-2xl hover:bg-orange-50 transition-all leading-none">
+                  विवरण देखें
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <ContactPopup
+        open={showContactPopup}
+        onOpenChange={setShowContactPopup}
+      />
     </section>
   )
 }

@@ -33,12 +33,12 @@ export function Navbar() {
 
   useEffect(() => {
     fetchUser()
-    
+
     // Listen for updates from other components (e.g., membership purchase)
     const handleUserUpdate = () => {
       fetchUser()
     }
-    
+
     window.addEventListener('user_updated', handleUserUpdate)
     return () => window.removeEventListener('user_updated', handleUserUpdate)
   }, [])
@@ -54,13 +54,14 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: "/", label: "गृह" },
-    { href: "/events", label: "कार्यक्रम" },
-    { href: "/images-gallery", label: "चित्र दीर्घा" },
-    { href: "/videos-gallery", label: "वीडियो दीर्घा" },
-    { href: "/kendriya", label: "केंद्रीय" },
-    { href: "/states", label: "राज्य" },
-    { href: "/about", label: "हमारे बारे में" },
+    { href: "/#home", label: "गृह" },
+    { href: "/#about", label: "हमारे बारे में" },
+    { href: "/#events", label: "कार्यक्रम" },
+    { href: "/#leadership", label: "केंद्रीय" },
+    { href: "/#branches", label: "राज्य" },
+    { href: "/#gallery", label: "चित्र दीर्घा" },
+    { href: "/#videos", label: "चलचित्र दीर्घा" },
+    { href: "/#contact", label: "संपर्क" },
   ]
 
   return (
@@ -82,14 +83,14 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {/* Admin Link */}
-            {user?.role === 'admin' && (
+            {/* {user?.role === 'admin' && (
               <Link
                 href="/members"
                 className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
               >
                 सदस्य
               </Link>
-            )}
+            )} */}
 
             {navLinks.map((link) => (
               <Link
@@ -111,7 +112,7 @@ export function Navbar() {
                 href="/login"
                 className="hidden sm:inline-block px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
               >
-                लॉग इन
+                प्रवेश
               </Link>
             )}
             {(!user || user.plan === 'free') && (
@@ -143,10 +144,10 @@ export function Navbar() {
                 className="block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                सदस्य (Members)
+                सदस्य
               </Link>
             )}
-            
+
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -169,7 +170,7 @@ export function Navbar() {
                     setIsProfileModalOpen(true)
                   }}
                 >
-                  प्रोफाइल
+                  व्यक्तिगत विवरण
                 </button>
                 <button
                   className="w-full text-left block px-3 py-2 text-sm font-medium text-red-600 hover:bg-accent/10 rounded-md transition-colors"
@@ -179,16 +180,16 @@ export function Navbar() {
                     window.location.href = "/"
                   }}
                 >
-                  लॉग आउट
+                  बाहर निकलें
                 </button>
               </>
             ) : (
-               <Link
+              <Link
                 href="/login"
                 className="w-full text-left block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors mt-2"
                 onClick={() => setIsOpen(false)}
               >
-                लॉग इन
+                प्रवेश
               </Link>
             )}
             {(!user || user.plan === 'free') && (
@@ -204,14 +205,14 @@ export function Navbar() {
         )}
 
         {isProfileModalOpen && (
-          <ProfileModal 
-            open={isProfileModalOpen} 
-            onOpenChange={setIsProfileModalOpen} 
+          <ProfileModal
+            open={isProfileModalOpen}
+            onOpenChange={setIsProfileModalOpen}
             user={user}
             onOpenMembership={() => {
-                setIsProfileModalOpen(false)
-                window.location.href = "/membership"
-            }} 
+              setIsProfileModalOpen(false)
+              window.location.href = "/membership"
+            }}
           />
         )}
       </div>
