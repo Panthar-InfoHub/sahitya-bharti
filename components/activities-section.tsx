@@ -64,7 +64,7 @@ export function ActivitiesSection() {
               <div className="absolute top-10 left-10">
                 <div className="flex items-center gap-3 bg-orange-600 text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
                   <Award className="w-4 h-4" />
-                  गिनीज वर्ल्ड रिकॉर्ड 2024
+                  गिनीज विश्व कीर्तिमान 2024
                 </div>
               </div>
               <div className="relative z-10 max-w-xl">
@@ -148,8 +148,8 @@ export function ActivitiesSection() {
                       <Languages className="w-6 h-6 text-orange-600" />
                     </div>
                     <div>
-                      <h4 className="font-black text-slate-900 mb-1">हिंदी विश्वविद्यालय नेटवर्क</h4>
-                      <p className="text-xs text-slate-600 font-medium leading-relaxed">दुनिया भर के हिंदी शिक्षण संस्थाओं को एक डिजिटल मंच पर लाना।</p>
+                      <h4 className="font-black text-slate-900 mb-1">हिंदी विश्वविद्यालय सञ्जाल</h4>
+                      <p className="text-xs text-slate-600 font-medium leading-relaxed">दुनिया भर के हिंदी शिक्षण संस्थाओं को एक साझा मंच पर लाना।</p>
                     </div>
                   </div>
 
@@ -158,7 +158,7 @@ export function ActivitiesSection() {
                       <Library className="w-6 h-6 text-orange-600" />
                     </div>
                     <div>
-                      <h4 className="font-black text-slate-900 mb-1">डिजिटल लाइब्रेरी</h4>
+                      <h4 className="font-black text-slate-900 mb-1">अंकीय ग्रंथागार</h4>
                       <p className="text-xs text-slate-600 font-medium leading-relaxed">हिंदी के दुर्लभ ग्रंथों को वैश्विक स्तर पर सुलभ बनाना।</p>
                     </div>
                   </div>

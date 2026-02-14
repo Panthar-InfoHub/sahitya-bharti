@@ -10,25 +10,25 @@ export function DirectorProfile() {
     <section className="py-24 bg-linear-to-br from-stone-50 via-white to-orange-50/30 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute bottom-0   left-0 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-7xl mx-auto space-y-16">
           {/* Main Hero Profile Section */}
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="grid lg:grid-cols-12 gap-16 items-center">
             {/* Visual Side */}
             <div className="lg:col-span-5 relative group">
               <div className="absolute -inset-4 bg-linear-to-br from-orange-400 to-amber-500 rounded-[3rem] blur-2xl opacity-20 group-hover:opacity-30 transition duration-700" />
               <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
                   src="/images/director.jpg"
-                  alt="डॉ. रविन्द्र शुक्ल 'रवि'"
+                  alt="डॉ. रविन्द्र शुक्ल"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
                 <div className="absolute bottom-0 inset-x-0 h-1/2 bg-linear-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-8 text-white">
-                  <h3 className="text-3xl font-black mb-1">डॉ. रविन्द्र शुक्ल 'रवि'</h3>
+                  <h3 className="text-3xl font-black mb-1">डॉ. रविन्द्र शुक्ल</h3>
                   <p className="text-orange-300 font-semibold tracking-wide uppercase text-sm">संस्थापक एवं अंतरराष्ट्रीय अध्यक्ष</p>
                 </div>
               </div>
@@ -36,23 +36,23 @@ export function DirectorProfile() {
 
             {/* Content Side */}
             <div className="lg:col-span-7 space-y-8">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-700 text-sm font-bold uppercase tracking-wider">
                   <Star className="w-4 h-4" />
                   साहित्य और संस्कृति के संरक्षक
                 </div>
-                <h2 className="text-4xl md:text-6xl font-black text-stone-900 leading-[1.6] md:leading-[1.2]">
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-stone-900 leading-[1.4] md:leading-[1.3] py-2">
                   भूमंडलीकरण में हिंदी के <span className="text-orange-600">वैश्विक ध्वजवाहक</span>
                 </h2>
-                <p className="text-xl text-stone-600 leading-relaxed font-medium italic">
-                  "डॉ. रवींद्र शुक्ल 'रवि' का हिंदी साहित्य में योगदान उनके बहुआयामी व्यक्तित्व को दर्शाता है। वे न केवल एक लेखक और कवि हैं, बल्कि हिंदी साहित्य भारती के माध्यम से हिंदी को वैश्विक मंच पर प्रतिष्ठित करने वाले एक प्रमुख संरक्षक भी हैं।"
+                <p className="text-xl text-stone-600 leading-[1.8] font-medium italic border-l-4 border-orange-200 pl-6">
+                  &quot;डॉ. रवींद्र शुक्ल का हिंदी साहित्य में योगदान उनके बहुआयामी व्यक्तित्व को दर्शाता है। वे न केवल एक लेखक और कवि हैं, बल्कि हिंदी साहित्य भारती के माध्यम से हिंदी को वैश्विक मंच पर प्रतिष्ठित करने वाले एक प्रमुख संरक्षक भी हैं।&quot;
                 </p>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="p-6 rounded-2xl bg-white shadow-sm border border-stone-100 hover:border-orange-200 transition-colors group">
                   <Trophy className="w-10 h-10 text-orange-500 mb-4 group-hover:scale-110 transition-transform" />
-                  <h4 className="font-bold text-stone-900 mb-1">गिनीज वर्ल्ड रिकॉर्ड (2024)</h4>
+                  <h4 className="font-bold text-stone-900 mb-1">गिनीज विश्व कीर्तिमान (2024)</h4>
                   <p className="text-sm text-stone-500">'सब में राम शाश्वत श्री राम' - वैश्विक सांस्कृतिक गौरव का नया कीर्तिमान</p>
                 </div>
                 <div className="p-6 rounded-2xl bg-white shadow-sm border border-stone-100 hover:border-orange-200 transition-colors group">
@@ -88,7 +88,7 @@ export function DirectorProfile() {
                 </TabsTrigger>
               </TabsList>
 
-              <div className="p-8 md:p-12">
+              <div className="p-10 md:p-16 lg:p-20">
                 {/* Major Works Tab */}
                 <TabsContent value="works" className="space-y-12 animate-in fade-in slide-in-from-bottom-4">
                   <div className="grid md:grid-cols-2 gap-8">
@@ -139,7 +139,7 @@ export function DirectorProfile() {
 
                 {/* History/Timeline Tab */}
                 <TabsContent value="history" className="animate-in fade-in slide-in-from-bottom-4">
-                  <div className="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-stone-300 before:to-transparent">
+                  <div className="relative space-y-20 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-stone-300 before:to-transparent pt-8">
                     {/* 1990-92 */}
                     <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                       <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-orange-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
@@ -222,7 +222,7 @@ export function DirectorProfile() {
                     <div className="space-y-8">
                       <div className="grid grid-cols-3 gap-4 border-b border-stone-100 pb-4">
                         <span className="text-stone-400 font-bold text-sm uppercase">नाम</span>
-                        <span className="col-span-2 font-black text-stone-900 text-lg">डॉ. रवीन्द्र शुक्ल 'रवि'</span>
+                        <span className="col-span-2 font-black text-stone-900 text-lg">डॉ. रवीन्द्र शुक्ल</span>
                       </div>
                       <div className="grid grid-cols-3 gap-4 border-b border-stone-100 pb-4">
                         <span className="text-stone-400 font-bold text-sm uppercase">पिता</span>

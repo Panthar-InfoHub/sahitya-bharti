@@ -11,7 +11,7 @@ export function Preloader() {
     const handleLoad = () => {
       setTimeout(() => {
         setIsLoading(false)
-      }, 500) // Small delay for smooth transition
+      }, 5000) // Small delay for smooth transition
     }
 
     if (document.readyState === 'complete') {
@@ -32,21 +32,21 @@ export function Preloader() {
       </div>
 
       {/* Main content */}
-      <div className="relative flex flex-col items-center gap-6">
+      <div className="relative flex flex-col items-center gap-10">
         {/* Logo with animation */}
         <div className="relative">
           {/* Outer rotating ring */}
           <div className="absolute inset-0 -m-4">
-            <div className="w-32 h-32 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
+            <div className="w-40 h-40 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
           </div>
-          
+
           {/* Inner pulsing ring */}
           <div className="absolute inset-0 -m-2">
-            <div className="w-28 h-28 border-2 border-amber-300 rounded-full animate-pulse" />
+            <div className="w-36 h-36 border-2 border-amber-300 rounded-full animate-pulse" />
           </div>
 
           {/* Logo */}
-          <div className="relative w-24 h-24 animate-scale-pulse">
+          <div className="relative w-32 h-32 animate-scale-pulse">
             <Image
               src="/logo.jpg"
               alt="Sahitya Bharti"
@@ -59,13 +59,13 @@ export function Preloader() {
 
         {/* Loading text */}
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent animate-fade-in">
+          <h2 className="text-5xl font-bold py-2 leading-relaxed bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent animate-fade-in">
             हिंदी साहित्य भारती
           </h2>
-          <p className="text-sm text-muted-foreground animate-fade-in-delay">
+          <p className="text-xl text-muted-foreground animate-fade-in-delay">
             Hindi Sahitya Bharti
           </p>
-          
+
           {/* Loading dots */}
           <div className="flex justify-center gap-1 pt-2">
             <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />

@@ -2,7 +2,6 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { OrganizationHero } from "@/components/organization-hero"
 import { AboutOrganization } from "@/components/about-organization"
-import { ObjectivesSection } from "@/components/objectives-section"
 import { ActivitiesSection } from "@/components/activities-section"
 import { DirectorProfile } from "@/components/director-profile"
 import { DirectorsSection } from "@/components/directors-section"
@@ -32,39 +31,58 @@ export default async function Home() {
     <>
       <Navbar />
       <main>
-        {/* 1. Hero Section - Organization Name, Vision, Mission, Purpose */}
-        <OrganizationHero />
+        {/* 1. Hero Section */}
+        <section id="home">
+          <OrganizationHero />
+        </section>
 
-        {/* Leadership - Founder & Director Profile */}
-        <DirectorProfile />
+        {/* 2. Director Profile */}
+          <DirectorProfile />
 
-        {/* Directors Section - National & International Board Members */}
-        <DirectorsSection />
+        {/* 3. Directors Section */}
+        <section id="leadership">
+          <DirectorsSection />
+        </section>
 
-        {/* 2. About the Organization - Establishment, Registration, Office, Work Areas */}
-        <AboutOrganization />
+        {/* 4. About the Organization */}
+        <section id="about">
+          <AboutOrganization />
+        </section>
 
-        {/* 3. Objectives - Main organizational goals */}
-        <ObjectivesSection />
+        {/* 5. Activities Section */}
+        <section id="activities">
+          <ActivitiesSection />
+        </section>
 
-        {/* 4. Key Activities - Programs and initiatives */}
-        <ActivitiesSection />
+        {/* 6. Branches Section */}
+        <section id="branches">
+          <BranchesSection />
+        </section>
 
-        {/* 7. Upcoming Events - Next 3 upcoming events */}
-        <UpcomingEventsPreview />
+        {/* 7. Upcoming Events */}
+        <section id="events">
+          <UpcomingEventsPreview />
+        </section>
 
-        {/* 8. Achievements & Recognition */}
-        <AchievementsSection />
+        {/* 8. Achievements Section */}
+        <section id="achievements">
+          <AchievementsSection />
+        </section>
 
-        {/* 9. Branches & Presence */}
-        <BranchesSection />
+        {/* 9. Image Gallery */}
+        <section id="gallery">
+          <ImageGalleryPreview />
+        </section>
 
-        {/* 10. Gallery Previews */}
-        <ImageGalleryPreview />
-        <VideoGalleryPreview />
+        {/* 10. Video Gallery */}
+        <section id="videos">
+          <VideoGalleryPreview />
+        </section>
 
         {/* 11. Contact Section */}
-        <ContactSection />
+        <section id="contact">
+          <ContactSection />
+        </section>
 
         {/* 12. Membership CTA (if not premium) */}
         {!isPremium && <MembershipCTA />}

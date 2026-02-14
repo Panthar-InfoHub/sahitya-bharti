@@ -57,7 +57,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
   const [formData, setFormData] = useState<Director>(emptyDirector)
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
-  
+
   // Position Management
   const [positions, setPositions] = useState<Position[]>([])
   const [isAddingPosition, setIsAddingPosition] = useState(false)
@@ -89,7 +89,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
       .select('*')
       .eq('category', category)
       .order('title', { ascending: true })
-    
+
     if (data) {
       setPositions(data)
     }
@@ -141,7 +141,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
         // Use title_hindi as the primary source since user removed English input
         const posTitle = newPosition.title_hindi || newPosition.title
         if (!posTitle) throw new Error("Please enter a position title")
-        
+
         // Save new position - use the same value for both if one is missing
         const { error: posError } = await supabase
           .from('org_positions')
@@ -150,9 +150,9 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
             title_hindi: posTitle,
             category: formData.category
           })
-        
+
         if (posError) throw posError
-        
+
         finalTitle = posTitle
       }
 
@@ -169,7 +169,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
           .eq('id', director.id)
 
         if (error) throw error
-        toast.success("निदेशक सफलतापूर्वक अपडेट हुआ")
+        toast.success("निर्देशक सफलतापूर्वक अपडेट हुआ")
       } else {
         // Create new
         const { error } = await supabase
@@ -177,7 +177,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
           .insert([directorData])
 
         if (error) throw error
-        toast.success("निदेशक सफलतापूर्वक बनाया गया")
+        toast.success("निर्देशक सफलतापूर्वक बनाया गया")
       }
 
       onSuccess()
@@ -209,7 +209,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {director ? "निदेशक संपादित करें" : "नया निदेशक जोड़ें"}
+            {director ? "निर्देशक संपादित करें" : "नया निर्देशक जोड़ें"}
           </DialogTitle>
         </DialogHeader>
 
@@ -239,12 +239,12 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
 
           {/* Name */}
           <div className="space-y-2">
-              <Label>नाम (Name)</Label>
-              <Input
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
+            <Label>नाम (Name)</Label>
+            <Input
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
           </div>
 
           {/* Category */}
@@ -271,10 +271,10 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold">पद (Position) *</Label>
               {isAddingPosition && (
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsAddingPosition(false)}
                   className="h-8 px-2 text-destructive hover:text-destructive"
                 >
@@ -296,7 +296,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
               </div>
             ) : (
               <div className="space-y-2">
-                <Select 
+                <Select
                   onValueChange={handlePositionSelect}
                   // Find ID of current title if it exists in positions, else empty (handled by finding match manually if needed)
                   value={positions.find(p => p.title === formData.title && p.category === formData.category)?.id}
@@ -304,7 +304,7 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
                   <SelectTrigger>
                     {/* Show Hindi title if available in position object, else just English title */}
                     <SelectValue placeholder={
-                        formData.title 
+                      formData.title
                         ? (positions.find(p => p.title === formData.title)?.title_hindi ? `${positions.find(p => p.title === formData.title)?.title_hindi} (${formData.title})` : formData.title)
                         : "पद चुनें (Select Position)"
                     } />
@@ -324,19 +324,19 @@ export function DirectorFormModal({ open, onOpenChange, director, onSuccess }: D
                   </SelectContent>
                 </Select>
                 {/* Fallback - simple validation check */}
-                 {!formData.title && <p className="text-xs text-muted-foreground mt-1">Select a position from the list</p>}
+                {!formData.title && <p className="text-xs text-muted-foreground mt-1">Select a position from the list</p>}
               </div>
             )}
           </div>
 
           {/* Bio */}
           <div className="space-y-2">
-              <Label>जीवनी (Bio)</Label>
-              <Textarea
-                rows={4}
-                value={formData.bio || ""}
-                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              />
+            <Label>जीवनी (Bio)</Label>
+            <Textarea
+              rows={4}
+              value={formData.bio || ""}
+              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+            />
           </div>
 
           {/* Contact */}

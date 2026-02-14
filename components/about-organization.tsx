@@ -40,7 +40,7 @@ export function AboutOrganization() {
                 <Users className="w-8 h-8 text-amber-600" />
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">संस्थापक</h3>
-              <p className="text-xl font-bold text-amber-600 leading-tight">डॉ. रवींद्र शुक्ल 'रवि'</p>
+              <p className="text-xl font-bold text-amber-600 leading-tight">डॉ. रवींद्र शुक्ल</p>
               <p className="text-slate-500 text-sm mt-2 font-medium">पूर्व शिक्षा मंत्री एवं देश के विद्वान</p>
             </div>
 
@@ -123,7 +123,7 @@ export function AboutOrganization() {
                 </div>
                 <ul className="space-y-4">
                   {[
-                    "अंतरराष्ट्रीय संगोष्ठियां (Seminars)",
+                    "अंतरराष्ट्रीय संगोष्ठियां",
                     "साहित्यकारों का सम्मान",
                     "विश्व रिकॉर्ड जैसे बड़े आयोजन",
                     "हिंदी का वैश्विक प्रचार"

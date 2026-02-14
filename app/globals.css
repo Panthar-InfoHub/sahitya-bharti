@@ -133,6 +133,9 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   * {
     @apply border-border outline-ring/50;
   }
@@ -146,6 +149,9 @@
         rgba(139, 69, 19, 0.02) 80px,
         rgba(139, 69, 19, 0.02) 160px
       );
+  }
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 }
 

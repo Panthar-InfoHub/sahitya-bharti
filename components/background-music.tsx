@@ -29,7 +29,7 @@ export function BackgroundMusic() {
     // Initial auto-play attempt
     const initAudio = async () => {
       if (!audioRef.current || userHasPaused) return
-      
+
       // Try to play immediately
       try {
         audioRef.current.volume = volume
@@ -37,15 +37,15 @@ export function BackgroundMusic() {
         setIsPlaying(true)
       } catch (error) {
         console.log("Initial auto-play blocked, retrying with mute or waiting for interaction")
-        
+
         // Fallback: Try muted autoplay
         try {
-           audioRef.current.muted = true
-           await audioRef.current.play()
-           setIsPlaying(true)
-           setIsMuted(true)
+          audioRef.current.muted = true
+          await audioRef.current.play()
+          setIsPlaying(true)
+          setIsMuted(true)
         } catch (mutedError) {
-           console.log("Muted auto-play also blocked")
+          console.log("Muted auto-play also blocked")
         }
       }
     }
@@ -63,16 +63,16 @@ export function BackgroundMusic() {
 
     const handleInteraction = async () => {
       if (!audioRef.current || userHasPaused) return
-      
+
       // If paused, try to play
       if (audioRef.current.paused) {
-          attemptPlay()
+        attemptPlay()
       }
       // If muted, unmute
       if (audioRef.current.muted && !isMuted) {
-          // If state says not muted but element is muted (maybe browser policy), unmute it
-           audioRef.current.muted = false
-           audioRef.current.volume = volume
+        // If state says not muted but element is muted (maybe browser policy), unmute it
+        audioRef.current.muted = false
+        audioRef.current.volume = volume
       }
     }
 
@@ -97,9 +97,9 @@ export function BackgroundMusic() {
       } else {
         setUserHasPaused(false) // User explicitly played
         try {
-            if (audioRef.current.paused) {
-                await audioRef.current.play()
-            }
+          if (audioRef.current.paused) {
+            await audioRef.current.play()
+          }
           setIsPlaying(true)
         } catch (error) {
           console.error("Play failed", error)
@@ -122,8 +122,8 @@ export function BackgroundMusic() {
     if (audioRef.current) {
       audioRef.current.volume = newVolume
       if (newVolume > 0 && isMuted) {
-           audioRef.current.muted = false // Unmute if volume is adjusted
-           setIsMuted(false)
+        audioRef.current.muted = false // Unmute if volume is adjusted
+        setIsMuted(false)
       }
     }
   }
@@ -143,7 +143,7 @@ export function BackgroundMusic() {
 
       {/* Floating Music Control */}
       <div className="fixed bottom-4 right-4 z-50">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-orange-200 p-2 flex items-center gap-2">
+        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 flex items-center gap-2">
           {/* Play/Pause Button */}
           <button
             onClick={togglePlay}
