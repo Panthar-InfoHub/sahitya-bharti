@@ -134,6 +134,9 @@ export default function DashboardMembersPage() {
                            <span>📍</span> 
                            <span className="truncate">
                                {(() => {
+                                   if (member.nation && member.nation !== "India") {
+                                       return `${member.city || "?"}, ${member.nation}`
+                                   }
                                    const mCity = statesMock.find(s => s.nameEn === member.state)?.cities.find(c => c.nameEn === member.city)?.nameHi || member.city;
                                    const mState = statesMock.find(s => s.nameEn === member.state)?.nameHi || member.state;
                                    return `${mCity || "?"}, ${mState || "?"}`
