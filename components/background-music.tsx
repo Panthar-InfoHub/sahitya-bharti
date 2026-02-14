@@ -26,13 +26,13 @@ export function BackgroundMusic() {
     const initAudio = async () => {
       if (!audioRef.current) return
       
-      audioRef.current.volume = volume // Set initial volume
-
+      // Try to play immediately
       try {
+        audioRef.current.volume = volume
         await audioRef.current.play()
         setIsPlaying(true)
       } catch (error) {
-        console.log("Auto-play blocked, waiting for user interaction")
+        console.log("Initial auto-play blocked, retrying with mute or waiting for interaction")
         
         // Fallback: Try muted autoplay
         try {
@@ -43,36 +43,51 @@ export function BackgroundMusic() {
         } catch (mutedError) {
            console.log("Muted auto-play also blocked")
         }
-
-        // Enable audio on first interaction
-        const handleInteraction = () => {
-          if (!audioRef.current) return
-
-          // If playing muted, unmute and reset volume
-          if (audioRef.current.muted && !audioRef.current.paused) {
-             audioRef.current.muted = false
-             audioRef.current.volume = volume
-             setIsMuted(false)
-          } 
-          // If paused (failed autoplay), try to play
-          else if (audioRef.current.paused) {
-              attemptPlay()
-          }
-          
-          // Remove listeners
-          window.removeEventListener("click", handleInteraction, true)
-          window.removeEventListener("scroll", handleInteraction, true)
-          window.removeEventListener("keydown", handleInteraction, true)
-        }
-
-        window.addEventListener("click", handleInteraction, true)
-        window.addEventListener("scroll", handleInteraction, true)
-        window.addEventListener("keydown", handleInteraction, true)
       }
     }
 
+    // Attempt to play on mount
     initAudio()
-  }, []) // Empty dependency array ensures this runs once on mount
+
+    // Also add a global listener to ensure it starts on first interaction if it hasn't already
+    const handleInteraction = async () => {
+      if (!audioRef.current) return
+
+      // If already playing and unmuted, we are good
+      if (!audioRef.current.paused && !audioRef.current.muted) {
+         return
+      }
+
+      // If playing but muted, unmute
+      if (!audioRef.current.paused && audioRef.current.muted) {
+         audioRef.current.muted = false
+         audioRef.current.volume = volume
+         setIsMuted(false)
+      } 
+      // If paused, play
+      else if (audioRef.current.paused) {
+          try {
+            await audioRef.current.play()
+            setIsPlaying(true)
+          } catch (e) {
+            console.error("Interaction play failed", e)
+          }
+      }
+    }
+
+    // Add listeners for common interactions
+    window.addEventListener("click", handleInteraction)
+    window.addEventListener("touchstart", handleInteraction)
+    window.addEventListener("keydown", handleInteraction)
+    window.addEventListener("scroll", handleInteraction)
+
+    return () => {
+      window.removeEventListener("click", handleInteraction)
+      window.removeEventListener("touchstart", handleInteraction)
+      window.removeEventListener("keydown", handleInteraction)
+      window.removeEventListener("scroll", handleInteraction)
+    }
+  }, [])
 
   const togglePlay = async () => {
     if (audioRef.current) {
@@ -109,7 +124,6 @@ export function BackgroundMusic() {
       <audio
         ref={audioRef}
         loop
-        autoPlay
         preload="auto"
       >
         <source src="/music/background.mp3" type="audio/mpeg" />

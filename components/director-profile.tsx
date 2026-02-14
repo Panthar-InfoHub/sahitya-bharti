@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function DirectorProfile() {
   return (
-    <section className="py-24 bg-gradient-to-br from-stone-50 via-white to-orange-50/30 relative overflow-hidden">
+    <section className="py-24 bg-linear-to-br from-stone-50 via-white to-orange-50/30 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />
@@ -18,7 +18,7 @@ export function DirectorProfile() {
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Visual Side */}
             <div className="lg:col-span-5 relative group">
-              <div className="absolute -inset-4 bg-gradient-to-br from-orange-400 to-amber-500 rounded-[3rem] blur-2xl opacity-20 group-hover:opacity-30 transition duration-700" />
+              <div className="absolute -inset-4 bg-linear-to-br from-orange-400 to-amber-500 rounded-[3rem] blur-2xl opacity-20 group-hover:opacity-30 transition duration-700" />
               <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
                   src="/images/director.jpg"
@@ -27,7 +27,7 @@ export function DirectorProfile() {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
-                <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-8 text-white">
+                <div className="absolute bottom-0 inset-x-0 h-1/2 bg-linear-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-8 text-white">
                   <h3 className="text-3xl font-black mb-1">डॉ. रविन्द्र शुक्ल 'रवि'</h3>
                   <p className="text-orange-300 font-semibold tracking-wide uppercase text-sm">संस्थापक एवं अंतरराष्ट्रीय अध्यक्ष</p>
                 </div>
@@ -139,7 +139,7 @@ export function DirectorProfile() {
 
                 {/* History/Timeline Tab */}
                 <TabsContent value="history" className="animate-in fade-in slide-in-from-bottom-4">
-                  <div className="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-stone-300 before:to-transparent">
+                  <div className="relative space-y-12 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-stone-300 before:to-transparent">
                     {/* 1990-92 */}
                     <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                       <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-orange-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
@@ -207,7 +207,7 @@ export function DirectorProfile() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-12 text-center p-10 bg-gradient-to-r from-orange-600 to-amber-600 rounded-[3rem] text-white">
+                  <div className="mt-12 text-center p-10 bg-linear-to-r from-orange-600 to-amber-600 rounded-[3rem] text-white">
                     <p className="text-xl font-bold italic mb-4">"100 से अधिक अन्य प्रतिष्ठित राष्ट्रीय एवं अंतरराष्ट्रीय सम्मान प्राप्त"</p>
                     <div className="flex justify-center gap-4">
                       <span className="px-4 py-1.5 bg-white/20 backdrop-blur rounded-full text-sm font-semibold">अन्तरराष्ट्रीय अध्यक्ष</span>
