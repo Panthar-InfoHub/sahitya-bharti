@@ -35,8 +35,8 @@ export function ActivitiesSection() {
                 <Zap className="w-3 h-3 text-orange-600" />
                 <span>प्रभाव एवं कीर्तिमान</span>
               </div>
-              <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-6 leading-[1.1]">
-                सांस्कृतिक <span className="text-orange-600 underline decoration-orange-200 decoration-8 underline-offset-4">सक्रियता</span><br />
+              <h2 className="text-3xl md:text-6xl font-black text-slate-900 mb-6 leading-[1.1]">
+                सांस्कृतिक <span className="text-orange-600 underline decoration-orange-200 decoration-8 underline-offset-4 font-black">सक्रियता</span><br />
                 एवं उपलब्धियाँ
               </h2>
               <p className="text-lg text-slate-500 font-medium">
@@ -47,7 +47,7 @@ export function ActivitiesSection() {
             <div className="flex items-center gap-4">
               <div className="hidden md:block h-20 w-[1px] bg-orange-200" />
               <div className="flex flex-col">
-                <span className="text-3xl font-black text-orange-600 italic">35+ देश</span>
+                <span className="text-2xl md:text-3xl font-black text-orange-600 italic">35+ देश</span>
                 <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">वैश्विक उपस्थिति</span>
               </div>
             </div>
@@ -57,22 +57,22 @@ export function ActivitiesSection() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
 
             {/* 1. Guinness World Record (Featured Card) */}
-            <div className="md:col-span-8 group relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-100 rounded-[3rem] p-10 min-h-[400px] flex flex-col justify-end transition-all hover:bg-white hover:shadow-2xl hover:shadow-orange-200/50">
-              <div className="absolute top-0 right-0 p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
-                <Trophy className="w-80 h-80 text-orange-600 pointer-events-none" />
+            <div className="md:col-span-8 group relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-100 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-10 min-h-[400px] md:min-h-[450px] flex flex-col justify-end transition-all hover:bg-white hover:shadow-2xl hover:shadow-orange-200/50">
+              <div className="absolute top-0 right-0 p-6 md:p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
+                <Trophy className="w-48 h-48 md:w-80 md:h-80 text-orange-600 pointer-events-none" />
               </div>
-              <div className="absolute top-10 left-10">
-                <div className="flex items-center gap-3 bg-orange-600 text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+              <div className="absolute top-6 left-6 md:top-10 md:left-10">
+                <div className="flex items-center gap-3 bg-orange-600 text-white px-4 md:px-5 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-lg">
                   <Award className="w-4 h-4" />
                   गिनीज विश्व कीर्तिमान 2024
                 </div>
               </div>
               <div className="relative z-10 max-w-xl">
-                <h3 className="text-4xl font-black text-slate-900 mb-4 leading-tight">
+                <h3 className="text-2xl md:text-4xl font-black text-slate-900 mb-4 leading-tight">
                   सब में राम शाश्वत श्री राम: <br />
                   <span className="text-orange-600">विश्व कीर्तिमान</span>
                 </h3>
-                <p className="text-slate-600 text-lg font-medium leading-relaxed mb-8">
+                <p className="text-slate-600 text-base md:text-lg font-medium leading-relaxed mb-6 md:mb-8">
                   मुम्बई में आयोजित कार्यक्रम में चीन का रिकॉर्ड तोड़कर भगवान राम को हज़ारों पोस्टकार्ड लिखकर गिनीज बुक में नाम दर्ज कराया।
                 </p>
                 <div className="flex items-center gap-4">
@@ -85,7 +85,7 @@ export function ActivitiesSection() {
             </div>
 
             {/* 2. Magazine / Publication (Secondary Card) */}
-            <div className="md:col-span-4 bg-white rounded-[3rem] p-8 relative overflow-hidden group border border-orange-100 shadow-sm hover:shadow-xl transition-all">
+            <div className="md:col-span-4 bg-white rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-8 relative overflow-hidden group border border-orange-100 shadow-sm hover:shadow-xl transition-all">
               <div className="absolute -right-8 -bottom-8 opacity-[0.03] group-hover:-rotate-12 transition-transform duration-500">
                 <Library className="w-48 h-48 text-orange-600" />
               </div>
@@ -104,7 +104,7 @@ export function ActivitiesSection() {
             </div>
 
             {/* 3. International Map/List Section (Grid Layout) */}
-            <div className="md:col-span-12 lg:col-span-7 bg-slate-50/50 border border-slate-200 rounded-[3.5rem] p-10">
+            <div className="md:col-span-12 lg:col-span-7 bg-slate-50/50 border border-slate-200 rounded-[2.5rem] md:rounded-[3.5rem] p-6 md:p-10">
               <div className="flex items-center justify-between mb-10">
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 mb-2">अंतरराष्ट्रीय शाखाएं</h3>
@@ -135,7 +135,7 @@ export function ActivitiesSection() {
             </div>
 
             {/* 4. Future Initiatives */}
-            <div className="md:col-span-12 lg:col-span-5 bg-gradient-to-br from-orange-100 via-white to-amber-50 rounded-[3.5rem] p-10 relative overflow-hidden group border border-orange-200 shadow-sm">
+            <div className="md:col-span-12 lg:col-span-5 bg-gradient-to-br from-orange-100 via-white to-amber-50 rounded-[2.5rem] md:rounded-[3.5rem] p-6 md:p-10 relative overflow-hidden group border border-orange-200 shadow-sm">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(249,115,22,0.1),transparent)] opacity-100" />
               <div className="relative z-10">
                 <h3 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
@@ -174,26 +174,26 @@ export function ActivitiesSection() {
           </div>
 
           {/* National Activities Stripes */}
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            <div className="flex items-center gap-6 p-8 bg-white rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center flex-shrink-0 border border-orange-100/50">
-                <Flag className="w-8 h-8 text-orange-600" />
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-16">
+            <div className="flex items-center gap-4 md:gap-6 p-6 md:p-8 bg-white rounded-2xl md:rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-50 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 border border-orange-100/50">
+                <Flag className="w-6 h-6 md:w-8 md:h-8 text-orange-600" />
               </div>
               <div>
-                <h4 className="text-xl font-black text-slate-900 mb-1">राष्ट्र वंदन अभियान</h4>
-                <p className="text-sm text-orange-600 font-bold uppercase tracking-widest">राष्ट्रीय अनुगूंज</p>
-                <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed">भारत के हर राज्य में सांस्कृतिक राष्ट्रवाद का प्रचार।</p>
+                <h4 className="text-lg md:text-xl font-black text-slate-900 mb-1">राष्ट्र वंदन अभियान</h4>
+                <p className="text-[10px] md:text-sm text-orange-600 font-bold uppercase tracking-widest">राष्ट्रीय अनुगूंज</p>
+                <p className="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2 font-medium leading-relaxed">भारत के हर राज्य में सांस्कृतिक राष्ट्रवाद का प्रचार।</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-6 p-8 bg-white rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-100/50">
-                <GraduationCap className="w-8 h-8 text-amber-600" />
+            <div className="flex items-center gap-4 md:gap-6 p-6 md:p-8 bg-white rounded-2xl md:rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-amber-50 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-100/50">
+                <GraduationCap className="w-6 h-6 md:w-8 md:h-8 text-amber-600" />
               </div>
               <div>
-                <h4 className="text-xl font-black text-slate-900 mb-1">युवा प्रोत्साहन</h4>
-                <p className="text-sm text-amber-600 font-bold uppercase tracking-widest">युवा सशक्तिकरण</p>
-                <p className="text-xs text-slate-500 mt-2 font-medium leading-relaxed">कॉलेजों में वाद-विवाद और कविता प्रतियोगिताओं का आयोजन।</p>
+                <h4 className="text-lg md:text-xl font-black text-slate-900 mb-1">युवा प्रोत्साहन</h4>
+                <p className="text-[10px] md:text-sm text-amber-600 font-bold uppercase tracking-widest">युवा सशक्तिकरण</p>
+                <p className="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2 font-medium leading-relaxed">कॉलेजों में वाद-विवाद और कविता प्रतियोगिताओं का आयोजन।</p>
               </div>
             </div>
           </div>
@@ -201,10 +201,10 @@ export function ActivitiesSection() {
           {/* Final Vision Banner */}
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-amber-400 rounded-[3rem] blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200" />
-            <div className="relative bg-white rounded-[3rem] p-12 text-center border-2 border-orange-100 overflow-hidden">
+            <div className="relative bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 text-center border-2 border-orange-100 overflow-hidden">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
-              <h3 className="text-3xl font-black text-slate-900 mb-6">हिंदी को संयुक्त राष्ट्र की आधिकारिक भाषा बनाना</h3>
-              <p className="text-slate-600 text-lg mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
+              <h3 className="text-2xl md:text-3xl font-black text-slate-900 mb-6">हिंदी को संयुक्त राष्ट्र की आधिकारिक भाषा बनाना</h3>
+              <p className="text-slate-600 text-base md:text-lg mb-8 md:mb-10 max-w-2xl mx-auto font-medium leading-relaxed">
                 हमारा संकल्प हिंदी को संयुक्त राष्ट्र की आधिकारिक भाषा के रूप में देखना है। इस वैश्विक जनमत संग्रह का हिस्सा बनें।
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
