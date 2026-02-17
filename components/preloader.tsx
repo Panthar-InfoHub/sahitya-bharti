@@ -11,7 +11,7 @@ export function Preloader() {
     const handleLoad = () => {
       setTimeout(() => {
         setIsLoading(false)
-      }, 5000) // Small delay for smooth transition
+      }, 8000) // Small delay for smooth transition
     }
 
     if (document.readyState === 'complete') {
@@ -63,7 +63,7 @@ export function Preloader() {
             हिंदी साहित्य भारती
           </h2>
           <p className="text-xl text-muted-foreground animate-fade-in-delay">
-            Hindi Sahitya Bharti
+            &quot;मानव बन जाए जग सारा, यह पावन संकल्प हमारा।&quot;
           </p>
 
           {/* Loading dots */}
