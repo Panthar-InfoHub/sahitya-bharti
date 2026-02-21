@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import { Plus, Settings, Trash2, Pencil, Users, Loader2, ChevronLeft } from "lucide-react"
+import { Plus, Settings, Trash2, Pencil, Users, Loader2, ChevronLeft, Download } from "lucide-react"
 import Link from "next/link"
 import {
   Card,
@@ -16,8 +16,8 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
 import { MemberModal } from "@/components/member-modal"
-import { PositionManager } from "@/components/position-manager"
 import { statesMock } from "@/mock/statesMock"
+import { saveAs } from "file-saver"
 
 export default function MembersPage() {
   const router = useRouter()
@@ -26,7 +26,6 @@ export default function MembersPage() {
   
   // Modals
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
-  const [isPositionManagerOpen, setIsPositionManagerOpen] = useState(false)
   const [selectedMember, setSelectedMember] = useState<any>(null)
 
   useEffect(() => {
@@ -70,6 +69,35 @@ export default function MembersPage() {
     }
   }
 
+  const handleDownloadCSV = () => {
+      if (members.length === 0) {
+          toast.error("No members to download")
+          return
+      }
+
+      const headers = ["First Name", "Last Name", "Email", "Phone Number", "Position", "Country", "State", "City", "Address"]
+      const csvData = members.map(m => {
+          const mCity = statesMock.find(s => s.nameEn === m.state)?.cities.find(c => c.nameEn === m.city)?.nameHi || m.city;
+          const mState = statesMock.find(s => s.nameEn === m.state)?.nameHi || m.state;
+          
+          return [
+              `"${m.first_name || ""}"`,
+              `"${m.last_name || ""}"`,
+              `"${m.email || ""}"`,
+              `"${m.phone_number || ""}"`,
+              `"${m.position || ""}"`,
+              `"${m.nation || ""}"`,
+              `"${mState || ""}"`,
+              `"${mCity || ""}"`,
+              `"${m.address || ""}"`
+          ].join(",")
+      })
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...csvData].join("\n")
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      saveAs(blob, `members_export_${new Date().toISOString().split('T')[0]}.csv`)
+  }
+
   const openAddModal = () => {
     setSelectedMember(null)
     setIsMemberModalOpen(true)
@@ -103,10 +131,16 @@ export default function MembersPage() {
                 <p className="text-muted-foreground mt-1">Manage members and their positions</p>
              </div>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-             <Button variant="outline" onClick={() => setIsPositionManagerOpen(true)} className="flex-1 sm:flex-none">
-                <Settings className="mr-2 h-4 w-4" />
-                पद प्रबंधन (Positions)
+          <div className="flex flex-wrap justify-end gap-2 w-full sm:w-auto">
+             <Link href="/dashboard/positions" className="flex-1 sm:flex-none">
+                 <Button variant="outline" className="w-full">
+                    <Settings className="mr-2 h-4 w-4" />
+                    पद (Positions)
+                 </Button>
+             </Link>
+             <Button variant="outline" onClick={handleDownloadCSV} disabled={members.length === 0} className="flex-1 sm:flex-none">
+                 <Download className="mr-2 h-4 w-4" />
+                 CSV
              </Button>
              <Button onClick={openAddModal} className="flex-1 sm:flex-none">
                 <Plus className="mr-2 h-4 w-4" />
@@ -185,11 +219,6 @@ export default function MembersPage() {
         isOpen={isMemberModalOpen} 
         onClose={() => setIsMemberModalOpen(false)} 
         member={selectedMember} 
-      />
-      
-      <PositionManager 
-        isOpen={isPositionManagerOpen}
-        onClose={() => setIsPositionManagerOpen(false)}
       />
     </div>
   )
