@@ -6,128 +6,112 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DirectorFormModal } from "@/components/director-form-modal"
+import { TrusteeFormModal, type Trustee } from "@/components/trustee-form-modal"
 import { Plus, Pencil, Trash2, Loader2, Search, Download } from "lucide-react"
 import { saveAs } from "file-saver"
 import { toast } from "sonner"
 
-interface Director {
-  id: string
-  name: string
-  title: string
-  category: 'national' | 'international'
-  photo_url: string | null
-  bio: string | null
-  email: string | null
-  phone: string | null
-  linkedin_url: string | null
-  display_order: number
-  is_active: boolean
-  created_at: string
-}
-
-export default function DirectorsPage() {
-  const [directors, setDirectors] = useState<Director[]>([])
+export default function TrusteesPage() {
+  const [trustees, setTrustees] = useState<Trustee[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [typeFilter, setTypeFilter] = useState("all")
   const [modalOpen, setModalOpen] = useState(false)
-  const [selectedDirector, setSelectedDirector] = useState<Director | null>(null)
+  const [selectedTrustee, setSelectedTrustee] = useState<Trustee | null>(null)
 
   useEffect(() => {
-    fetchDirectors()
+    fetchTrustees()
   }, [])
 
-  const fetchDirectors = async () => {
+  const fetchTrustees = async () => {
     setLoading(true)
     const supabase = createClient()
     const { data, error } = await supabase
-      .from('directors')
+      .from('trustees')
       .select('*')
       .order('display_order', { ascending: true })
 
     if (!error && data) {
-      setDirectors(data)
+      setTrustees(data)
     }
     setLoading(false)
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this director?")) return
+    if (!confirm("Are you sure you want to delete this trustee?")) return
 
     const supabase = createClient()
     const { error } = await supabase
-      .from('directors')
+      .from('trustees')
       .delete()
       .eq('id', id)
 
     if (error) {
-      toast.error("Failed to delete director")
+      toast.error("Failed to delete trustee")
     } else {
-      toast.success("निर्देशक सफलतापूर्वक हटाया गया")
-      fetchDirectors()
+      toast.success("ट्रस्टी सफलतापूर्वक हटाया गया")
+      fetchTrustees()
     }
   }
 
   const handleDownloadCSV = () => {
-    if (directors.length === 0) {
-        toast.error("No directors to download")
+    if (trustees.length === 0) {
+        toast.error("No trustees to download")
         return
     }
 
-    const headers = ["Name", "Title", "Category", "Bio", "Email", "Phone", "LinkedIn URL", "Display Order", "Is Active"]
-    const csvData = directors.map(d => {
+    const headers = ["Name", "Type", "Description", "Email", "Phone", "Address", "Display Order", "Is Active"]
+    const csvData = trustees.map(t => {
         return [
-            `"${d.name || ""}"`,
-            `"${d.title || ""}"`,
-            `"${d.category || ""}"`,
-            `"${d.bio ? d.bio.replace(/"/g, '""') : ""}"`,
-            `"${d.email || ""}"`,
-            `"${d.phone || ""}"`,
-            `"${d.linkedin_url || ""}"`,
-            `"${d.display_order}"`,
-            `"${d.is_active}"`
+            `"${t.name || ""}"`,
+            `"${t.type || ""}"`,
+            `"${t.description ? t.description.replace(/"/g, '""') : ""}"`,
+            `"${t.email || ""}"`,
+            `"${t.phone || ""}"`,
+            `"${t.address ? t.address.replace(/"/g, '""') : ""}"`,
+            `"${t.display_order}"`,
+            `"${t.is_active}"`
         ].join(",")
     })
 
     const csvContent = "\uFEFF" + [headers.join(","), ...csvData].join("\n")
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    saveAs(blob, `directors_export_${new Date().toISOString().split('T')[0]}.csv`)
+    saveAs(blob, `trustees_export_${new Date().toISOString().split('T')[0]}.csv`)
   }
 
-  const handleEdit = (director: Director) => {
-    setSelectedDirector(director)
+  const handleEdit = (trustee: Trustee) => {
+    setSelectedTrustee(trustee)
     setModalOpen(true)
   }
 
   const handleAdd = () => {
-    setSelectedDirector(null)
+    setSelectedTrustee(null)
     setModalOpen(true)
   }
 
-  const filteredDirectors = directors.filter((director) => {
+  const filteredTrustees = trustees.filter((trustee) => {
     const matchesSearch =
-      director.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      director.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = categoryFilter === "all" || director.category === categoryFilter
-    return matchesSearch && matchesCategory
+      trustee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (trustee.description?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+    const matchesType = typeFilter === "all" || trustee.type === typeFilter
+    return matchesSearch && matchesType
   })
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">निर्देशक प्रबंधन</h1>
-          <p className="text-muted-foreground">राष्ट्रीय और अंतर्राष्ट्रीय निर्देशकों का प्रबंधन करें</p>
+          <h1 className="text-3xl font-bold">ट्रस्टी प्रबंधन (Trustees)</h1>
+          <p className="text-muted-foreground">राष्ट्रीय और अंतर्राष्ट्रीय ट्रस्टियों का प्रबंधन करें</p>
         </div>
         <div className="flex gap-2">
-            <Button variant="outline" onClick={handleDownloadCSV} disabled={directors.length === 0} className="gap-2">
+            <Button variant="outline" onClick={handleDownloadCSV} disabled={trustees.length === 0} className="gap-2">
               <Download className="h-4 w-4" />
               CSV
             </Button>
             <Button onClick={handleAdd} className="gap-2">
               <Plus className="h-4 w-4" />
-              निर्देशक जोड़ें
+              ट्रस्टी जोड़ें
             </Button>
         </div>
       </div>
@@ -137,13 +121,13 @@ export default function DirectorsPage() {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="नाम या पद से खोजें..."
+            placeholder="नाम या विवरण से खोजें..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
           />
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
           <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
@@ -167,7 +151,7 @@ export default function DirectorsPage() {
               <TableRow>
                 <TableHead>फोटो</TableHead>
                 <TableHead>नाम</TableHead>
-                <TableHead>पद</TableHead>
+                <TableHead>ईमेल / फोन</TableHead>
                 <TableHead>श्रेणी</TableHead>
                 <TableHead>क्रम</TableHead>
                 <TableHead>स्थिति</TableHead>
@@ -175,55 +159,57 @@ export default function DirectorsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredDirectors.length === 0 ? (
+              {filteredTrustees.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    कोई निर्देशक नहीं मिला
+                    कोई ट्रस्टी नहीं मिला
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredDirectors.map((director) => (
-                  <TableRow key={director.id}>
+                filteredTrustees.map((trustee) => (
+                  <TableRow key={trustee.id}>
                     <TableCell>
-                      {director.photo_url ? (
+                      {trustee.photo_url ? (
                         <img
-                          src={director.photo_url}
-                          alt={director.name}
+                          src={trustee.photo_url}
+                          alt={trustee.name}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                          <span className="text-orange-600 font-bold">
-                            {director.name.charAt(0)}
+                        <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                          <span className="text-blue-600 font-bold">
+                            {trustee.name.charAt(0)}
                           </span>
                         </div>
                       )}
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{director.name}</p>
+                        <p className="font-medium">{trustee.name}</p>
+                        {trustee.address && <p className="text-xs text-muted-foreground">{trustee.address}</p>}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <p>{director.title}</p>
+                      <div className="text-sm">
+                        {trustee.email && <p>{trustee.email}</p>}
+                        {trustee.phone && <p>{trustee.phone}</p>}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${director.category === 'national'
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${trustee.type === 'national'
                           ? 'bg-blue-100 text-blue-700'
                           : 'bg-purple-100 text-purple-700'
                         }`}>
-                        {director.category === 'national' ? 'राष्ट्रीय' : 'अंतर्राष्ट्रीय'}
+                        {trustee.type === 'national' ? 'राष्ट्रीय' : 'अंतर्राष्ट्रीय'}
                       </span>
                     </TableCell>
-                    <TableCell>{director.display_order}</TableCell>
+                    <TableCell>{trustee.display_order}</TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${director.is_active
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${trustee.is_active
                           ? 'bg-green-100 text-green-700'
                           : 'bg-gray-100 text-gray-700'
                         }`}>
-                        {director.is_active ? 'सक्रिय' : 'निष्क्रिय'}
+                        {trustee.is_active ? 'सक्रिय' : 'निष्क्रिय'}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
@@ -231,14 +217,14 @@ export default function DirectorsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => handleEdit(director)}
+                          onClick={() => handleEdit(trustee)}
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
-                          onClick={() => handleDelete(director.id)}
+                          onClick={() => handleDelete(trustee.id!)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -253,11 +239,11 @@ export default function DirectorsPage() {
       )}
 
       {/* Modal */}
-      <DirectorFormModal
+      <TrusteeFormModal
         open={modalOpen}
         onOpenChange={setModalOpen}
-        director={selectedDirector}
-        onSuccess={fetchDirectors}
+        trustee={selectedTrustee}
+        onSuccess={fetchTrustees}
       />
     </div>
   )

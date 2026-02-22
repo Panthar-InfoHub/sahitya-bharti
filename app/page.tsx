@@ -11,6 +11,7 @@ import { ContactSection } from "@/components/contact-section"
 import { BranchesSection } from "@/components/branches-section"
 import { ImageGalleryPreview } from "@/components/image-gallery-preview"
 import { VideoGalleryPreview } from "@/components/video-gallery-preview"
+import { TrusteesSection } from "@/components/trustees-section"
 import { MembershipCTA } from "@/components/membership-cta"
 import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
 import { BackgroundMusic } from "@/components/background-music"
@@ -49,7 +50,12 @@ export default async function Home() {
           <AboutOrganization />
         </section>
 
-        {/* 5. Activities Section */}
+        {/* 5. Trustees Section */}
+        <section id="trustees">
+          <TrusteesSection />
+        </section>
+
+        {/* 6. Activities Section */}
         <section id="activities">
           <ActivitiesSection />
         </section>
