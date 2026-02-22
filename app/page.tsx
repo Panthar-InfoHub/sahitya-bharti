@@ -15,6 +15,7 @@ import { TrusteesSection } from "@/components/trustees-section"
 import { MembershipCTA } from "@/components/membership-cta"
 import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
 import { BackgroundMusic } from "@/components/background-music"
+import { AnnualEvents } from "@/components/annual-events"
 
 import { createClient } from "@/lib/supabase/server"
 
@@ -38,11 +39,11 @@ export default async function Home() {
         </section>
 
         {/* 2. Director Profile */}
-          <DirectorProfile />
+        <DirectorProfile />
 
-        {/* 3. Directors Section */}
-        <section id="leadership">
-          <DirectorsSection />
+        {/* 3. Trustees Section */}
+        <section id="trustees">
+          <TrusteesSection />
         </section>
 
         {/* 4. About the Organization */}
@@ -50,9 +51,9 @@ export default async function Home() {
           <AboutOrganization />
         </section>
 
-        {/* 5. Trustees Section */}
-        <section id="trustees">
-          <TrusteesSection />
+        {/* 5. Directors Section */}
+        <section id="directors">
+          <DirectorsSection />
         </section>
 
         {/* 6. Activities Section */}
@@ -65,7 +66,12 @@ export default async function Home() {
           <BranchesSection />
         </section>
 
-        {/* 7. Upcoming Events */}
+        {/* 7. Annual Events Calendar */}
+        <section id="annual-events">
+          <AnnualEvents />
+        </section>
+
+        {/* 8. Upcoming Events */}
         <section id="events">
           <UpcomingEventsPreview />
         </section>

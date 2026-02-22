@@ -57,29 +57,52 @@ export function ActivitiesSection() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
 
             {/* 1. Guinness World Record (Featured Card) */}
-            <div className="md:col-span-8 group relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-100 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-10 min-h-[400px] md:min-h-[450px] flex flex-col justify-end transition-all hover:bg-white hover:shadow-2xl hover:shadow-orange-200/50">
-              <div className="absolute top-0 right-0 p-6 md:p-12 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
-                <Trophy className="w-48 h-48 md:w-80 md:h-80 text-orange-600 pointer-events-none" />
-              </div>
-              <div className="absolute top-6 left-6 md:top-10 md:left-10">
-                <div className="flex items-center gap-3 bg-orange-600 text-white px-4 md:px-5 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-lg">
-                  <Award className="w-4 h-4" />
-                  गिनीज विश्व कीर्तिमान 2024
-                </div>
-              </div>
-              <div className="relative z-10 max-w-xl">
-                <h3 className="text-2xl md:text-4xl font-black text-slate-900 mb-4 leading-tight">
-                  सब में राम शाश्वत श्री राम: <br />
-                  <span className="text-orange-600">विश्व कीर्तिमान</span>
-                </h3>
-                <p className="text-slate-600 text-base md:text-lg font-medium leading-relaxed mb-6 md:mb-8">
-                  मुम्बई में आयोजित कार्यक्रम में चीन का रिकॉर्ड तोड़कर भगवान राम को हज़ारों पोस्टकार्ड लिखकर गिनीज बुक में नाम दर्ज कराया।
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-white rounded-2xl shadow-md flex items-center justify-center border border-orange-100">
-                    <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
+            <div className="md:col-span-8 group relative overflow-hidden bg-white border-2 border-orange-100 rounded-[2.5rem] md:rounded-[3rem] p-0 min-h-[450px] transition-all hover:shadow-2xl hover:shadow-orange-200/50">
+              <div className="grid md:grid-cols-2 h-full">
+                {/* Text Content */}
+                <div className="p-8 md:p-12 flex flex-col justify-center relative z-10">
+                  <div className="mb-6">
+                    <div className="inline-flex items-center gap-3 bg-orange-600 text-white px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+                      <Award className="w-4 h-4" />
+                      गिनीज विश्व कीर्तिमान 2024
+                    </div>
                   </div>
-                  <span className="font-bold text-slate-700">संस्था की अब तक की सबसे बड़ी उपलब्धि</span>
+
+                  <h3 className="text-3xl md:text-4xl font-black text-slate-900 mb-4 leading-tight">
+                    सब में राम शाश्वत श्री राम: <br />
+                    <span className="text-orange-600">विश्व कीर्तिमान</span>
+                  </h3>
+
+                  <p className="text-slate-600 text-lg font-medium leading-relaxed mb-8">
+                    मुम्बई में आयोजित कार्यक्रम में चीन का 13 साल पुराना रिकॉर्ड तोड़कर, भगवान राम को समर्पित हज़ारों पोस्टकार्ड लिखकर "Largest Postcard Sentence" का विश्व कीर्तिमान रचा।
+                  </p>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-50 rounded-2xl shadow-sm flex items-center justify-center border border-orange-100">
+                      <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
+                    </div>
+                    <span className="font-bold text-slate-700">संस्था की ऐतिहासिक उपलब्धि</span>
+                  </div>
+                </div>
+
+                {/* Image / Certificate Content */}
+                <div className="relative bg-orange-50/50 flex items-center justify-center p-8 overflow-hidden">
+                  {/* Decorative background for image */}
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-orange-200/20 rounded-full blur-3xl -mr-32 -mt-32" />
+
+                  {/* The Certificate Frame */}
+                  <div className="relative z-10 w-full aspect-[3/4.5] max-w-[280px] group-hover:scale-105 transition-transform duration-700 shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-lg overflow-hidden border-8 border-white bg-white">
+                    <img
+                      src="/images/wrold-record.png"
+                      alt="Guinness World Record Certificate"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+
+                  {/* Icon Overlay for empty space */}
+                  <div className="absolute -bottom-10 -right-10 opacity-[0.05] group-hover:scale-110 transition-transform duration-700">
+                    <Trophy className="w-64 h-64 text-orange-600 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,27 +196,87 @@ export function ActivitiesSection() {
             </div>
           </div>
 
-          {/* National Activities Stripes */}
-          <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-16">
-            <div className="flex items-center gap-4 md:gap-6 p-6 md:p-8 bg-white rounded-2xl md:rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-orange-50 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 border border-orange-100/50">
-                <Flag className="w-6 h-6 md:w-8 md:h-8 text-orange-600" />
+          {/* Rashtra Vandan Detailed Section */}
+          <div className="mb-20">
+            <div className="flex items-center gap-3 mb-10">
+              <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200">
+                <Flag className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h4 className="text-lg md:text-xl font-black text-slate-900 mb-1">राष्ट्र वंदन अभियान</h4>
-                <p className="text-[10px] md:text-sm text-orange-600 font-bold uppercase tracking-widest">राष्ट्रीय अनुगूंज</p>
-                <p className="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2 font-medium leading-relaxed">भारत के हर राज्य में सांस्कृतिक राष्ट्रवाद का प्रचार।</p>
+                <h3 className="text-2xl font-black text-slate-900">राष्ट्र वंदन: एक त्रिवेणी संगम</h3>
+                <p className="text-sm font-bold text-orange-600 uppercase tracking-widest">सांस्कृतिक एवं साहित्यिक महा-अभियान</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 md:gap-6 p-6 md:p-8 bg-white rounded-2xl md:rounded-3xl border border-orange-100 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-amber-50 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-100/50">
-                <GraduationCap className="w-6 h-6 md:w-8 md:h-8 text-amber-600" />
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "1. राष्ट्र वंदन: अतीत का अभिनंदन",
+                  theme: "पुरखों और इतिहास को नमन",
+                  desc: "यह सत्र भारत की सांस्कृतिक विरासत और हिंदी साहित्य के उन महान साहित्यकारों को समर्पित होता है जिन्होंने भाषा की नींव रखी।",
+                  goal: "तुलसीदास, कबीर, निराला और प्रेमचंद जैसे 'युग पुरुषों' के योगदान पर चर्चा। नई पीढ़ी को अपनी जड़ों से जोड़ना ही मुख्य उद्देश्य है।",
+                  icon: Library,
+                  color: "bg-orange-50 text-orange-600 border-orange-100"
+                },
+                {
+                  title: "2. राष्ट्र वंदन: वर्तमान का अभिनंदन",
+                  theme: "समकालीन साहित्यकारों का सम्मान",
+                  desc: "इस चरण में वर्तमान समय में हिंदी भाषा की सेवा कर रहे विद्वानों, लेखकों और सामाजिक कार्यकर्ताओं का अभिनंदन किया जाता है।",
+                  goal: "हिंदी साहित्य भारती सम्मान (जैसे जून 2024 में IPS कृष्ण प्रकाश का सम्मान) और डिजिटल युग में हिंदी की प्रासंगिकता पर विमर्श।",
+                  icon: Award,
+                  color: "bg-amber-50 text-amber-600 border-amber-100"
+                },
+                {
+                  title: "3. राष्ट्र वंदन: कवि अभिनंदन",
+                  theme: "काव्य चेतना और रस",
+                  desc: "कविता को हिंदी साहित्य का हृदय माना जाता है, इसलिए यह सत्र पूरी तरह से एक भव्य 'कवि सम्मेलन' के रूप में आयोजित होता है।",
+                  goal: "देश-विदेश के प्रतिष्ठित कवियों द्वारा राष्ट्रभक्ति और सांस्कृतिक गौरव का स्वर बुलंद करना। यह कार्यक्रम का सबसे भावनात्मक हिस्सा होता है।",
+                  icon: Megaphone,
+                  color: "bg-rose-50 text-rose-600 border-rose-100"
+                }
+              ].map((phase, idx) => (
+                <div key={idx} className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group">
+                  <div className={`w-14 h-14 ${phase.color} rounded-2xl flex items-center justify-center mb-6 border transition-transform group-hover:rotate-12`}>
+                    <phase.icon className="w-7 h-7" />
+                  </div>
+                  <h4 className="text-xl font-black text-slate-900 mb-2">{phase.title}</h4>
+                  <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <Sparkles className="w-3 h-3 text-orange-500" />
+                    {phase.theme}
+                  </div>
+                  <p className="text-slate-600 text-sm font-medium leading-relaxed mb-6">
+                    {phase.desc}
+                  </p>
+                  <div className="pt-6 border-t border-slate-50">
+                    <p className="text-slate-500 text-xs font-semibold leading-relaxed italic">
+                      <span className="text-slate-900 font-bold not-italic">लक्ष्य:</span> {phase.goal}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <div className="flex items-center gap-6 p-8 bg-orange-50/50 rounded-[2rem] border border-orange-100 group">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 border border-orange-200 shadow-sm group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-8 h-8 text-orange-600" />
               </div>
               <div>
-                <h4 className="text-lg md:text-xl font-black text-slate-900 mb-1">युवा प्रोत्साहन</h4>
-                <p className="text-[10px] md:text-sm text-amber-600 font-bold uppercase tracking-widest">युवा सशक्तिकरण</p>
-                <p className="text-[10px] md:text-xs text-slate-500 mt-1 md:mt-2 font-medium leading-relaxed">कॉलेजों में वाद-विवाद और कविता प्रतियोगिताओं का आयोजन।</p>
+                <h4 className="text-xl font-black text-slate-900 mb-1">युवा प्रोत्साहन</h4>
+                <p className="text-xs text-orange-600 font-bold uppercase tracking-widest mb-2">भावी पीढ़ी का सशक्तीकरण</p>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">कॉलेजों और विश्वविद्यालयों में वाद-विवाद, कविता प्रतियोगिताओं और कार्यशालाओं के माध्यम से भाषाई संस्कार भरना।</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6 p-8 bg-amber-50/50 rounded-[2rem] border border-amber-100 group">
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 border border-amber-200 shadow-sm group-hover:scale-110 transition-transform">
+                <Star className="w-8 h-8 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-slate-900 mb-1">सांस्कृतिक संगम</h4>
+                <p className="text-xs text-amber-600 font-bold uppercase tracking-widest mb-2">विविधता में एकता</p>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">विभिन्न क्षेत्रीय भाषाओं और लोक-साहित्य के साथ हिंदी का सामंजस्य स्थापित कर सर्व-भारतीय चेतना का जागरण।</p>
               </div>
             </div>
           </div>
