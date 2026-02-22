@@ -95,7 +95,7 @@ export function OrganizationHero() {
 
               <div className="space-y-6">
                 <p className="text-lg md:text-2xl text-stone-800 leading-relaxed font-serif italic border-l-4 border-orange-200 pl-6">
-                  प्रख्यात साहित्यकार एवं पूर्व शिक्षा मंत्री उ.प्र. <span className="text-orange-700 font-bold not-italic">डॉ. रविन्द्र शुक्ल</span> तथा देश एवं विदेश के अनेक विद्वानों ने भारतीय संस्कृति की मूलधार, हिन्दी भाषा और हिन्दी साहित्य के उत्थान का संकल्प लेकर व्यापक मंथन के बाद <span className="text-stone-950 font-bold not-italic">15 जुलाई 2020</span> को संस्था का गठन किया।
+                  प्रख्यात साहित्यकार एवं पूर्व शिक्षा मंत्री उ.प्र. <span className="text-orange-700 font-bold not-italic">डॉ. रवीन्द्र शुक्ल</span> तथा देश एवं विदेश के अनेक विद्वानों ने भारतीय संस्कृति की पुनर्प्रतिष्ठा, हिंदी भाषा और हिंदी साहित्य के उत्थान का संकल्प लेकर व्यापक मंथन के बाद <span className="text-stone-950 font-bold not-italic">15 जुलाई 2020</span> को संस्था का गठन किया।
                 </p>
               </div>
             </div>
@@ -104,7 +104,7 @@ export function OrganizationHero() {
               <div className="p-8 rounded-[2rem] md:rounded-[2.5rem] bg-orange-600 text-white shadow-2xl shadow-orange-200 transform lg:translate-y-8">
                 <Globe className="w-8 h-8 md:w-10 md:h-10 mb-6 opacity-50" />
                 <p className="text-base md:text-xl leading-relaxed font-medium">
-                  आज हिन्दी साहित्य भारती विश्व के <span className="text-amber-300 font-bold text-2xl">37 देशों</span>, भारत के प्रत्येक प्रदेश, जनपदीय एवं महानगरीय स्तर पर सक्रियता के साथ अपने संकल्प को पूर्ण करने में लगी हुई है। यह विश्व की एक अभिनव और सबसे बड़ी संस्था है।
+                  आज हिंदी साहित्य भारती विश्व के <span className="text-amber-300 font-bold text-2xl">37 देशों</span>, भारत के प्रत्येक प्रदेश, जनपदीय एवं महानगरीय स्तर पर सक्रियता के साथ अपने संकल्प को पूर्ण करने में लगी हुई है। यह विश्व की एक अभिनव और सबसे बड़ी संस्था है।
                 </p>
               </div>
 
@@ -141,7 +141,8 @@ export function OrganizationHero() {
                 <div className="flex items-center justify-center gap-4">
                   <div className="h-px w-10 md:w-16 bg-stone-200" />
                   <p className="text-sm md:text-xl text-stone-500 font-medium italic font-serif">
-                    महाउपनिषद: अध्याय 6, मंत्र 71
+
+                    महोपनिषद: अध्याय 6, मंत्र 71
                   </p>
                   <div className="h-px w-10 md:w-16 bg-stone-200" />
                 </div>
@@ -152,7 +153,7 @@ export function OrganizationHero() {
                   &quot;यह अपना मित्र है और यह नहीं है, इस तरह की गणना छोटे चित्त वाले लोग करते हैं। उदार हृदय वाले लोगों के लिए तो (सम्पूर्ण) धरती ही परिवार है।&quot;
                 </p>
                 <p className="text-sm md:text-xl text-stone-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                  हिन्दी साहित्य भारती ने <span className="text-orange-400">“मानव बन जाए जग सारा”</span> को अपना ध्येय बनाकर शांति स्थापना के लिए आंदोलन प्रारम्भ किया है।
+                  हिंदी साहित्य भारती ने <span className="text-orange-400">“मानव बन जाए जग सारा”</span> को अपना ध्येय बनाकर शांति स्थापना के लिए आंदोलन प्रारम्भ किया है।
                 </p>
               </div>
             </div>
@@ -171,7 +172,7 @@ export function OrganizationHero() {
                 { title: "विश्व शांति", desc: "सकारात्मक सोच के बुद्धिजीवियों को एक मंच पर लाना।", icon: <Globe className="w-5 h-5" />, color: "bg-orange-600" },
                 { title: "सनातन चेतना", desc: "सांस्कृतिक चेतना को विश्व पटल पर प्रतिष्ठित करना।", icon: <Sparkles className="w-5 h-5" />, color: "bg-amber-600" },
                 { title: "साहित्यिक माध्यम", desc: "सम्पूर्ण साहित्य को माध्यम बनाकर मूल्यों का विकास।", icon: <BookOpen className="w-5 h-5" />, color: "bg-stone-900" },
-                { title: "हिन्दी का गौरव", desc: "हिन्दी को सम्पर्क और राष्ट्रभाषा की प्रतिष्ठा दिलाना।", icon: <Heart className="w-5 h-5" />, color: "bg-orange-600" },
+                { title: "हिंदी का गौरव", desc: "हिंदी को सम्पर्क और राष्ट्रभाषा की प्रतिष्ठा दिलाना।", icon: <Heart className="w-5 h-5" />, color: "bg-orange-600" },
                 { title: "युवा संस्कार", desc: "युवा पीढ़ी में संस्कार के लिए कार्यक्रमों की रचना।", icon: <Users className="w-5 h-5" />, color: "bg-amber-600" },
                 { title: "लेखक सहयोग", desc: "रचनाकारों को हर प्रकार का साहित्यिक सहयोग देना।", icon: <PenTool className="w-5 h-5" />, color: "bg-stone-900" },
                 { title: "शोध एवं यथार्थ", desc: "साहित्य में भारत की गरिमा के प्रक्षेपणों का शोध।", icon: <Search className="w-5 h-5" />, color: "bg-orange-600" },

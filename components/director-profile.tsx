@@ -22,13 +22,13 @@ export function DirectorProfile() {
               <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white">
                 <Image
                   src="/images/director.jpg"
-                  alt="डॉ. रविन्द्र शुक्ल"
+                  alt="डॉ. रवीन्द्र शुक्ल"
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
                 <div className="absolute bottom-0 inset-x-0 h-3/5 bg-linear-to-t from-black/90 via-black/50 to-transparent flex flex-col justify-end p-8 text-white">
-                  <h3 className="text-3xl font-black mb-1">डॉ. रविन्द्र शुक्ल</h3>
+                  <h3 className="text-3xl font-black mb-1">डॉ. रवीन्द्र शुक्ल</h3>
                   <p className="text-orange-300 font-bold tracking-wide uppercase text-xs mb-3">राष्ट्रीय कवि एवं साहित्यकार</p>
                   <div className="space-y-1 text-stone-300 text-xs font-medium">
                     <p className="flex items-center gap-2"><MapPin className="w-3 h-3 text-orange-400" /> संकल्प 70/A-5 अयोध्यापुरी, झाँसी (उ.प्र.)</p>
@@ -60,7 +60,7 @@ export function DirectorProfile() {
                     पग चिन्ह बनाने वाला ही दुनिया में पूजा जाता है।&quot;
                   </p>
                   <p className="text-stone-500 font-medium leading-relaxed">
-                    प्रख्यात राष्ट्रवादी चिंतक, पूर्व राज्यमंत्री (उ.प्र. सरकार) एवं चार बार झाँसी के विधायक रहे डॉ. रविन्द्र शुक्ल ने अपना सम्पूर्ण जीवन हिन्दी साहित्य एवं सनातन संस्कृति की पुनर्स्थापना के लिए समर्पित कर दिया है।
+                    प्रख्यात राष्ट्रवादी चिंतक, पूर्व राज्यमंत्री (उ.प्र. सरकार) एवं चार बार झाँसी के विधायक रहे डॉ. रवीन्द्र शुक्ल ने अपना सम्पूर्ण जीवन हिंदी साहित्य एवं सनातन संस्कृति की पुनर्स्थापना के लिए समर्पित कर दिया है।
                   </p>
                 </div>
               </div>
@@ -121,7 +121,7 @@ export function DirectorProfile() {
                       </div>
                       <div className="grid grid-cols-3 gap-4 border-b border-stone-100 pb-4">
                         <span className="text-stone-400 font-bold text-xs uppercase">पिता</span>
-                        <span className="col-span-2 font-bold text-stone-700">स्व. श्री मनूलाल शुक्ल</span>
+                        <span className="col-span-2 font-bold text-stone-700">स्व. श्री मन्नूलालशुक्ल</span>
                       </div>
                       <div className="grid grid-cols-3 gap-4 border-b border-stone-100 pb-4">
                         <span className="text-stone-400 font-bold text-xs uppercase">जन्म</span>
@@ -171,7 +171,7 @@ export function DirectorProfile() {
                       { year: '1978–83', title: 'एडवोकेट एवं श्रमिक नेता', desc: 'भारतीय मजदूर संघ के अध्यक्ष के रूप में सक्रिय।' },
                       { year: '1989–2002', title: 'विधायी सेवा', desc: 'चार बार झाँसी से विधायक एवं उ.प्र. मंत्रिपरिषद सदस्य।' },
                       { year: '1990–92', title: 'राम मंदिर आन्दोलन', desc: 'तीन बार कारागार में निरुद्ध एवं एक बार रासुका बन्दी।' },
-                      { year: '2020–आज', title: 'हिन्दी साहित्य भारती', desc: 'विश्व के 37 देशों में हिन्दी विस्तार का नेतृत्व।' }
+                      { year: '2020–आज', title: 'हिंदी साहित्य भारती', desc: 'विश्व के 37 देशों में हिंदी विस्तार का नेतृत्व।' }
                     ].map((item, i) => (
                       <div key={i} className="p-8 rounded-[2.5rem] bg-stone-50 border border-stone-200 hover:bg-white hover:shadow-xl hover:shadow-orange-200/20 transition-all group">
                         <div className="text-orange-600 font-black text-xl mb-2 group-hover:scale-110 transition-transform origin-left">{item.year}</div>
@@ -203,7 +203,7 @@ export function DirectorProfile() {
                       <h4 className="text-2xl font-black text-stone-900">संस्थागत एवं सामाजिक</h4>
                       <div className="grid gap-3">
                         {[
-                          'अन्तरराष्ट्रीय अध्यक्ष — हिन्दी साहित्य भारती',
+                          'अन्तरराष्ट्रीय अध्यक्ष — हिंदी साहित्य भारती',
                           'अध्यक्ष — रवीन्द्र फाउंडेशन (समाजसेवी ट्रस्ट)',
                           'अध्यक्ष — पं. दीनदयाल उपाध्याय शिक्षण समिति',
                           'अधिष्ठाता — उ.प्र. विधान सभा (पूर्व)',
@@ -229,7 +229,7 @@ export function DirectorProfile() {
                         </h4>
                         <div className="p-8 bg-orange-600 text-white rounded-[2.5rem] shadow-xl shadow-orange-100 relative overflow-hidden">
                           <Quote className="absolute top-0 right-0 w-32 h-32 text-white/10 -translate-y-4 translate-x-4" />
-                          <h5 className="text-xl font-black mb-2">श्री शुक्ल चरित (महाकाव्य)</h5>
+                          <h5 className="text-xl font-black mb-2">श्री शत्रुघ्न चरित (महाकाव्य)</h5>
                           <p className="text-sm text-orange-100 leading-relaxed italic">सद्य: प्रकाशित होने के बाद भी अनेक शोध एवं पी.एच.डी. का केंद्र बना विश्व का प्रथम महाकाव्य।</p>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -279,7 +279,7 @@ export function DirectorProfile() {
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                     {[
                       'साहित्य भास्कर (एटा)', 'त्रिवेणी साहित्य पुरस्कार', 'विशाल सहयोग पुरस्कार', 'दिनकर पुरस्कार', 'कविवर भूषण सम्मान',
-                      'तुलसी साहित्य पुरस्कार', 'रविन्द्र नाथ टैगोर सम्मान', 'काव्य शिरोमणि सम्मान', 'साहित्य विभूति', 'साहित्य सिद्धि',
+                      'तुलसी साहित्य पुरस्कार', 'रवीन्द्र नाथ टैगोर सम्मान', 'काव्य शिरोमणि सम्मान', 'साहित्य विभूति', 'साहित्य सिद्धि',
                       'अखिल भारतीय राष्ट्रभाषा सम्मान', 'तुलसी सम्मान (झाँसी)', 'लोकतंत्र सेनानी सम्मान', 'महाकवि सम्मान'
                     ].map((award, i) => (
                       <div key={i} className="p-5 text-center border border-stone-100 rounded-3xl hover:bg-orange-50 transition-all hover:scale-105">
