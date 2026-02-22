@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import { Plus, Trash2, Pencil, Users, Loader2 } from "lucide-react"
+import { Plus, Trash2, Pencil, Users, Loader2, Download } from "lucide-react"
+import { saveAs } from "file-saver"
 import {
   Card,
   CardContent,
@@ -63,6 +64,35 @@ export default function DashboardMembersPage() {
     }
   }
 
+  const handleDownloadCSV = () => {
+    if (members.length === 0) {
+        toast.error("No members to download")
+        return
+    }
+
+    const headers = ["First Name", "Last Name", "Email", "Phone Number", "Position", "Country", "State", "City", "Address"]
+    const csvData = members.map(m => {
+        const mCity = statesMock.find(s => s.nameEn === m.state)?.cities.find(c => c.nameEn === m.city)?.nameHi || m.city;
+        const mState = statesMock.find(s => s.nameEn === m.state)?.nameHi || m.state;
+        
+        return [
+            `"${m.first_name || ""}"`,
+            `"${m.last_name || ""}"`,
+            `"${m.email || ""}"`,
+            `"${m.phone_number || ""}"`,
+            `"${m.position || ""}"`,
+            `"${m.nation || ""}"`,
+            `"${mState || ""}"`,
+            `"${mCity || ""}"`,
+            `"${m.address ? m.address.replace(/"/g, '""') : ""}"`
+        ].join(",")
+    })
+
+    const csvContent = "\uFEFF" + [headers.join(","), ...csvData].join("\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    saveAs(blob, `members_export_${new Date().toISOString().split('T')[0]}.csv`)
+  }
+
   const openAddModal = () => {
     setSelectedMember(null)
     setIsMemberModalOpen(true)
@@ -90,10 +120,16 @@ export default function DashboardMembersPage() {
              पंजीकृत सदस्यों का प्रबंधन करें (Manage members)
           </p>
         </div>
-        <Button onClick={openAddModal} size="lg">
-            <Plus className="mr-2 h-4 w-4" />
-            नया सदस्य (Add)
-        </Button>
+        <div className="flex gap-2">
+            <Button variant="outline" onClick={handleDownloadCSV} disabled={members.length === 0} size="lg" className="gap-2">
+                <Download className="h-4 w-4" />
+                CSV
+            </Button>
+            <Button onClick={openAddModal} size="lg">
+                <Plus className="mr-2 h-4 w-4" />
+                नया सदस्य (Add)
+            </Button>
+        </div>
       </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

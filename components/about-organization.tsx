@@ -157,6 +157,101 @@ export function AboutOrganization() {
               </div>
             </div>
           </div>
+
+          {/* Sankalap Section */}
+          <div className="mt-20 mb-8 p-8 md:p-16 bg-white/60 backdrop-blur-md rounded-[3rem] border border-orange-100 shadow-2xl relative overflow-hidden">
+            {/* Background Decorative Element */}
+            <div className="absolute top-0 right-0 p-12 opacity-[0.03] select-none pointer-events-none">
+              <Sparkles className="w-96 h-96 text-orange-600" />
+            </div>
+
+            <div className="relative z-10 max-w-4xl mx-auto">
+              <div className="text-center mb-16">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-100 text-orange-700 text-sm font-bold mb-4">
+                  <Heart className="w-4 h-4" />
+                  <span>साहित्यिक संकल्प</span>
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">संकल्प</h2>
+                <div className="w-24 h-1.5 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
+              </div>
+
+              <div className="space-y-12">
+                {/* Intro Stanza */}
+                <div className="text-center group">
+                  <div className="text-2xl md:text-3xl font-bold text-orange-600 leading-tight space-y-2">
+                    <p className="hover:scale-105 transition-transform duration-300">बीज बनकर आज हम, नव सृष्टि की रचना करेंगे</p>
+                    <p className="hover:scale-105 transition-transform duration-300">हो गई है जड़ मनुजता, चेतना फिर से भरेंगे</p>
+                  </div>
+                </div>
+
+                {/* Poem Grid */}
+                <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
+                  {[
+                    [
+                      "मिल गया निज तंत्र फिर भी, दैन्यता हटने न पाई",
+                      "बस प्रगति के नाम हमने, नीति-पथ को दी विदाई",
+                      "स्वप्न पुरखों का अधूरा, आज हम पूरा करेंगे",
+                      "हो गई है जड़ मनुजता, चेतना फिर से भरेंगे"
+                    ],
+                    [
+                      "सत्य को देकर तिलांजलि, झूठ का सम्बल रहा है",
+                      "ध्येय निष्ठा को भुलाया, भवन संस्कृति का ढहा है",
+                      "ध्येय पथ की साधना से, सृजन की वर्षा करेंगे",
+                      "हो गई है जड़ मनुजता, चेतना फिर से भरेंगे।"
+                    ],
+                    [
+                      "मिट रही है वसुन्धरा अब, शत्रुता घनघोर छाई",
+                      "स्वार्थ की स्वच्छन्दता ने मनुजता को दी विदाई",
+                      "श्रेष्ठ है परमार्थ श्रद्धा भावना विकसित करेंगे",
+                      "हो गई है जड़ मनुजता, चेतना फिर से भरेंगे।"
+                    ],
+                    [
+                      "जातियों का विष भयकर, फैलता ही जा रहा है",
+                      "राष्ट्र की ममता मिटाकर नेह को ही खा रहा है",
+                      "किन्तु हम अपनी धरा पर, बेल यह पलने न देंगे",
+                      "हो गई है जड़ मनुजता, चेतना फिर से भरेंगे।"
+                    ],
+                    [
+                      "आस्तर जिसको दिया था, मित्रता का प्यार देने",
+                      "वह खड़ा है अब दंग दे, हम सभी के प्राण लेने",
+                      "कर अपरिमित शक्ति संचित दुष्ट दानवता हरेंगे",
+                      "हो गई है जड़ मनुजता, चेतना फिर से भरेंगे।"
+                    ],
+                    [
+                      "रक्त की गंगा बहाकर, त्यागमय स्वातंत्र्य पाया",
+                      "कफन सिर पर बाँध बन्दे मातरम् का गीत गाया",
+                      "प्रेरणा लेकर उन्हीं से क्रान्ति की ज्वाला बनेंगे",
+                      "हो गई है जड़ मनुजता, चेतना फिर से भरेंगे।"
+                    ]
+                  ].map((stanza, idx) => (
+                    <div key={idx} className="space-y-3 relative">
+                      <div className="absolute -left-4 top-0 bottom-0 w-1 bg-orange-100/50 rounded-full" />
+                      {stanza.map((line, lIdx) => (
+                        <p
+                          key={lIdx}
+                          className={`text-lg md:text-xl leading-relaxed ${lIdx === 3 ? "font-bold text-slate-900 border-t border-orange-50 pt-2 mt-2" : "text-slate-600 font-medium"
+                            }`}
+                        >
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Author Info */}
+                <div className="mt-20 pt-10 border-t border-slate-100 text-center">
+                  <div className="inline-block relative">
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.3em] mb-3">रचनाकार</p>
+                    <p className="text-2xl md:text-3xl font-black text-slate-900">डॉ० रवीन्द्र शुक्ल</p>
+                    <div className="absolute -right-12 -top-2 opacity-20">
+                      <FileText className="w-8 h-8 text-orange-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
