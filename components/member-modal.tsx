@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
-import { Country, State, City } from "country-state-city"
+import { Country, State, City, type ICity } from "country-state-city"
 import {
   Select,
   SelectContent,
@@ -67,7 +67,7 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
   // Location arrays based on current selection
   const availableStates = useMemo(() => formData.nation_code ? State.getStatesOfCountry(formData.nation_code) : [], [formData.nation_code])
   const availableCities = useMemo(() => {
-    let rawCities = []
+    let rawCities: ICity[] = []
     if (formData.nation_code && formData.state_code) {
       rawCities = City.getCitiesOfState(formData.nation_code, formData.state_code)
     } else if (formData.nation_code) {
