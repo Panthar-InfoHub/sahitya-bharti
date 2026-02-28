@@ -76,6 +76,10 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
 
     setStep('processing')
 
+    const basePrice = plan?.price || 1000;
+    const gstAmount = basePrice * 0.025;
+    const totalAmount = basePrice + gstAmount;
+
     const isScriptLoaded = await loadRazorpayScript();
     if (!isScriptLoaded) {
         toast.error("Failed to load Razorpay SDK. Please check your internet.");
@@ -89,7 +93,7 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                amount: plan?.price || 1000,
+                amount: totalAmount,
                 notes: { 
                     userId: user.id,
                     plan: plan?.name || 'membership',
@@ -131,7 +135,7 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
                     const { error } = await supabase
                         .from('users')
                         .update({ 
-                            plan: (plan?.name || 'premium').toLowerCase(),
+                            plan: plan?.name || 'premium',
                             phone_number: formData.phone,
                             full_name: `${formData.name} ${formData.surname}`.trim()
                         })
@@ -146,7 +150,9 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
                     const receipt = {
                         id: response.razorpay_payment_id,
                         date: new Date().toLocaleDateString(),
-                        amount: plan?.price || 1000,
+                        amount: totalAmount,
+                        baseAmount: basePrice,
+                        gstAmount: gstAmount,
                         plan: plan?.label || "Membership",
                         user: `${formData.name} ${formData.surname}`
                     }
@@ -248,6 +254,14 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
                             <span className="text-muted-foreground">योजना (Plan):</span>
                             <span className="font-bold text-primary">{receiptData.plan}</span>
                         </div>
+                        <div className="flex justify-between pt-2 border-t">
+                            <span className="text-muted-foreground">मूल्य (Base Amount):</span>
+                            <span>₹{receiptData.baseAmount}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">GST (2.5%):</span>
+                            <span>₹{receiptData.gstAmount}</span>
+                        </div>
                         <div className="border-t pt-2 mt-2 flex justify-between text-base">
                             <span className="font-bold">कुल भुगतान (Total Paid):</span>
                             <span className="font-bold text-green-600">₹{receiptData.amount}</span>
@@ -262,9 +276,14 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
                 <form onSubmit={handlePayment} className="space-y-5">
                     
                     {/* Plan Information */}
-                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg text-center">
+                    <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg text-center space-y-2">
                         <h3 className="font-bold text-lg text-primary mb-1">{plan?.label}</h3>
-                        <p className="text-2xl font-extrabold text-foreground">₹{plan?.price}</p>
+                        <div className="flex flex-col items-center justify-center">
+                            <p className="text-2xl font-extrabold text-foreground">₹{(plan?.price || 1000) + (plan?.price || 1000) * 0.025}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                                (Base: ₹{plan?.price || 1000} + GST @ 2.5%: ₹{(plan?.price || 1000) * 0.025})
+                            </p>
+                        </div>
                         <p className="text-sm text-muted-foreground mt-2">Unlock all premium features • Priority Support • Exclusive Content</p>
                     </div>
 
@@ -306,7 +325,7 @@ export function MembershipModal({ isOpen, onClose, user, plan }: MembershipModal
                         type="submit"
                         className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-lg transition-all transform active:scale-95 shadow-lg"
                     >
-                        Pay ₹{plan?.price} Securely
+                        Pay ₹{(plan?.price || 1000) + (plan?.price || 1000) * 0.025} Securely
                     </Button>
                     
                     {/* <p className="text-xs text-center text-muted-foreground flex justify-center items-center gap-1">

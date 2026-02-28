@@ -10,11 +10,11 @@ export async function UpcomingEventPopup() {
     .select("*")
     .eq("status", "आगामी")
     .order("date", { ascending: true })
-    .limit(1)
+    .limit(3)
 
   if (!events || events.length === 0) {
     return null
   }
 
-  return <EventPopupClient event={events[0]} />
+  return <EventPopupClient events={events} />
 }

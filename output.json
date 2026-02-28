@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "email": "nikhil.2226cseai1100@kiet.edu",
+      "plan": "Gold"
+    },
+    {
+      "email": "nikhilraikwar846@gmail.com",
+      "plan": "patron"
+    },
+    {
+      "email": "nikhil@pantharinfohub.com",
+      "plan": "gold"
+    }
+  ]
+}{
+  "plans": [
+    {
+      "name": "standard"
+    },
+    {
+      "name": "patron"
+    },
+    {
+      "name": "Gold"
+    }
+  ]
+}

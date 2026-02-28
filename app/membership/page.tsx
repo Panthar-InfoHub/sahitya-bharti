@@ -27,6 +27,8 @@ export default function MembershipPage() {
   const [form, setForm] = useState({ control: {} }) // Declare form variable
   const [isSubmitting, setIsSubmitting] = useState(false) // Declare isSubmitting variable
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [plans, setPlans] = useState<any[]>([])
+  const [loadingPlans, setLoadingPlans] = useState(true)
   
   useEffect(() => {
     const getUser = async () => {
@@ -41,7 +43,43 @@ export default function MembershipPage() {
         setUser({ ...user, ...profile })
       }
     }
+
+    const fetchPlans = async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase.from('membership_plans').select('*').order('level', { ascending: true })
+      if (!error && data) {
+        setPlans(data)
+      } else {
+        // Fallback plans if not set up yet
+        setPlans([
+          { 
+            name: "Standard", 
+            price: 1000, 
+            label: "मानक सदस्यता (Standard)",
+            features: ["आजीवन सदस्यता", "ई-पत्रिका का उपयोग", "कार्यक्रमों में प्रवेश", "डिजिटल सदस्य कार्ड"],
+            level: 1
+          },
+          { 
+            name: "Premium", 
+            price: 1500, 
+            label: "विशिष्ट सदस्यता (Premium)",
+            features: ["मानक की सभी सुविधाएं", "प्राथमिकता बैठने की व्यवस्था", "लेखक कार्यशालाओं में छूट", "भौतिक सदस्य कार्ड", "वार्षिक स्मारिका"],
+            level: 2
+          },
+          { 
+            name: "Patron", 
+            price: 100000, 
+            label: " संरक्षक सदस्यता (Patron)",
+            features: ["विशिष्ट की सभी सुविधाएं", "वीआईपी अतिथि सम्मान", "निर्णायक मंडल में स्थान", "विशेष रात्रिभोज आमंत्रण", "जीवन भर का सम्मान"],
+            level: 3
+          },
+        ])
+      }
+      setLoadingPlans(false)
+    }
+
     getUser()
+    fetchPlans()
   }, [])
   
   const onSubmit = (data : any) => {
@@ -82,28 +120,13 @@ export default function MembershipPage() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { 
-                  name: "Standard", 
-                  price: 1000, 
-                  label: "मानक सदस्यता (Standard)",
-                  features: ["आजीवन सदस्यता", "ई-पत्रिका का उपयोग", "कार्यक्रमों में प्रवेश", "डिजिटल सदस्य कार्ड"] 
-                },
-                { 
-                  name: "Premium", 
-                  price: 1500, 
-                  label: "विशिष्ट सदस्यता (Premium)",
-                  features: ["मानक की सभी सुविधाएं", "प्राथमिकता बैठने की व्यवस्था", "लेखक कार्यशालाओं में छूट", "भौतिक सदस्य कार्ड", "वार्षिक स्मारिका"] 
-                },
-                { 
-                  name: "Patron", 
-                  price: 100000, 
-                  label: " संरक्षक सदस्यता (Patron)",
-                  features: ["विशिष्ट की सभी सुविधाएं", "वीआईपी अतिथि सम्मान", "निर्णायक मंडल में स्थान", "विशेष रात्रिभोज आमंत्रण", "जीवन भर का सम्मान"] 
-                },
-              ].map((plan, index) => (
+              {loadingPlans ? (
+                 <div className="col-span-1 md:col-span-3 text-center py-12">
+                   <p className="text-muted-foreground animate-pulse font-medium">योजनाएं लोड हो रही हैं... (Loading Plans...)</p>
+                 </div>
+              ) : plans.map((plan, index) => (
                 <div 
-                  key={index} 
+                  key={plan.id || index} 
                   className={`relative flex flex-col p-6 rounded-2xl border ${index === 1 ? 'border-primary shadow-2xl scale-105 bg-primary/5' : 'border-border bg-card'} transition-all hover:shadow-xl`}
                 >
                   {index === 1 && (
@@ -111,13 +134,13 @@ export default function MembershipPage() {
                       सर्वाधिक लोकप्रिय
                     </div>
                   )}
-                  <h3 className="text-xl font-bold text-foreground mb-2">{plan.label.split('(')[0]}</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-2">{plan.label}</h3>
                   <div className="mb-4">
                     <span className="text-4xl font-bold">₹{plan.price}</span>
                     <span className="text-muted-foreground"> / आजीवन</span>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
-                    {plan.features.map((feature, i) => (
+                    {plan.features?.map((feature: string, i: number) => (
                       <li key={i} className="flex items-center text-sm text-foreground/80">
                         <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                         {feature}
@@ -128,19 +151,10 @@ export default function MembershipPage() {
                     className={`w-full ${index === 1 ? 'bg-primary' : ''}`}
                     variant={index === 1 ? 'default' : 'outline'}
                     onClick={() => {
-                        // Plan Hierarchy
-                        const planLevels: Record<string, number> = {
-                          'free': 0,
-                          'standard': 1,
-                          'premium': 2,
-                          'patron': 3
-                        }
+                        const currentPlan = user?.plan || 'free'
                         
-                        const currentPlan = user?.plan?.toLowerCase() || 'free'
-                        const selectedPlanName = plan.name.toLowerCase()
-                        
-                        const currentLevel = planLevels[currentPlan] || 0
-                        const selectedLevel = planLevels[selectedPlanName] || 0
+                        const currentLevel = plans.find(p => p.name === currentPlan)?.level || 0
+                        const selectedLevel = plan.level || 0
 
                         if (selectedLevel <= currentLevel) {
                            toast.info("आपके पास पहले से ही यह (या इससे उच्च) सदस्यता है।", {
@@ -154,16 +168,10 @@ export default function MembershipPage() {
                     }}
                   >
                     {(() => {
-                        const planLevels: Record<string, number> = {
-                          'free': 0,
-                          'standard': 1,
-                          'premium': 2,
-                          'patron': 3
-                        }
                         const currentPlan = user?.plan?.toLowerCase() || 'free'
                         const selectedPlanName = plan.name.toLowerCase()
-                        const currentLevel = planLevels[currentPlan] || 0
-                        const selectedLevel = planLevels[selectedPlanName] || 0
+                        const currentLevel = plans.find(p => p.name.toLowerCase() === currentPlan)?.level || 0
+                        const selectedLevel = plan.level || 0
                         
                         if (selectedLevel <= currentLevel) return "वर्तमान योजना (Current)"
                         return "चुनें"

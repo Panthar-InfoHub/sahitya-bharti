@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Pie, PieChart } from "recharts"
+import { Pie, PieChart, Cell } from "recharts"
 import { createClient } from "@/lib/supabase/client"
 import {
   Card,
@@ -19,32 +19,11 @@ import {
 } from "@/components/ui/chart"
 import { TrendingUp } from "lucide-react"
 
-const chartConfig = {
-  users: {
-    label: "Users",
-  },
-  patron: {
-    label: "Patron",
-    color: "var(--chart-1)",
-  },
-  premium: {
-    label: "Premium",
-    color: "var(--chart-2)",
-  },
-  standard: {
-    label: "Standard",
-    color: "var(--chart-3)",
-  },
-  free: {
-    label: "Free",
-    color: "var(--chart-5)", // Using chart-5 for distinct color (chart-4 is muted brown)
-  },
-} satisfies ChartConfig
-
 export function UserPlanChart() {
   const [chartData, setChartData] = React.useState<any[]>([])
+  const [chartConfig, setChartConfig] = React.useState<ChartConfig>({ users: { label: "Users" } })
   const [loading, setLoading] = React.useState(true)
-  const [mainPlanPercentage, setMainPlanPercentage] = React.useState({ plan: 'Premium', percent: 0 })
+  const [mainPlanPercentage, setMainPlanPercentage] = React.useState({ plan: 'Paid', percent: 0 })
 
   React.useEffect(() => {
     fetchUserPlanData()
@@ -54,36 +33,67 @@ export function UserPlanChart() {
     setLoading(true)
     const supabase = createClient()
     
-    // Fetch all users
-    const { data: users } = await supabase
-      .from('users')
-      .select('plan')
+    // Fetch all users and plans
+    const { data: plans } = await supabase.from('membership_plans').select('*');
+    const { data: users } = await supabase.from('users').select('plan');
 
     if (users) {
-      const patronCount = users.filter(u => u.plan?.toLowerCase() === 'patron').length
-      const premiumCount = users.filter(u => u.plan?.toLowerCase() === 'premium').length
-      const standardCount = users.filter(u => u.plan?.toLowerCase() === 'standard').length
+      const activePlans = plans || [];
       
-      // Free is anyone not in the above (assuming nullable or empty or 'free')
-      // Safe to say anyone NOT normalized to these 3 is free
-      const freeCount = users.filter(u => !['patron', 'premium', 'standard'].includes(u.plan?.toLowerCase())).length
+      const newChartData: any[] = [];
+      const newConfig: ChartConfig = { users: { label: "Users" } };
       
+      let paidCount = 0;
+
+      activePlans.forEach((plan, index) => {
+        // Create an alphanumeric key for the chart config 
+        const key = plan.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || `plan${index}`;
+        const count = users.filter(u => u.plan?.trim().toLowerCase() === plan.name.trim().toLowerCase()).length;
+        
+        // Add to data even if 0, or maybe filter out 0 later?
+        // It's nice to see all plans
+        newChartData.push({
+          plan: key,
+          users: count,
+          fill: `var(--color-${key})`
+        });
+        
+        newConfig[key] = {
+          label: plan.name,
+          color: `hsl(var(--chart-${(index % 5) + 1}))`
+        };
+        
+        paidCount += count;
+      });
+
+      // Anyone whose plan doesn't directly match an active tier (or is null/free)
+      const freeCount = users.filter(u => {
+        const userPlan = u.plan?.trim().toLowerCase() || '';
+        return !activePlans.some(p => p.name.trim().toLowerCase() === userPlan) || userPlan === 'free' || !userPlan;
+      }).length;
+
+      newChartData.push({
+        plan: "free",
+        users: freeCount,
+        fill: "var(--color-free)"
+      });
+      
+      newConfig["free"] = {
+        label: "Free / No Plan",
+        color: "hsl(var(--muted-foreground))" // fallback gray
+      };
+
+      // Only show non-zero in the chart for cleanliness
+      const cleanData = newChartData.filter(d => d.users > 0);
+
+      setChartData(cleanData);
+      setChartConfig(newConfig);
+
       const total = users.length
-
-      setChartData([
-        { plan: "patron", users: patronCount, fill: "var(--color-patron)" },
-        { plan: "premium", users: premiumCount, fill: "var(--color-premium)" },
-        { plan: "standard", users: standardCount, fill: "var(--color-standard)" },
-        { plan: "free", users: freeCount, fill: "var(--color-free)" },
-      ])
-
-      // Calculate percentage of most popular paid plan or just display Total Paid vs Free?
-      // Let's just show Premium % for consistency or Total Paid %
-      const totalPaid = patronCount + premiumCount + standardCount
       if (total > 0) {
         setMainPlanPercentage({ 
             plan: 'Paid', 
-            percent: Math.round((totalPaid / total) * 100) 
+            percent: Math.round((paidCount / total) * 100) 
         })
       }
     }
@@ -104,7 +114,7 @@ export function UserPlanChart() {
       <CardContent className="flex-1 pb-0">
         {loading ? (
           <div className="flex items-center justify-center h-[250px]">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground animate-pulse">Loading Chart Data...</p>
           </div>
         ) : totalUsers === 0 ? (
           <div className="flex items-center justify-center h-[250px]">
@@ -121,13 +131,13 @@ export function UserPlanChart() {
                 data={chartData} 
                 dataKey="users" 
                 label 
-                nameKey="plan"
+                nameKey="plan" // Maps to the key in chartConfig
               />
             </PieChart>
           </ChartContainer>
         )}
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
+      <CardFooter className="flex-col gap-2 text-sm mt-4">
         <div className="flex items-center gap-2 leading-none font-medium">
           {mainPlanPercentage.percent}% Paid Members <TrendingUp className="h-4 w-4" />
         </div>

@@ -25,12 +25,14 @@ export default async function IdCardPage() {
     .single()
 
   // 3. Check Membership Status
-  const paidPlans = ['standard', 'premium', 'patron']
-  if (!profile || !paidPlans.includes(profile.plan?.toLowerCase())) {
+  const cleanPlan = (profile?.plan || '').trim()
+  const { data: activePlan } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlan).limit(1).maybeSingle()
+
+  if (!profile || !activePlan) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
         <h1 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h1>
-        <p className="text-gray-600 mb-4">यह आईडी कार्ड केवल भुगतान किए गए सदस्यों (Standard, Premium, Patron) के लिए उपलब्ध है।</p>
+        <p className="text-gray-600 mb-4">यह आईडी कार्ड केवल भुगतान किए गए सदस्यों (Paid Members) के लिए उपलब्ध है।</p>
         <Link href="/">
           <Button>Go Home</Button>
         </Link>
@@ -38,14 +40,7 @@ export default async function IdCardPage() {
     )
   }
 
-  const getPlanLabel = (plan: string) => {
-    switch (plan?.toLowerCase()) {
-      case 'standard': return "मानक सदस्य"
-      case 'premium': return "विशिष्ट सदस्"
-      case 'patron': return "संरक्षक सदस"
-      default: return "सदस्य (Member)"
-    }
-  }
+  const getPlanLabel = () => activePlan.label || "सदस्य (Member)"
 
   return (
     <div className="min-h-screen bg-slate-100 p-8 flex flex-col items-center print:bg-white print:p-0">
@@ -94,7 +89,7 @@ export default async function IdCardPage() {
           <h3 className="text-xl font-bold text-gray-800 line-clamp-1">{profile.full_name}</h3>
 
           <div className="mt-1 inline-block px-3 py-1 bg-yellow-500 text-yellow-800 text-xs font-bold rounded-full border border-yellow-200 uppercase">
-            {getPlanLabel(profile.plan)}
+            {getPlanLabel()}
           </div>
 
           <div className="mt-6 flex flex-col gap-1 text-sm text-gray-600">

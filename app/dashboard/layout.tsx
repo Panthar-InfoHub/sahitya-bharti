@@ -2,8 +2,8 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LayoutDashboard, Calendar, Users, Award, Menu, Home, Image as ImageIcon, Video, Banknote, Receipt, UserCog, ShieldCheck } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { NotificationNav } from "@/components/notification-nav"
+// import { Button } from "@/components/ui/button"
+// import { NotificationNav } from "@/components/notification-nav"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -35,6 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/positions", label: "पद (Positions)", icon: Award },
     { href: "/dashboard/transactions", label: "लेनदेन (Transactions)", icon: Receipt },
     { href: "/dashboard/refunds", label: "धनवापसी (Refunds)", icon: Banknote },
+    { href: "/dashboard/plans", label: "योजनाएं (Plans)", icon: Award },
   ]
 
   return (
@@ -78,9 +79,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <span className="font-bold">Admin</span>
           </div>
 
-          <div className="flex items-center gap-4 ml-auto">
+          {/* <div className="flex items-center gap-4 ml-auto">
             <NotificationNav />
-          </div>
+          </div> */}
         </header>
         <main className="flex-1 p-6 md:p-8 overflow-y-auto">
           {children}
