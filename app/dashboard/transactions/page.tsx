@@ -25,7 +25,7 @@ interface Transaction {
   plan: string | null
   created_at: string
   users: {
-    name: string
+    full_name: string
     email: string
   }
   events?: {
@@ -52,7 +52,7 @@ export default function TransactionsPage() {
       .from("transactions")
       .select(`
         *,
-        users (name, email),
+        users (full_name, email),
         events (title)
       `)
       .order("created_at", { ascending: false })
@@ -80,7 +80,7 @@ export default function TransactionsPage() {
     if (!searchQuery) return true
     const query = searchQuery.toLowerCase()
     return (
-      tx.users?.name?.toLowerCase().includes(query) ||
+      tx.users?.full_name?.toLowerCase().includes(query) ||
       tx.users?.email?.toLowerCase().includes(query) ||
       tx.razorpay_payment_id?.toLowerCase().includes(query) ||
       tx.razorpay_order_id?.toLowerCase().includes(query)
@@ -95,7 +95,7 @@ export default function TransactionsPage() {
     const headers = ["Date", "User", "Email", "Type", "Description", "Amount", "Status", "Payment ID"]
     const rows = filteredTransactions.map(tx => [
       format(new Date(tx.created_at), "yyyy-MM-dd HH:mm"),
-      tx.users?.name || "N/A",
+      tx.users?.full_name || "N/A",
       tx.users?.email || "N/A",
       tx.type,
       tx.type === 'event' ? tx.events?.title || 'Event' : `${tx.plan} Plan`,
@@ -239,7 +239,7 @@ export default function TransactionsPage() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{tx.users?.name || "N/A"}</div>
+                          <div className="font-medium">{tx.users?.full_name || "N/A"}</div>
                           <div className="text-sm text-muted-foreground">{tx.users?.email}</div>
                         </div>
                       </TableCell>

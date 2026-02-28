@@ -70,8 +70,6 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
     let rawCities: ICity[] = []
     if (formData.nation_code && formData.state_code) {
       rawCities = City.getCitiesOfState(formData.nation_code, formData.state_code)
-    } else if (formData.nation_code) {
-      rawCities = City.getCitiesOfCountry(formData.nation_code) || []
     }
     
     // Deduplicate cities by name

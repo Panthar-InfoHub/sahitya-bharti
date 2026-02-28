@@ -37,6 +37,7 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
   const [uploading, setUploading] = useState(false)
   const [userEvents, setUserEvents] = useState<any[]>([])
   const [loadingEvents, setLoadingEvents] = useState(true)
+  const [planDetails, setPlanDetails] = useState<any>(null)
 
   useEffect(() => {
     if (user) {
@@ -48,8 +49,21 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
             address: user?.address || "",
         })
         fetchUserEvents(user.id)
+        if (user.plan && user.plan !== 'free') {
+           fetchPlanDetails(user.plan)
+        }
     }
   }, [user, open])
+
+  const fetchPlanDetails = async (planName: string) => {
+      const supabase = createClient()
+      const cleanPlanName = planName?.trim()
+      console.log('Fetching plan details for:', cleanPlanName)
+      const { data, error } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlanName).limit(1).maybeSingle()
+      console.log('Fetched plan details:', data, error)
+      if (data) setPlanDetails(data)
+      else console.error('No plan found in DB matching ilike:', cleanPlanName)
+  }
 
   const fetchUserEvents = async (userId: string) => {
     try {
@@ -184,22 +198,20 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
 
                 {/* Membership Plan Section */}
                 <div className={`p-4 rounded-xl border w-full text-center shadow-sm ${
-                    currentUser?.plan === 'patron' ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-200' :
-                    currentUser?.plan === 'premium' ? 'bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200' :
-                    currentUser?.plan === 'standard' ? 'bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200' :
+                    planDetails?.level >= 3 ? 'bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-200' :
+                    planDetails?.level === 2 ? 'bg-gradient-to-br from-yellow-50 to-amber-100 border-yellow-200' :
+                    planDetails?.level === 1 ? 'bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200' :
                     'bg-gray-50 border-gray-100'
                 }`}>
-                    {['standard', 'premium', 'patron'].includes(currentUser?.plan) ? (
+                    {planDetails ? (
                         <>
                             <p className="text-sm font-medium text-muted-foreground mb-1 uppercase tracking-wider">वर्तमान सदस्यता (Current Membership)</p>
-                            <p className={`text-xl font-bold capitalize mb-3 ${
-                                currentUser?.plan === 'patron' ? 'text-purple-800' :
-                                currentUser?.plan === 'premium' ? 'text-yellow-800' :
+                            <p className={`text-xl font-bold mb-3 ${
+                                planDetails?.level >= 3 ? 'text-purple-800' :
+                                planDetails?.level === 2 ? 'text-yellow-800' :
                                 'text-blue-800'
                             }`}>
-                                {currentUser?.plan === 'Patron' ? 'संरक्षक सदस्य (Patron Member)' :
-                                 currentUser?.plan === 'Premium' ? 'विशिष्ट सदस्य (Premium Member)' :
-                                 'मानक सदस्य (Standard Member)'}
+                                {planDetails.name}
                             </p>
                             <div className="flex flex-col gap-2 w-full">
                                 <Button 
@@ -207,8 +219,8 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
                                     size="sm" 
                                     asChild 
                                     className={`w-full ${
-                                        currentUser?.plan === 'patron' ? 'border-purple-300 text-purple-800 hover:bg-purple-100' :
-                                        currentUser?.plan === 'premium' ? 'border-yellow-300 text-yellow-800 hover:bg-yellow-100' :
+                                        planDetails?.level >= 3 ? 'border-purple-300 text-purple-800 hover:bg-purple-100' :
+                                        planDetails?.level === 2 ? 'border-yellow-300 text-yellow-800 hover:bg-yellow-100' :
                                         'border-blue-300 text-blue-800 hover:bg-blue-100'
                                     }`}
                                 >
@@ -222,8 +234,8 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
                                     size="sm" 
                                     asChild
                                     className={`w-full ${
-                                        currentUser?.plan === 'patron' ? 'border-purple-300 text-purple-800 hover:bg-purple-100' :
-                                        currentUser?.plan === 'premium' ? 'border-yellow-300 text-yellow-800 hover:bg-yellow-100' :
+                                        planDetails?.level >= 3 ? 'border-purple-300 text-purple-800 hover:bg-purple-100' :
+                                        planDetails?.level === 2 ? 'border-yellow-300 text-yellow-800 hover:bg-yellow-100' :
                                         'border-blue-300 text-blue-800 hover:bg-blue-100'
                                     }`}
                                 >

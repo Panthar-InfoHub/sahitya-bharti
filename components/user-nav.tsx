@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { LogOut, User, Users, LayoutDashboard, Crown, Receipt } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -42,34 +42,36 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
     window.location.href = "/"
   }
 
-  const getPlanStyles = (plan?: string | null) => {
-    switch (plan) {
-      case "patron":
-        return "ring-2 ring-purple-500 ring-offset-2"
-      case "premium":
-        return "ring-2 ring-yellow-500 ring-offset-2"
-      case "standard":
-        return "ring-2 ring-blue-500 ring-offset-2"
-      default:
-        // Free user - minimal or no ring
-        return ""
+  const [planDetails, setPlanDetails] = useState<any>(null)
+
+  useEffect(() => {
+    if (user.plan && user.plan !== 'free') {
+      const fetchPlan = async () => {
+        const cleanPlanName = (user.plan || '').trim()
+        const { data } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlanName).limit(1).maybeSingle()
+        if (data) setPlanDetails(data)
+      }
+      fetchPlan()
     }
+  }, [user.plan])
+
+  const getPlanStyles = () => {
+    if (!planDetails) return ""
+    if (planDetails.level >= 3) return "ring-2 ring-purple-500 ring-offset-2"
+    if (planDetails.level === 2) return "ring-2 ring-yellow-500 ring-offset-2"
+    return "ring-2 ring-blue-500 ring-offset-2"
   }
 
-  const getPlanLabel = (plan?: string | null) => {
-     switch (plan) {
-      case "patron": return "Patron Member"
-      case "premium": return "Premium Member"
-      case "standard": return "Standard Member"
-      default: return "Free Plan"
-    }
+  const getPlanLabel = () => {
+     if (!planDetails) return "Free Plan"
+     return planDetails.name
   }
 
   return (
     <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={`relative h-10 w-10 rounded-full ${getPlanStyles(user.plan)}`}>
+        <Button variant="ghost" className={`relative h-10 w-10 rounded-full ${getPlanStyles()}`} suppressHydrationWarning>
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.avatar_url || ""} alt={user.full_name || ""} />
             <AvatarFallback>{user.full_name?.charAt(0) || user.email?.charAt(0) || "U"}</AvatarFallback>
@@ -81,12 +83,12 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
                 <p className="text-sm font-medium leading-none">{user.full_name}</p>
-                {(user.plan === 'premium' || user.plan === 'patron') && <Crown className={`h-3 w-3 ${user.plan === 'patron' ? 'text-purple-500' : 'text-yellow-500'}`} fill="currentColor" />}
+                {planDetails && planDetails.level >= 2 && <Crown className={`h-3 w-3 ${planDetails.level >= 3 ? 'text-purple-500' : 'text-yellow-500'}`} fill="currentColor" />}
             </div>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
             <div className="pt-1">
-                <Badge variant={user.plan === 'patron' ? 'default' : user.plan === 'premium' ? 'default' : user.plan === 'standard' ? 'secondary' : 'outline'} className={`text-[10px] h-5 px-1.5 ${user.plan === 'patron' ? 'bg-purple-600 hover:bg-purple-700' : ''}`}>
-                    {getPlanLabel(user.plan)}
+                <Badge variant={planDetails?.level >= 3 ? 'default' : planDetails?.level === 2 ? 'default' : planDetails?.level === 1 ? 'secondary' : 'outline'} className={`text-[10px] h-5 px-1.5 ${planDetails?.level >= 3 ? 'bg-purple-600 hover:bg-purple-700' : ''}`}>
+                    {getPlanLabel()}
                 </Badge>
             </div>
           </div>
