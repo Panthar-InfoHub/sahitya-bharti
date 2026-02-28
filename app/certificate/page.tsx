@@ -24,12 +24,14 @@ export default async function CertificatePage() {
     .single()
 
   // 3. Check Membership Status
-  const paidPlans = ['standard', 'premium', 'patron']
-  if (!profile || !paidPlans.includes(profile.plan?.toLowerCase())) {
+  const cleanPlan = (profile?.plan || '').trim()
+  const { data: activePlan } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlan).limit(1).maybeSingle()
+
+  if (!profile || !activePlan) {
       return (
           <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
               <h1 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h1>
-              <p className="text-gray-600 mb-4">यह प्रमाण पत्र केवल भुगतान किए गए सदस्यों (Standard, Premium, Patron) के लिए उपलब्ध है।</p>
+              <p className="text-gray-600 mb-4">यह प्रमाण पत्र केवल भुगतान किए गए सदस्यों (Paid Members) के लिए उपलब्ध है।</p>
               <Link href="/">
                 <Button>Go Home</Button>
               </Link>
@@ -37,14 +39,7 @@ export default async function CertificatePage() {
       )
   }
 
-  const getPlanLabel = (plan: string) => {
-    switch (plan?.toLowerCase()) {
-      case 'standard': return "मानक सदस्य"
-      case 'premium': return "विशिष्ट सदस्य"
-      case 'patron': return "संरक्षक सदस्य"
-      default: return "सदस्य"
-    }
-  }
+  const getPlanLabel = () => activePlan.label || "सदस्य"
 
   return (
     <div className="min-h-screen bg-slate-100 p-8 flex flex-col items-center print:bg-white print:p-0">
@@ -88,7 +83,7 @@ export default async function CertificatePage() {
 
                 <p className="text-sm md:text-xl text-gray-600 font-serif px-2 leading-relaxed">
                    <span className="text-lg md:text-2xl font-bold text-[#8B4513]">साहित्य भारती</span> के एक सम्मानित <br/>
-                    <strong className="text-base md:text-2xl text-[#DAA520]">{getPlanLabel(profile.plan)}</strong> हैं।
+                    <strong className="text-base md:text-2xl text-[#DAA520]">{getPlanLabel()}</strong> हैं।
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-x-0 md:gap-y-8 max-w-xl mx-auto w-full mt-6 md:mt-12 text-sm md:text-lg text-gray-700 pb-4 md:pb-0">
