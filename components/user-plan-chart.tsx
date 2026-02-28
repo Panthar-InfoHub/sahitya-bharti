@@ -60,7 +60,7 @@ export function UserPlanChart() {
         
         newConfig[key] = {
           label: plan.name,
-          color: `hsl(var(--chart-${(index % 5) + 1}))`
+          color: `var(--chart-${(index % 5) + 1})`
         };
         
         paidCount += count;
@@ -80,7 +80,7 @@ export function UserPlanChart() {
       
       newConfig["free"] = {
         label: "Free / No Plan",
-        color: "hsl(var(--muted-foreground))" // fallback gray
+        color: "var(--muted-foreground)" // fallback gray
       };
 
       // Only show non-zero in the chart for cleanliness
