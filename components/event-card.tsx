@@ -64,12 +64,16 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
              return;
          }
 
+         const basePrice = event.fee;
+         const gstAmount = basePrice * 0.025;
+         const totalAmount = basePrice + gstAmount;
+
          // Create Order
          const response = await fetch("/api/razorpay/order", {
              method: "POST",
              headers: { "Content-Type": "application/json" },
              body: JSON.stringify({ 
-                 amount: event.fee,
+                 amount: totalAmount,
                  notes: { eventId: event.id, userId: currentUserId }
              }),
          });
@@ -253,8 +257,11 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
             </h3>
             <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    <span>{format(new Date(event.date), "PPP")}</span>
+                    <Calendar className="h-4 w-4 text-primary min-w-[16px]" />
+                    <span>
+                      {format(new Date(event.date), "PPP")}
+                      {event.end_date && ` - ${format(new Date(event.end_date), "PPP")}`}
+                    </span>
                 </div>
                 <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-primary" />

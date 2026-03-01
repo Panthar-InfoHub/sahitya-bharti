@@ -32,7 +32,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/gallery", label: "गैलरी (Gallery)", icon: ImageIcon },
     { href: "/dashboard/videos", label: "वीडियो (Videos)", icon: Video },
     { href: "/dashboard/members", label: "सदस्य (Members)", icon: Users },
-    { href: "/dashboard/positions", label: "पद (Positions)", icon: Award },
     { href: "/dashboard/transactions", label: "लेनदेन (Transactions)", icon: Receipt },
     { href: "/dashboard/refunds", label: "धनवापसी (Refunds)", icon: Banknote },
     { href: "/dashboard/plans", label: "योजनाएं (Plans)", icon: Award },

@@ -50,6 +50,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
     end_time: eventToEdit?.end_time || "",
   })
   const [date, setDate] = useState<Date | undefined>(eventToEdit?.date ? new Date(eventToEdit.date) : new Date())
+  const [endDate, setEndDate] = useState<Date | undefined>(eventToEdit?.end_date ? new Date(eventToEdit.end_date) : undefined)
   const [imageFile, setImageFile] = useState<File | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -111,6 +112,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
           status: formData.status,
           start_time: formData.start_time || null,
           end_time: formData.end_time || null,
+          end_date: endDate ? endDate.toISOString() : null,
       }
 
       if (eventToEdit) {
@@ -136,6 +138,8 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
       setOpen(false)
       if (!eventToEdit) {
          setFormData({ title: "", description: "", location: "", seats: "", fee: "", prizes: "", rules: "", status: "आगामी", start_time: "", end_time: "" })
+         setDate(new Date())
+         setEndDate(undefined)
          setImageFile(null)
       }
       router.refresh()
@@ -151,7 +155,7 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>
             {eventToEdit ? "कार्यक्रम संपादित करें (Edit Event)" : "नया कार्यक्रम जोड़ें (Add New Event)"}
@@ -173,30 +177,57 @@ export function EventModal({ trigger, eventToEdit }: EventModalProps) {
                         <Label htmlFor="location">स्थान (Location) *</Label>
                         <Input id="location" name="location" required value={formData.location} onChange={handleChange} placeholder="स्थान / शहर (Venue / City)" />
                     </div>
-                    <div className="space-y-2 flex flex-col">
-                        <Label>दिनांक (Date) *</Label>
-                         <Popover>
-                            <PopoverTrigger asChild>
-                            <Button
-                                variant={"outline"}
-                                className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !date && "text-muted-foreground"
-                                )}
-                            >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {date ? format(date, "PPP") : <span>तारीख चुनें (Pick a date)</span>}
-                            </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={date}
-                                onSelect={setDate}
-                                initialFocus
-                            />
-                            </PopoverContent>
-                        </Popover>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2 flex flex-col">
+                            <Label>आरंभ तिथि (Start Date) *</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {date ? format(date, "PPP") : <span>तारीख चुनें</span>}
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    initialFocus
+                                />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
+                        <div className="space-y-2 flex flex-col">
+                            <Label>अंतिम तिथि (End Date)</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !endDate && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {endDate ? format(endDate, "PPP") : <span>तारीख चुनें</span>}
+                                </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={endDate}
+                                    onSelect={setEndDate}
+                                    initialFocus
+                                />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                     </div>
                 </div>
                 {/* Column 2: Details */}

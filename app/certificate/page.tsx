@@ -64,6 +64,15 @@ export default async function CertificatePage() {
             <div className="absolute bottom-2 left-2 w-8 h-8 md:w-16 md:h-16 border-b-2 border-l-2 md:border-b-4 md:border-l-4 border-[#DAA520]"></div>
             <div className="absolute bottom-2 right-2 w-8 h-8 md:w-16 md:h-16 border-b-2 border-r-2 md:border-b-4 md:border-r-4 border-[#DAA520]"></div>
 
+            {/* Passport Photo */}
+            <div className="absolute top-6 right-6 md:top-12 md:right-12 z-20 w-16 h-20 md:w-28 md:h-36 border-2 border-[#8B4513] shadow-sm bg-gray-50 flex items-center justify-center overflow-hidden">
+                {profile.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Member Photo" className="w-full h-full object-cover" />
+                ) : (
+                    <span className="text-xs text-gray-400 text-center px-1">फ़ोटो <br/> (Photo)</span>
+                )}
+            </div>
+
             {/* Header */}
             <div className="space-y-2 mt-4 md:mt-8">
                  <div className="relative w-16 h-16 md:w-24 md:h-24 mx-auto mb-2">

@@ -63,6 +63,7 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
   const [customNation, setCustomNation] = useState("")
   const [customState, setCustomState] = useState("")
   const [customCity, setCustomCity] = useState("")
+  const [customPosition, setCustomPosition] = useState("")
 
   // Location arrays based on current selection
   const availableStates = useMemo(() => formData.nation_code ? State.getStatesOfCountry(formData.nation_code) : [], [formData.nation_code])
@@ -114,6 +115,7 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
         setCustomNation("")
         setCustomState("")
         setCustomCity("")
+        setCustomPosition("")
     }
   }, [member, isOpen])
 
@@ -215,6 +217,14 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
       const finalNation = formData.nation === "other" ? customNation : formData.nation
       const finalState = formData.state === "other" ? customState : formData.state
       const finalCity = formData.city === "other" ? customCity : formData.city
+      const finalPosition = formData.position === "other" ? customPosition : formData.position
+
+      if (formData.position === "other" && customPosition.trim() !== "") {
+          const { data: existingPos } = await supabase.from("positions").select("*").eq("name", customPosition.trim()).single()
+          if (!existingPos) {
+              await supabase.from("positions").insert([{ name: customPosition.trim() }])
+          }
+      }
 
       const memberData = {
         first_name: formData.first_name,
@@ -225,7 +235,7 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
         nation: finalNation,
         state: finalState,
         city: finalCity,
-        position: formData.position,
+        position: finalPosition,
         profile_picture: avatarUrl,
         user_id: user.id
       }
@@ -379,15 +389,20 @@ export function MemberModal({ member, isOpen, onClose }: MemberModalProps) {
                           <SelectValue placeholder={loadingData ? "Loading..." : "Select Position"} />
                       </SelectTrigger>
                       <SelectContent>
-                          {allPositions.length > 0 ? allPositions.map(p => (
+                          <SelectItem value="other" className="font-semibold text-primary">Other (Add New)</SelectItem>
+                          {allPositions.map(p => (
                               <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>
-                          )) : (
-                              <div className="p-2 text-sm text-center text-muted-foreground">
-                                  No positions found.
-                              </div>
-                          )}
+                          ))}
                       </SelectContent>
                  </Select>
+                 {formData.position === "other" && (
+                     <Input 
+                         placeholder="Type new position name" 
+                         value={customPosition}
+                         onChange={e => setCustomPosition(e.target.value)}
+                         required
+                     />
+                 )}
             </div>
           </div>
 
