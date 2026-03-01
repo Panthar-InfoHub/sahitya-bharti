@@ -74,8 +74,11 @@ export function EventDetailsModal({
                 </DialogTitle>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-sm text-muted-foreground mt-2">
                     <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        <span>{format(new Date(event.date), "PPP")}</span>
+                        <Calendar className="h-4 w-4 text-primary min-w-[16px]" />
+                        <span>
+                            {format(new Date(event.date), "PPP")}
+                            {event.end_date && ` - ${format(new Date(event.end_date), "PPP")}`}
+                        </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-primary" />
@@ -107,7 +110,7 @@ export function EventDetailsModal({
                             <Trophy className="h-3 w-3" />
                             पुरस्कार (Prizes)
                         </h4>
-                        <p className="text-sm font-medium whitespace-pre-wrap break-words">{event.prizes}</p>
+                        <p className="text-sm font-medium whitespace-pre-wrap wrap-break-word">{event.prizes}</p>
                     </div>
                 )}
                 {event.rules && (
@@ -116,7 +119,7 @@ export function EventDetailsModal({
                             <FileText className="h-3 w-3" />
                             नियम (Rules)
                         </h4>
-                        <p className="text-sm font-medium whitespace-pre-wrap break-words">{event.rules}</p>
+                        <p className="text-sm font-medium whitespace-pre-wrap wrap-break-word">{event.rules}</p>
                     </div>
                 )}
             </div>

@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import { Plus, Trash2, Pencil, Users, Loader2, Download } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, Trash2, Pencil, Users, Loader2, Download, Search } from "lucide-react"
 import { saveAs } from "file-saver"
 import {
   Card,
@@ -22,6 +24,10 @@ export default function DashboardMembersPage() {
   
   const [isMemberModalOpen, setIsMemberModalOpen] = useState(false)
   const [selectedMember, setSelectedMember] = useState<any>(null)
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [cityFilter, setCityFilter] = useState("all")
+  const [positionFilter, setPositionFilter] = useState("all")
 
   useEffect(() => {
     fetchMembers()
@@ -132,14 +138,69 @@ export default function DashboardMembersPage() {
         </div>
       </div>
 
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input 
+                  placeholder="खोजें (Search by name or email)..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+              />
+          </div>
+          <div className="flex gap-4 md:w-1/2">
+              <Select value={positionFilter} onValueChange={setPositionFilter}>
+                  <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="पद (Position)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="all">सभी पद (All Positions)</SelectItem>
+                      {Array.from(new Set(members.map(m => m.position).filter(Boolean))).sort().map(pos => (
+                          <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                      ))}
+                  </SelectContent>
+              </Select>
+              
+              <Select value={cityFilter} onValueChange={setCityFilter}>
+                  <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="शहर (City)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="all">सभी शहर (All Cities)</SelectItem>
+                      {Array.from(new Set(members.map(m => m.city).filter(Boolean))).sort().map(city => {
+                          const cityNameEn = city;
+                          const mCityHi = statesMock.find(s => s.cities.some(c => c.nameEn === cityNameEn))?.cities.find(c => c.nameEn === cityNameEn)?.nameHi || cityNameEn;
+                          return (
+                              <SelectItem key={cityNameEn} value={cityNameEn}>{mCityHi}</SelectItem>
+                          )
+                      })}
+                  </SelectContent>
+              </Select>
+          </div>
+      </div>
+
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {members.length === 0 ? (
+          {members.filter(m => {
+              const matchesSearch = (m.first_name + " " + m.last_name).toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    (m.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+              const matchesCity = cityFilter === "all" || m.city === cityFilter
+              const matchesPosition = positionFilter === "all" || m.position === positionFilter
+              
+              return matchesSearch && matchesCity && matchesPosition
+          }).length === 0 ? (
             <div className="col-span-full py-20 text-center bg-white rounded-lg border border-dashed text-muted-foreground">
                 <Users className="h-10 w-10 mx-auto mb-2 opacity-20" />
                 कोई सदस्य नहीं मिला (No members found)
             </div>
           ) : (
-            members.map((member) => (
+            members.filter(m => {
+              const matchesSearch = (m.first_name + " " + m.last_name).toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                    (m.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+              const matchesCity = cityFilter === "all" || m.city === cityFilter
+              const matchesPosition = positionFilter === "all" || m.position === positionFilter
+              
+              return matchesSearch && matchesCity && matchesPosition
+            }).map((member) => (
               <Card key={member.id} className="relative group overflow-hidden hover:shadow-md transition-all">
                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
                     <div className="h-12 w-12 rounded-full overflow-hidden border bg-muted flex-shrink-0">

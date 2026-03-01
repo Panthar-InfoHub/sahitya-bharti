@@ -112,7 +112,18 @@ export function EventRegistrationModal({ open, onOpenChange, event, user, onConf
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         ) : (
-            <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+            <form onSubmit={handleSubmit} className="grid gap-4 py-3">
+            {event.fee > 0 && (
+                <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg text-center space-y-2 mb-2">
+                    <h3 className="font-bold text-lg text-primary mb-1">पंजीकरण शुल्क (Fee)</h3>
+                    <div className="flex flex-col items-center justify-center">
+                        <p className="text-2xl font-extrabold text-foreground">₹{(event.fee + event.fee * 0.025).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            (Base: ₹{event.fee} + GST @ 2.5%: ₹{(event.fee * 0.025).toFixed(2)})
+                        </p>
+                    </div>
+                </div>
+            )}
             <div className="grid gap-2">
                 <Label htmlFor="full_name">पूरा नाम (Full Name)</Label>
                 <Input
