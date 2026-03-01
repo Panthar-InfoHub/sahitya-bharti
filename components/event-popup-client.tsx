@@ -91,9 +91,12 @@ export function EventPopupClient({ events }: EventPopupClientProps) {
                     </h3>
                     
                     <div className="space-y-1.5 mb-4">
-                        <div className="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
-                            <Calendar className="h-3.5 w-3.5 text-orange-400 shrink-0" />
-                            <span>{format(new Date(event.date), "PPP")}</span>
+                        <div className="flex items-center gap-2 text-[12px] text-slate-600 font-medium whitespace-normal">
+                            <Calendar className="h-3.5 w-3.5 text-orange-400 shrink-0 min-w-[14px]" />
+                            <span>
+                                {format(new Date(event.date), "PPP")}
+                                {event.end_date && ` - ${format(new Date(event.end_date), "PPP")}`}
+                            </span>
                         </div>
                         <div className="flex items-center gap-2 text-[12px] text-slate-600 font-medium">
                             <MapPin className="h-3.5 w-3.5 text-orange-400 shrink-0" />

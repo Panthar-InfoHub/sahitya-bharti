@@ -56,7 +56,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/#home", label: "गृह" },
     { href: "/#about", label: "हमारे बारे में" },
-    { href: "/#events", label: "कार्यक्रम" },
+    { href: "/events", label: "कार्यक्रम" },
     { href: "/#leadership", label: "केंद्रीय" },
     { href: "/#branches", label: "राज्य" },
     { href: "/#gallery", label: "चित्र दीर्घा" },

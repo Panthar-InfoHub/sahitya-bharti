@@ -142,33 +142,33 @@ export function BackgroundMusic() {
       </audio>
 
       {/* Floating Music Control */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-xl p-2 flex items-center gap-2">
+      <div className="fixed bottom-4 left-4 z-50">
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-1.5 flex items-center gap-1.5">
           {/* Play/Pause Button */}
           <button
             onClick={togglePlay}
-            className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
+            className="w-6 h-6 bg-linear-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-md"
             aria-label={isPlaying ? "Pause music" : "Play music"}
           >
             {isPlaying ? (
-              <Pause className="w-4 h-4 text-white" />
+              <Pause className="w-3 h-3 text-white" />
             ) : (
-              <Play className="w-4 h-4 text-white ml-0.5" />
+              <Play className="w-3 h-3 text-white ml-[1px]" />
             )}
           </button>
 
           {/* Volume Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {/* Mute/Unmute Button */}
             <button
               onClick={toggleMute}
-              className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"
+              className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center hover:bg-orange-200 transition-colors"
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? (
-                <VolumeX className="w-4 h-4 text-orange-600" />
+                <VolumeX className="w-3 h-3 text-orange-600" />
               ) : (
-                <Volume2 className="w-4 h-4 text-orange-600" />
+                <Volume2 className="w-3 h-3 text-orange-600" />
               )}
             </button>
 
@@ -180,15 +180,15 @@ export function BackgroundMusic() {
               step="0.1"
               value={volume}
               onChange={handleVolumeChange}
-              className="w-20 h-1.5 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+              className="w-16 h-1 bg-orange-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
               aria-label="Volume control"
             />
           </div>
 
           {/* Music Label */}
-          <div className="hidden sm:block pl-2 border-l border-orange-200">
-            <p className="text-[10px] font-semibold text-orange-600">संगीत</p>
-            <p className="text-[10px] text-muted-foreground">
+          <div className="hidden sm:block pl-1.5 border-l border-orange-200">
+            <p className="text-[9px] font-semibold text-orange-600">संगीत</p>
+            <p className="text-[9px] text-muted-foreground">
               {isPlaying ? "चल रहा है" : "रुका हुआ"}
             </p>
           </div>
