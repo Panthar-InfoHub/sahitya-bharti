@@ -54,10 +54,14 @@ export function Navbar() {
   }
 
   const navLinks = [
-    { href: "/#home", label: "गृह" },
-    { href: "/#about", label: "हमारे बारे में" },
+    { href: "/", label: "गृह" },
+    { href: "/#constitution", label: "संविधान" },
+    { href: "/#directors-section", label: "संस्थापक" },
+    { href: "/#trustees", label: "ट्रस्टी" },
+    { href: "/#about-organization", label: "संस्था" },
     { href: "/events", label: "कार्यक्रम" },
-    { href: "/#leadership", label: "केंद्रीय" },
+    { href: "/#directors", label: "केंद्रीय" },
+    { href: "/#activities", label: "गतिविधिया" },
     { href: "/#branches", label: "राज्य" },
     { href: "/#gallery", label: "चित्र दीर्घा" },
     { href: "/#videos", label: "चलचित्र दीर्घा" },
