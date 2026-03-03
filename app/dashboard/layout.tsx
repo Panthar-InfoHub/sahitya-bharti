@@ -19,11 +19,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     .eq("id", user.id)
     .single()
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "super_admin") {
     redirect("/")
   }
 
-  const sidebarLinks = [
+  const isSuperAdmin = profile?.role === "super_admin"
+
+  const baseSidebarLinks = [
     { href: "/dashboard", label: "अवलोकन (Overview)", icon: LayoutDashboard },
     { href: "/dashboard/contacts", label: "संपर्क अनुरोध (Contact Requests)", icon: Menu },
     { href: "/dashboard/events", label: "कार्यक्रम (Events)", icon: Calendar },
@@ -32,10 +34,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/gallery", label: "गैलरी (Gallery)", icon: ImageIcon },
     { href: "/dashboard/videos", label: "वीडियो (Videos)", icon: Video },
     { href: "/dashboard/members", label: "सदस्य (Members)", icon: Users },
-    { href: "/dashboard/transactions", label: "लेनदेन (Transactions)", icon: Receipt },
     { href: "/dashboard/refunds", label: "धनवापसी (Refunds)", icon: Banknote },
     { href: "/dashboard/plans", label: "योजनाएं (Plans)", icon: Award },
   ]
+
+  const sidebarLinks = isSuperAdmin
+    ? [
+        ...baseSidebarLinks,
+        { href: "/dashboard/transactions", label: "लेनदेन (Transactions)", icon: Receipt },
+        { href: "/dashboard/admins", label: "एडमिन प्रबंधित करें (Admins)", icon: ShieldCheck },
+      ]
+    : baseSidebarLinks
 
   return (
     <div className="flex min-h-screen bg-slate-50">

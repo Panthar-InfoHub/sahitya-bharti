@@ -282,7 +282,7 @@ export function ActivitiesSection() {
           </div>
 
           {/* Final Vision Banner */}
-          <div className="relative group">
+          {/* <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-orange-400 to-amber-400 rounded-[3rem] blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200" />
             <div className="relative bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 text-center border-2 border-orange-100 overflow-hidden">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none" />
@@ -302,7 +302,7 @@ export function ActivitiesSection() {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

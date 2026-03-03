@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function DirectorProfile() {
   return (
-    <section className="py-24 bg-linear-to-br from-stone-50 via-white to-orange-50/30 relative overflow-hidden">
+    <section id="directors-section" className="py-24 bg-linear-to-br from-stone-50 via-white to-orange-50/30 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-100/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-amber-100/20 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2" />

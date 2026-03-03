@@ -94,22 +94,22 @@ export default function MembershipPage() {
       <Navbar />
       <main className="min-h-screen bg-background">
         {/* Hero Section */}
-        <section className="py-20 sm:py-28 bg-gradient-to-b from-primary/10 via-card to-background">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <p className="text-sm font-semibold text-primary uppercase tracking-wide">परिवार में शामिल हों</p>
-            <h1 className="text-5xl sm:text-6xl font-bold text-foreground">सदस्यता प्राप्त करें</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              हिंदी साहित्य भारती का सदस्य बनकर एक गौरवशाली परंपरा का हिस्सा बनें।
-            </p>
-            <Button 
-              size="lg" 
-              className="bg-primary hover:bg-primary/90 text-lg px-10 py-6"
-              onClick={() => setIsOpen(true)}
-            >
-              आवेदन शुरू करें
-            </Button>
-          </div>
-        </section>
+          {/* <section className="py-20 sm:py-28 bg-gradient-to-b from-primary/10 via-card to-background">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+              <p className="text-sm font-semibold text-primary uppercase tracking-wide">परिवार में शामिल हों</p>
+              <h1 className="text-5xl sm:text-6xl font-bold text-foreground">सदस्यता प्राप्त करें</h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                हिंदी साहित्य भारती का सदस्य बनकर एक गौरवशाली परंपरा का हिस्सा बनें।
+              </p>
+              <Button 
+                size="lg" 
+                className="bg-primary hover:bg-primary/90 text-lg px-10 py-6"
+                onClick={() => setIsOpen(true)}
+              >
+                आवेदन शुरू करें
+              </Button>
+            </div>
+          </section> */}
 
         {/* Pricing Plans Section */}
         <section className="py-16 sm:py-20 bg-background">

@@ -40,7 +40,7 @@ export default async function Home() {
         </section>
 
         {/* Constitution PDF Link */}
-        <section className="py-12 bg-orange-50/50 border-y border-orange-100">
+        <section id="constitution" className="py-12 bg-orange-50/50 border-y border-orange-100">
           <div className="container mx-auto px-4 max-w-4xl text-center">
              <div className="bg-white rounded-2xl shadow-md border border-orange-100 p-8 flex flex-col items-center justify-center transform hover:scale-[1.01] transition-transform duration-300">
                 <div className="bg-orange-100 p-4 rounded-full mb-4">
@@ -66,7 +66,7 @@ export default async function Home() {
         </section>
 
         {/* 2. Director Profile */}
-        <DirectorProfile />
+        <DirectorProfile/>
 
         {/* 3. Trustees Section */}
         <section id="trustees">

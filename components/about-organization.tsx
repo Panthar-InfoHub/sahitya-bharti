@@ -2,7 +2,7 @@ import { Building2, Calendar, FileText, Globe2, Trophy, Users, Heart, MapPin, Sp
 
 export function AboutOrganization() {
   return (
-    <section className="py-24 bg-gradient-to-b from-orange-50/50 via-white to-orange-50/50 relative overflow-hidden">
+    <section id="about-organization" className="py-24 bg-gradient-to-b from-orange-50/50 via-white to-orange-50/50 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[500px] h-[500px] bg-orange-100/30 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[500px] h-[500px] bg-amber-100/30 rounded-full blur-3xl" />

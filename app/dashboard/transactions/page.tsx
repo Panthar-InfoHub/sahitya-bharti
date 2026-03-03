@@ -39,6 +39,7 @@ export default function TransactionsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean | null>(null)
 
   useEffect(() => {
     fetchTransactions()
@@ -47,6 +48,22 @@ export default function TransactionsPage() {
   const fetchTransactions = async () => {
     setLoading(true)
     const supabase = createClient()
+
+    // Auth check
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        setLoading(false)
+        return
+    }
+
+    const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
+    if (profile?.role !== 'super_admin') {
+        setIsSuperAdmin(false)
+        setLoading(false)
+        return
+    }
+
+    setIsSuperAdmin(true)
 
     let query = supabase
       .from("transactions")
@@ -57,7 +74,7 @@ export default function TransactionsPage() {
       `)
       .order("created_at", { ascending: false })
 
-    // Apply filters
+    // Apply filters  
     if (typeFilter !== "all") {
       query = query.eq("type", typeFilter)
     }
@@ -115,14 +132,25 @@ export default function TransactionsPage() {
     toast.success("CSV exported successfully")
   }
 
+  if (isSuperAdmin === false) {
+     return (
+        <div className="flex items-center justify-center p-12 h-64">
+           <div className="text-center text-red-600">
+              <h2 className="text-2xl font-bold">Access Denied</h2>
+              <p className="mt-2 text-muted-foreground">Only Super Admins can view transactions.</p>
+           </div>
+        </div>
+     )
+  }
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Transactions</h1>
+          <h1 className="text-3xl font-bold">लेनदेन (Transactions)</h1>
           <p className="text-muted-foreground">View all payment transactions</p>
         </div>
-        <Button onClick={exportToCSV} variant="outline">
+        <Button onClick={exportToCSV} variant="outline" disabled={filteredTransactions.length === 0}>
           <Download className="mr-2 h-4 w-4" />
           Export CSV
         </Button>

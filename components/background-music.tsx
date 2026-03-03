@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Volume2, VolumeX, Play, Pause } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 export function BackgroundMusic() {
+  const pathname = usePathname()
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [volume, setVolume] = useState(0.3) // 30% volume by default
@@ -126,6 +128,10 @@ export function BackgroundMusic() {
         setIsMuted(false)
       }
     }
+  }
+
+  if (pathname?.startsWith("/dashboard")) {
+    return null
   }
 
   return (

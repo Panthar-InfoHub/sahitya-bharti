@@ -62,7 +62,7 @@ export function OrganizationHero() {
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-linear-to-tr from-amber-50 to-transparent opacity-50" />
 
               <p className="relative text-xl md:text-3xl lg:text-4xl text-stone-900 leading-[1.4] font-bold font-serif italic text-center px-2">
-                &quot;हिंदी साहित्य भारती एक अंतरराष्ट्रीय गैर-सरकारी संगठन है, जो <span className="text-orange-600 decoration-orange-200 underline underline-offset-4">हिंदी साहित्य</span> के संवर्धन और भारतीय सनातन जीवन-मूल्यों की वैश्विक पुनर्स्थापना के लिए समर्पित है।&quot;
+                &quot;हिंदी साहित्य भारती एक अंतरराष्ट्रीय गैर-सरकारी संगठन है, जो <span className="text-orange-600 decoration-orange-200 underline underline-offset-4">सनातन</span> के संवर्धन और भारतीय सनातन जीवन-मूल्यों की वैश्विक पुनर्स्थापना के लिए समर्पित है।&quot;
               </p>
 
               <div className="mt-8 md:mt-12 flex flex-col items-center gap-6">
