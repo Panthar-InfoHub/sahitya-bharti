@@ -142,13 +142,13 @@ export function Navbar() {
         {isOpen && (
           <div className="md:hidden pb-4 space-y-1 border-t border-border">
             {/* Admin Link Mobile */}
-            {user?.role === 'admin' && (
+            {(user?.role === 'admin' || user?.role === 'super_admin') && (
               <Link
-                href="/members"
-                className="block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/10 rounded-md transition-colors"
+                href="/dashboard"
+                className="block px-3 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                सदस्य
+                डैशबोर्ड (Dashboard)
               </Link>
             )}
 

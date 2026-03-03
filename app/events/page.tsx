@@ -19,7 +19,7 @@ export default async function EventsPage() {
     .eq("id", user.id)
     .single() : { data: null }
 
-  const isAdmin = profile?.role === 'admin'
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin'
 
   // Fetch all events
   const { data: events } = await supabase
