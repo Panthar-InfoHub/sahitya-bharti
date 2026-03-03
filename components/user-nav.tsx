@@ -42,6 +42,7 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
     window.location.href = "/"
   }
 
+  // console.log("user",user)
   const [planDetails, setPlanDetails] = useState<any>(null)
 
   useEffect(() => {
@@ -119,7 +120,7 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
             <span>लेनदेन (Transactions)</span>
         </DropdownMenuItem>
 
-        {user.role === "admin" && (
+        {(user.role === "admin" || user.role === "super_admin") && (
             <DropdownMenuItem asChild>
               <Link href="/dashboard" className="flex items-center cursor-pointer">
                 <LayoutDashboard className="mr-2 h-4 w-4" />
