@@ -34,6 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: "/dashboard/gallery", label: "गैलरी (Gallery)", icon: ImageIcon },
     { href: "/dashboard/videos", label: "वीडियो (Videos)", icon: Video },
     { href: "/dashboard/members", label: "सदस्य (Members)", icon: Users },
+    { href: "/dashboard/users", label: "उपयोगकर्ता (Users)", icon: ShieldCheck },
     { href: "/dashboard/refunds", label: "धनवापसी (Refunds)", icon: Banknote },
     { href: "/dashboard/plans", label: "योजनाएं (Plans)", icon: Award },
   ]
@@ -42,7 +43,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
     ? [
         ...baseSidebarLinks,
         { href: "/dashboard/transactions", label: "लेनदेन (Transactions)", icon: Receipt },
-        { href: "/dashboard/admins", label: "एडमिन प्रबंधित करें (Admins)", icon: ShieldCheck },
       ]
     : baseSidebarLinks
 
@@ -51,8 +51,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r hidden md:flex flex-col fixed inset-y-0 z-50">
         <div className="p-6 border-b flex items-center justify-between">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            एडमिन पैनल (Admin)
+          <h2 className="text-xl font-bold bg-linear-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+             {isSuperAdmin ? "सुपर एडमिन पैनल (Super Admin)" : "एडमिन पैनल (Admin)"}
           </h2>
           <Link href="/" title="Go Home">
             <Home className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
@@ -84,7 +84,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link href="/">
               <Home className="h-5 w-5" />
             </Link>
-            <span className="font-bold">Admin</span>
+            <span className="font-bold">{isSuperAdmin ? "Super Admin" : "Admin"}</span>
           </div>
 
           {/* <div className="flex items-center gap-4 ml-auto">
