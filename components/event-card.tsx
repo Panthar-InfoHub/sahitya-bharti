@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { Calendar, MapPin, Trophy, Users, Trash2, Pencil } from "lucide-react"
+import { Calendar, MapPin, Trophy, Users, Trash2, Pencil, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,6 +12,7 @@ import { useState } from "react"
 import { EventDetailsModal } from "@/components/event-details-modal"
 import { RefundRequestModal } from "@/components/refund-request-modal"
 import { EventModal } from "@/components/event-modal"
+import { EventParticipantsModal } from "@/components/event-participants-modal"
 import { EventRegistrationModal } from "@/components/event-registration-modal"
 import {
   AlertDialog,
@@ -37,6 +38,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   const [showDetails, setShowDetails] = useState(false)
   const [showRefundModal, setShowRefundModal] = useState(false)
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
+  const [showParticipants, setShowParticipants] = useState(false)
   
   const isJoined = event.event_participants?.some((p: any) => p.user_id === currentUserId)
   const participantsCount = event.event_participants?.length || 0
@@ -121,7 +123,12 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                  }
              },
              prefill: { name: "", contact: "" },
-             theme: { color: "#F37254" }
+             theme: { color: "#F37254" },
+             modal: {
+               ondismiss: function() {
+                   setJoining(false);
+               }
+             }
          };
 
          const paymentObject = new (window as any).Razorpay(options);
@@ -298,38 +305,66 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
 
         <div className="pt-2 flex items-center justify-between gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
              {isAdmin ? (
-                 <div className="flex w-full gap-2">
-                     <EventModal 
-                        eventToEdit={event} 
-                        trigger={
-                            <Button variant="outline" size="sm" className="flex-1">
-                                <Pencil className="h-4 w-4 mr-2" /> 
-                                Edit
-                            </Button>
-                        } 
-                     />
-                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm" className="flex-1">
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete the event.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                    Delete
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                     </AlertDialog>
+                 <div className="flex flex-col w-full gap-2">
+                     <div className="flex gap-2">
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                            onClick={() => setShowParticipants(true)}
+                        >
+                            <Users className="h-4 w-4 mr-2" />
+                            प्रतिभागी (Participants)
+                        </Button>
+                        <EventModal 
+                            eventToEdit={event} 
+                            trigger={
+                                <Button variant="outline" size="sm" className="flex-1">
+                                    <Pencil className="h-4 w-4 mr-2" /> 
+                                    संपादित करें (Edit)
+                                </Button>
+                            } 
+                        />
+                     </div>
+                     <div className="flex gap-2">
+                        <Button 
+                            variant={isJoined ? "outline" : "default"} 
+                            size="sm"
+                            className="flex-1"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (isJoined) handleJoin();
+                                else setShowDetails(true);
+                            }}
+                            disabled={joining || (isFull && !isJoined)}
+                        >
+                            {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 
+                            isJoined ? "नाम वापस लें (Leave)" : 
+                            isFull ? "जगह नहीं (Full)" : 
+                            event.fee > 0 ? "स्वयं पंजीकरण (Register)" : "शामिल हों (Join)"}
+                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm" className="px-3">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete the event.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                        Delete
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                     </div>
                  </div>
              ) : (
                 <Button 
@@ -355,13 +390,13 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                             </div>
                         </>
                     ) : isJoined ? (
-                        "Leave Event"
+                        "नाम वापस लें (Leave Event)"
                     ) : isFull ? (
                         "कोई सीट नहीं (No Seats Left)"
                     ) : event.fee > 0 ? (
-                         `Register`
+                         `पंजीकरण करें (Register)`
                     ) : (
-                        "Join Event (Free)"
+                        "अभी शामिल हों (Join Event)"
                     )}
                 </Button>
              )}
@@ -396,6 +431,11 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
         event={event}
         user={{ id: currentUserId }} 
         onConfirm={initiatePayment} 
+    />
+    <EventParticipantsModal 
+        event={event}
+        open={showParticipants}
+        onOpenChange={setShowParticipants}
     />
     </>
   )
