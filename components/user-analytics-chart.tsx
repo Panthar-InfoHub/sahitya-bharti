@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import { format, subDays, startOfDay } from "date-fns"
 
 const chartConfig = {
   users: {
@@ -24,99 +25,124 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-type TimeRange = "day" | "week" | "month"
+type TimeRange = "day" | "week" | "month" | "year"
 
 export function UserAnalyticsChart() {
   const [timeRange, setTimeRange] = React.useState<TimeRange>("week")
+  const [allUsers, setAllUsers] = React.useState<any[]>([])
   const [chartData, setChartData] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(true)
-  const [totalUsers, setTotalUsers] = React.useState(0)
+  const [stats, setStats] = React.useState({ day: 0, week: 0, month: 0, year: 0 })
 
   React.useEffect(() => {
-    fetchUserData()
-  }, [timeRange])
-
-  const fetchUserData = async () => {
-    setLoading(true)
-    const supabase = createClient()
-    
-    // Calculate date range based on selected time range
-    const now = new Date()
-    let startDate = new Date()
-    
-    switch (timeRange) {
-      case "day":
-        startDate.setDate(now.getDate() - 7) // Last 7 days
-        break
-      case "week":
-        startDate.setDate(now.getDate() - 30) // Last 30 days (4 weeks)
-        break
-      case "month":
-        startDate.setMonth(now.getMonth() - 6) // Last 6 months
-        break
-    }
-
-    // Fetch users created within the date range
-    const { data: users } = await supabase
-      .from('users')
-      .select('created_at')
-      .gte('created_at', startDate.toISOString())
-      .order('created_at', { ascending: true })
-
-    if (users) {
-      // Group users by time period
-      const grouped = groupUsersByTimePeriod(users, timeRange)
-      setChartData(grouped)
-      setTotalUsers(users.length)
-    }
-    
-    setLoading(false)
-  }
-
-  const groupUsersByTimePeriod = (users: any[], range: TimeRange) => {
-    const grouped: Record<string, number> = {}
-    
-    users.forEach(user => {
-      const date = new Date(user.created_at)
-      let key: string
+    const fetchUserData = async () => {
+      setLoading(true)
+      const supabase = createClient()
       
-      switch (range) {
+      const now = new Date()
+      const oneYearAgo = subDays(now, 365)
+
+      const { data: users } = await supabase
+        .from('users')
+        .select('created_at')
+        .gte('created_at', oneYearAgo.toISOString())
+        .order('created_at', { ascending: true })
+
+      if (users) {
+        setAllUsers(users)
+        
+        // Calculate standard counts
+        const dayAgo = subDays(now, 1)
+        const weekAgo = subDays(now, 7)
+        const monthAgo = subDays(now, 30)
+        const yearAgo = subDays(now, 365)
+
+        const dayCount = users.filter(u => new Date(u.created_at) >= dayAgo).length
+        const weekCount = users.filter(u => new Date(u.created_at) >= weekAgo).length
+        const monthCount = users.filter(u => new Date(u.created_at) >= monthAgo).length
+        const yearCount = users.filter(u => new Date(u.created_at) >= yearAgo).length
+
+        setStats({
+          day: dayCount,
+          week: weekCount,
+          month: monthCount,
+          year: yearCount
+        })
+      }
+      setLoading(false)
+    }
+
+    fetchUserData()
+  }, [])
+
+  React.useEffect(() => {
+    if (allUsers.length > 0) {
+      const now = new Date()
+      let startDate: Date
+      
+      switch (timeRange) {
         case "day":
-          // Group by day
-          key = date.toISOString().split('T')[0]
+          startDate = subDays(now, 7)
           break
         case "week":
-          // Group by week (start of week)
-          const weekStart = new Date(date)
-          weekStart.setDate(date.getDate() - date.getDay())
-          key = weekStart.toISOString().split('T')[0]
+          startDate = subDays(now, 30)
           break
         case "month":
-          // Group by month
-          key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`
+          startDate = subDays(now, 180)
+          break
+        case "year":
+          startDate = subDays(now, 365)
           break
         default:
-          key = date.toISOString().split('T')[0]
+          startDate = subDays(now, 30)
       }
-      
-      grouped[key] = (grouped[key] || 0) + 1
-    })
 
-    // Convert to array and sort
-    return Object.entries(grouped)
-      .map(([date, count]) => ({ date, users: count }))
-      .sort((a, b) => a.date.localeCompare(b.date))
-  }
+      const filteredUsers = allUsers.filter(u => new Date(u.created_at) >= startDate)
+      
+      const grouped: Record<string, number> = {}
+      filteredUsers.forEach(user => {
+        const d = new Date(user.created_at)
+        let key: string
+        
+        switch (timeRange) {
+          case "day":
+            key = d.toISOString().split('T')[0]
+            break
+          case "week":
+            const weekStart = new Date(d)
+            weekStart.setDate(d.getDate() - d.getDay())
+            key = weekStart.toISOString().split('T')[0]
+            break
+          case "month":
+          case "year":
+            key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`
+            break
+          default:
+            key = d.toISOString().split('T')[0]
+        }
+        
+        grouped[key] = (grouped[key] || 0) + 1
+      })
+
+      const formattedData = Object.entries(grouped)
+        .map(([date, count]) => ({ date, users: count }))
+        .sort((a, b) => a.date.localeCompare(b.date))
+        
+      setChartData(formattedData)
+    }
+  }, [allUsers, timeRange])
 
   const formatXAxisTick = (value: string) => {
-    const date = new Date(value)
+    const d = new Date(value)
     switch (timeRange) {
       case "day":
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
       case "week":
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
       case "month":
-        return date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+        return d.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      case "year":
+        return d.toLocaleDateString("en-US", { month: "short", year: "numeric" })
       default:
         return value
     }
@@ -124,30 +150,27 @@ export function UserAnalyticsChart() {
 
   return (
     <Card className="py-4 sm:py-0">
-      <CardHeader className="flex flex-col items-stretch border-b !p-0 sm:flex-row">
+      <CardHeader className="flex flex-col items-stretch border-b p-0! sm:flex-row">
         <div className="flex flex-1 flex-col justify-center gap-1 px-6 pb-3 sm:pb-0">
           <CardTitle>User Growth</CardTitle>
-          <CardDescription>
-            New user registrations over time
-          </CardDescription>
+          <CardDescription>New user registrations over time</CardDescription>
         </div>
-        <div className="flex">
+        <div className="flex overflow-x-auto scrollbar-hide">
           {[
             { key: "day", label: "Daily" },
             { key: "week", label: "Weekly" },
-            { key: "month", label: "Monthly" }
+            { key: "month", label: "Monthly" },
+            { key: "year", label: "Yearly" }
           ].map((option) => (
             <button
               key={option.key}
               data-active={timeRange === option.key}
-              className="data-[active=true]:bg-muted/50 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6"
+              className="data-[active=true]:bg-muted/50 flex flex-1 min-w-[110px] flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6"
               onClick={() => setTimeRange(option.key as TimeRange)}
             >
-              <span className="text-muted-foreground text-xs">
-                {option.label}
-              </span>
-              <span className="text-lg leading-none font-bold sm:text-3xl">
-                {loading ? "..." : totalUsers.toLocaleString()}
+              <span className="text-muted-foreground text-xs">{option.label}</span>
+              <span className="text-lg leading-none font-bold sm:text-2xl whitespace-nowrap">
+                {loading ? "..." : (stats as any)[option.key].toLocaleString()}
               </span>
             </button>
           ))}

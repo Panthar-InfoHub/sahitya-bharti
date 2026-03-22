@@ -58,7 +58,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Home className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
           </Link>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200">
           {sidebarLinks.map((link) => (
             <Link
               key={link.href}
