@@ -12,6 +12,7 @@ import { BranchesSection } from "@/components/branches-section"
 import { ImageGalleryPreview } from "@/components/image-gallery-preview"
 import { VideoGalleryPreview } from "@/components/video-gallery-preview"
 import { TrusteesSection } from "@/components/trustees-section"
+import { FoundersSection } from "@/components/founders-section"
 import { MembershipCTA } from "@/components/membership-cta"
 import { UpcomingEventPopup } from "@/components/upcoming-event-popup"
 import { BackgroundMusic } from "@/components/background-music"
@@ -68,7 +69,12 @@ export default async function Home() {
         {/* 2. Director Profile */}
         <DirectorProfile/>
 
-        {/* 3. Trustees Section */}
+        {/* 3. Founders Section */}
+        <section id="founders">
+          <FoundersSection />
+        </section>
+
+        {/* 4. Trustees Section */}
         <section id="trustees">
           <TrusteesSection />
         </section>

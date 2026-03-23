@@ -56,7 +56,7 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "गृह" },
     { href: "/#constitution", label: "संविधान" },
-    { href: "/#directors-section", label: "संस्थापक" },
+    { href: "/#founders", label: "संस्थापक" },
     { href: "/#trustees", label: "ट्रस्टी" },
     { href: "/#about-organization", label: "संस्था" },
     { href: "/events", label: "कार्यक्रम" },
