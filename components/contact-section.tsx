@@ -35,9 +35,9 @@ export function ContactSection() {
   ]
 
   const socialLinks = [
-    { icon: Facebook, label: "Facebook", link: "#" },
-    { icon: Twitter, label: "Twitter", link: "#" },
-    { icon: Youtube, label: "YouTube", link: "#" },
+    { icon: Facebook, label: "Facebook", link: "https://www.facebook.com/share/186BLqRx4d/?mibextid=wwXIfr" },
+    { icon: Twitter, label: "Twitter", link: "https://www.instagram.com/hindisahityabharti?igsh=M3pqOTdqanliZXJp" },
+    { icon: Youtube, label: "YouTube", link: "https://youtube.com/channel/UCYdR3PCSoaJwFD5DNG88gcA?si=Z8Q83IeWWm-9NVNz" },
   ]
 
   return (
@@ -61,7 +61,7 @@ export function ContactSection() {
               <h3 className="text-2xl font-bold text-foreground mb-6">
                 संपर्क जानकारी
               </h3>
-              
+
               {contactInfo.map((contact, index) => {
                 const Icon = contact.icon
                 const content = (
@@ -117,7 +117,7 @@ export function ContactSection() {
               <h3 className="text-2xl font-bold text-foreground mb-6">
                 संदेश भेजें
               </h3>
-              
+
               <form className="space-y-4" onSubmit={async (e) => {
                 e.preventDefault()
                 const form = e.target as HTMLFormElement
@@ -139,7 +139,7 @@ export function ContactSection() {
 
                 try {
                   const supabase = createClient()
-                  
+
                   // Get current user (optional)
                   const { data: { user } } = await supabase.auth.getUser()
 
