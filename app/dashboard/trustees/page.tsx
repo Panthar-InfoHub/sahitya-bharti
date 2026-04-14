@@ -54,14 +54,27 @@ export default function TrusteesPage() {
     }
   }
 
+  const handleAdd = () => {
+    setSelectedTrustee(null)
+    setModalOpen(true)
+  }
+
+  const filteredTrustees = trustees.filter((trustee) => {
+    const matchesSearch =
+      trustee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (trustee.description?.toLowerCase() || "").includes(searchQuery.toLowerCase())
+    const matchesType = typeFilter === "all" || trustee.type === typeFilter
+    return matchesSearch && matchesType
+  })
+
   const handleDownloadCSV = () => {
-    if (trustees.length === 0) {
+    if (filteredTrustees.length === 0) {
         toast.error("No trustees to download")
         return
     }
 
     const headers = ["Name", "Type", "Description", "Email", "Phone", "Address", "Display Order", "Is Active"]
-    const csvData = trustees.map(t => {
+    const csvData = filteredTrustees.map(t => {
         return [
             `"${t.name || ""}"`,
             `"${t.type || ""}"`,
@@ -84,19 +97,6 @@ export default function TrusteesPage() {
     setModalOpen(true)
   }
 
-  const handleAdd = () => {
-    setSelectedTrustee(null)
-    setModalOpen(true)
-  }
-
-  const filteredTrustees = trustees.filter((trustee) => {
-    const matchesSearch =
-      trustee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (trustee.description?.toLowerCase() || "").includes(searchQuery.toLowerCase())
-    const matchesType = typeFilter === "all" || trustee.type === typeFilter
-    return matchesSearch && matchesType
-  })
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -105,7 +105,7 @@ export default function TrusteesPage() {
           <p className="text-muted-foreground">राष्ट्रीय और अंतर्राष्ट्रीय ट्रस्टियों का प्रबंधन करें</p>
         </div>
         <div className="flex gap-2">
-            <Button variant="outline" onClick={handleDownloadCSV} disabled={trustees.length === 0} className="gap-2">
+            <Button variant="outline" onClick={handleDownloadCSV} disabled={filteredTrustees.length === 0} className="gap-2">
               <Download className="h-4 w-4" />
               CSV
             </Button>

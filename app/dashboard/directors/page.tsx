@@ -69,14 +69,27 @@ export default function DirectorsPage() {
     }
   }
 
+  const handleAdd = () => {
+    setSelectedDirector(null)
+    setModalOpen(true)
+  }
+
+  const filteredDirectors = directors.filter((director) => {
+    const matchesSearch =
+      director.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      director.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = categoryFilter === "all" || director.category === categoryFilter
+    return matchesSearch && matchesCategory
+  })
+
   const handleDownloadCSV = () => {
-    if (directors.length === 0) {
+    if (filteredDirectors.length === 0) {
         toast.error("No directors to download")
         return
     }
 
     const headers = ["Name", "Title", "Category", "Bio", "Email", "Phone", "LinkedIn URL", "Display Order", "Is Active"]
-    const csvData = directors.map(d => {
+    const csvData = filteredDirectors.map(d => {
         return [
             `"${d.name || ""}"`,
             `"${d.title || ""}"`,
@@ -100,19 +113,6 @@ export default function DirectorsPage() {
     setModalOpen(true)
   }
 
-  const handleAdd = () => {
-    setSelectedDirector(null)
-    setModalOpen(true)
-  }
-
-  const filteredDirectors = directors.filter((director) => {
-    const matchesSearch =
-      director.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      director.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = categoryFilter === "all" || director.category === categoryFilter
-    return matchesSearch && matchesCategory
-  })
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -121,7 +121,7 @@ export default function DirectorsPage() {
           <p className="text-muted-foreground">राष्ट्रीय और अंतर्राष्ट्रीय निर्देशकों का प्रबंधन करें</p>
         </div>
         <div className="flex gap-2">
-            <Button variant="outline" onClick={handleDownloadCSV} disabled={directors.length === 0} className="gap-2">
+            <Button variant="outline" onClick={handleDownloadCSV} disabled={filteredDirectors.length === 0} className="gap-2">
               <Download className="h-4 w-4" />
               CSV
             </Button>
