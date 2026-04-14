@@ -70,14 +70,23 @@ export default function DashboardMembersPage() {
     }
   }
 
+  const filteredMembers = members.filter(m => {
+    const matchesSearch = (m.first_name + " " + m.last_name).toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (m.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCity = cityFilter === "all" || m.city === cityFilter
+    const matchesPosition = positionFilter === "all" || m.position === positionFilter
+    
+    return matchesSearch && matchesCity && matchesPosition
+  })
+
   const handleDownloadCSV = () => {
-    if (members.length === 0) {
+    if (filteredMembers.length === 0) {
         toast.error("No members to download")
         return
     }
 
     const headers = ["First Name", "Last Name", "Email", "Phone Number", "Position", "Country", "State", "City", "Address"]
-    const csvData = members.map(m => {
+    const csvData = filteredMembers.map(m => {
         const mCity = statesMock.find(s => s.nameEn === m.state)?.cities.find(c => c.nameEn === m.city)?.nameHi || m.city;
         const mState = statesMock.find(s => s.nameEn === m.state)?.nameHi || m.state;
         
@@ -127,7 +136,7 @@ export default function DashboardMembersPage() {
           </p>
         </div>
         <div className="flex gap-2">
-            <Button variant="outline" onClick={handleDownloadCSV} disabled={members.length === 0} size="lg" className="gap-2">
+            <Button variant="outline" onClick={handleDownloadCSV} disabled={filteredMembers.length === 0} size="lg" className="gap-2">
                 <Download className="h-4 w-4" />
                 CSV
             </Button>
@@ -149,58 +158,48 @@ export default function DashboardMembersPage() {
               />
           </div>
           <div className="flex gap-4 md:w-1/2">
-              <Select value={positionFilter} onValueChange={setPositionFilter}>
-                  <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="पद (Position)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                      <SelectItem value="all">सभी पद (All Positions)</SelectItem>
-                      {Array.from(new Set(members.map(m => m.position).filter(Boolean))).sort().map(pos => (
-                          <SelectItem key={pos} value={pos}>{pos}</SelectItem>
-                      ))}
-                  </SelectContent>
-              </Select>
+              <div className="flex-1">
+                <Select value={positionFilter} onValueChange={setPositionFilter}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="पद (Position)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">सभी पद (All Positions)</SelectItem>
+                        {Array.from(new Set(members.map(m => m.position).filter(Boolean))).sort().map(pos => (
+                            <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              </div>
               
-              <Select value={cityFilter} onValueChange={setCityFilter}>
-                  <SelectTrigger className="flex-1">
-                      <SelectValue placeholder="शहर (City)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                      <SelectItem value="all">सभी शहर (All Cities)</SelectItem>
-                      {Array.from(new Set(members.map(m => m.city).filter(Boolean))).sort().map(city => {
-                          const cityNameEn = city;
-                          const mCityHi = statesMock.find(s => s.cities.some(c => c.nameEn === cityNameEn))?.cities.find(c => c.nameEn === cityNameEn)?.nameHi || cityNameEn;
-                          return (
-                              <SelectItem key={cityNameEn} value={cityNameEn}>{mCityHi}</SelectItem>
-                          )
-                      })}
-                  </SelectContent>
-              </Select>
+              <div className="flex-1">
+                <Select value={cityFilter} onValueChange={setCityFilter}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="शहर (City)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">सभी शहर (All Cities)</SelectItem>
+                        {Array.from(new Set(members.map(m => m.city).filter(Boolean))).sort().map(city => {
+                            const cityNameEn = city;
+                            const mCityHi = statesMock.find(s => s.cities.some(c => c.nameEn === cityNameEn))?.cities.find(c => c.nameEn === cityNameEn)?.nameHi || cityNameEn;
+                            return (
+                                <SelectItem key={cityNameEn} value={cityNameEn}>{mCityHi}</SelectItem>
+                            )
+                        })}
+                    </SelectContent>
+                </Select>
+              </div>
           </div>
       </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {members.filter(m => {
-              const matchesSearch = (m.first_name + " " + m.last_name).toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                    (m.email || "").toLowerCase().includes(searchQuery.toLowerCase())
-              const matchesCity = cityFilter === "all" || m.city === cityFilter
-              const matchesPosition = positionFilter === "all" || m.position === positionFilter
-              
-              return matchesSearch && matchesCity && matchesPosition
-          }).length === 0 ? (
+          {filteredMembers.length === 0 ? (
             <div className="col-span-full py-20 text-center bg-white rounded-lg border border-dashed text-muted-foreground">
                 <Users className="h-10 w-10 mx-auto mb-2 opacity-20" />
                 कोई सदस्य नहीं मिला (No members found)
             </div>
           ) : (
-            members.filter(m => {
-              const matchesSearch = (m.first_name + " " + m.last_name).toLowerCase().includes(searchQuery.toLowerCase()) || 
-                                    (m.email || "").toLowerCase().includes(searchQuery.toLowerCase())
-              const matchesCity = cityFilter === "all" || m.city === cityFilter
-              const matchesPosition = positionFilter === "all" || m.position === positionFilter
-              
-              return matchesSearch && matchesCity && matchesPosition
-            }).map((member) => (
+            filteredMembers.map((member) => (
               <Card key={member.id} className="relative group overflow-hidden hover:shadow-md transition-all">
                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
                     <div className="h-12 w-12 rounded-full overflow-hidden border bg-muted flex-shrink-0">
