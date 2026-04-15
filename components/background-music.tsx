@@ -148,7 +148,7 @@ export function BackgroundMusic() {
       </audio>
 
       {/* Floating Music Control */}
-      <div className="fixed bottom-4 left-4 z-50">
+      <div className="fixed bottom-4 left-4 z-50 print:hidden">
         <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-1.5 flex items-center gap-1.5">
           {/* Play/Pause Button */}
           <button
