@@ -11,7 +11,7 @@ export function Preloader() {
     const handleLoad = () => {
       setTimeout(() => {
         setIsLoading(false)
-      }, 3000) // Small delay for smooth transition
+      }, 2000) // Small delay for smooth transition
     }
 
     if (document.readyState === 'complete') {

@@ -26,6 +26,8 @@ export default function DashboardMembersPage() {
   const [selectedMember, setSelectedMember] = useState<any>(null)
 
   const [searchQuery, setSearchQuery] = useState("")
+  const [countryFilter, setCountryFilter] = useState("all")
+  const [stateFilter, setStateFilter] = useState("all")
   const [cityFilter, setCityFilter] = useState("all")
   const [positionFilter, setPositionFilter] = useState("all")
 
@@ -73,10 +75,12 @@ export default function DashboardMembersPage() {
   const filteredMembers = members.filter(m => {
     const matchesSearch = (m.first_name + " " + m.last_name).toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (m.email || "").toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCountry = countryFilter === "all" || m.nation === countryFilter
+    const matchesState = stateFilter === "all" || m.state === stateFilter
     const matchesCity = cityFilter === "all" || m.city === cityFilter
     const matchesPosition = positionFilter === "all" || m.position === positionFilter
     
-    return matchesSearch && matchesCity && matchesPosition
+    return matchesSearch && matchesCountry && matchesState && matchesCity && matchesPosition
   })
 
   const handleDownloadCSV = () => {
@@ -147,49 +151,81 @@ export default function DashboardMembersPage() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+          <div className="relative md:col-span-2 lg:col-span-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input 
-                  placeholder="खोजें (Search by name or email)..." 
+                  placeholder="खोजें (Search)..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
               />
           </div>
-          <div className="flex gap-4 md:w-1/2">
-              <div className="flex-1">
-                <Select value={positionFilter} onValueChange={setPositionFilter}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="पद (Position)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">सभी पद (All Positions)</SelectItem>
-                        {Array.from(new Set(members.map(m => m.position).filter(Boolean))).sort().map(pos => (
-                            <SelectItem key={pos} value={pos}>{pos}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="flex-1">
-                <Select value={cityFilter} onValueChange={setCityFilter}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="शहर (City)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">सभी शहर (All Cities)</SelectItem>
-                        {Array.from(new Set(members.map(m => m.city).filter(Boolean))).sort().map(city => {
-                            const cityNameEn = city;
-                            const mCityHi = statesMock.find(s => s.cities.some(c => c.nameEn === cityNameEn))?.cities.find(c => c.nameEn === cityNameEn)?.nameHi || cityNameEn;
-                            return (
-                                <SelectItem key={cityNameEn} value={cityNameEn}>{mCityHi}</SelectItem>
-                            )
-                        })}
-                    </SelectContent>
-                </Select>
-              </div>
-          </div>
+          
+          <Select value={positionFilter} onValueChange={setPositionFilter}>
+              <SelectTrigger>
+                  <SelectValue placeholder="पद (Position)" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">सभी पद (All Positions)</SelectItem>
+                  {Array.from(new Set(members.map(m => m.position).filter(Boolean))).sort().map(pos => (
+                      <SelectItem key={pos} value={pos}>{pos}</SelectItem>
+                  ))}
+              </SelectContent>
+          </Select>
+
+          <Select value={countryFilter} onValueChange={(val) => {
+              setCountryFilter(val)
+              setStateFilter("all")
+              setCityFilter("all")
+          }}>
+              <SelectTrigger>
+                  <SelectValue placeholder="देश (Country)" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">सभी देश (All Countries)</SelectItem>
+                  {Array.from(new Set(members.map(m => m.nation).filter(Boolean))).sort().map(nation => (
+                      <SelectItem key={nation} value={nation}>{nation}</SelectItem>
+                  ))}
+              </SelectContent>
+          </Select>
+
+          <Select value={stateFilter} onValueChange={(val) => {
+              setStateFilter(val)
+              setCityFilter("all")
+          }}>
+              <SelectTrigger>
+                  <SelectValue placeholder="राज्य (State)" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">सभी राज्य (All States)</SelectItem>
+                  {Array.from(new Set(members.filter(m => countryFilter === "all" || m.nation === countryFilter).map(m => m.state).filter(Boolean))).sort().map(state => {
+                      const stateNameHi = statesMock.find(s => s.nameEn === state)?.nameHi || state;
+                      return (
+                          <SelectItem key={state} value={state}>{stateNameHi}</SelectItem>
+                      )
+                  })}
+              </SelectContent>
+          </Select>
+          
+          <Select value={cityFilter} onValueChange={setCityFilter}>
+              <SelectTrigger>
+                  <SelectValue placeholder="शहर (City)" />
+              </SelectTrigger>
+              <SelectContent>
+                  <SelectItem value="all">सभी शहर (All Cities)</SelectItem>
+                  {Array.from(new Set(members.filter(m => 
+                      (countryFilter === "all" || m.nation === countryFilter) && 
+                      (stateFilter === "all" || m.state === stateFilter)
+                  ).map(m => m.city).filter(Boolean))).sort().map(city => {
+                      const cityNameEn = city;
+                      const mCityHi = statesMock.find(s => s.cities.some(c => c.nameEn === cityNameEn))?.cities.find(c => c.nameEn === cityNameEn)?.nameHi || cityNameEn;
+                      return (
+                          <SelectItem key={cityNameEn} value={cityNameEn}>{mCityHi}</SelectItem>
+                      )
+                  })}
+              </SelectContent>
+          </Select>
       </div>
 
        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
