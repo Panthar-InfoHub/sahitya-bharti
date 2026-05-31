@@ -8,93 +8,132 @@ interface Founder {
   designation: string
   bio: string
   photo_url: string
+  phone: string
+  email: string
+  location: string
 }
 
 const founders: Founder[] = [
   {
     id: "1",
-    name: "डॉ. राम प्रसाद शुक्ल",
+    name: "डॉ. रवीन्द्र शुक्ल",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=RP&background=FF8C00&color=fff&size=200"
+    bio: "पूर्व शिक्षा मंत्री उ.प्र. सरकार, वरिष्ठ कवि एवं साहित्यकार",
+    photo_url: "/images/director.jpg",
+    phone: "+91 98765 43210",
+    email: "kaviravindrashukla@gmail.com",
+    location: "नई दिल्ली, भारत"
   },
   {
     id: "2",
-    name: "प्रो. सरिता वर्मा",
+    name: "पूज्य स्वामी डॉ. शाश्वतानन्द गिरि जी",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=SV&background=FF8C00&color=fff&size=200"
+    bio: "महामण्डलेश्वर, कुरुक्षेत्र",
+    photo_url: "/founder/founder2.jpeg",
+    phone: "9416051108",
+    email: "12vidant@gmail.com",
+    location: "(निरंजनी अखाड़ा) कुरुक्षेत्र, हरियाणा"
   },
   {
     id: "3",
-    name: "श्री विकास मिश्र",
+    name: "डॉ. बुद्धिनाथ मिश्र",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=VM&background=FF8C00&color=fff&size=200"
+    bio: "पूर्व महाप्रबंधक ओएनजीसी, वरिष्ठ साहित्यकार, देहरादून",
+    photo_url: "/founder/founder3.jpeg",
+    phone: "+91 63976 77279",
+    email: "buddhinathji@gmail.com",
+    location: "देहरादून, उत्तराखंड"
   },
   {
     id: "4",
-    name: "डॉ. अर्चना पाठक",
+    name: "आचार्य देवेंद्र देव",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=AP&background=FF8C00&color=fff&size=200"
+    bio: "वरिष्ठ साहित्यकार, बरेली (गिनीज बुक नामिनी)",
+    photo_url: "/founder/founder4.jpeg",
+    phone: "+91 91493 54944",
+    email: "9149354944",
+    location: "बरेली, उ.प्र."
   },
   {
     id: "5",
-    name: "श्री संजय सिंह",
+    name: "डॉ. करुणा शंकर उपाध्याय",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=SS&background=FF8C00&color=fff&size=200"
+    bio: "विभागाध्यक्ष हिन्दी, मुंबई विश्वविद्यालय, वरिष्ठ समालोचक एवं साहित्यकार",
+    photo_url: "/founder/founder5.jpeg",
+    phone: "+91  91679 21043",
+    email: "dr.krupadhyay@gmail.com",
+    location: "मुंबई, महाराष्ट्र"
   },
   {
     id: "6",
-    name: "डॉ. नीलम श्रीवास्तव",
+    name: "श्री निशांत शुक्ल",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=NS&background=FF8C00&color=fff&size=200"
+    bio: "व्यवसायी कवि, चिंतक, समाजसेवी, झांसी",
+    photo_url: "/founder/founder6.jpeg",
+    phone: "+91 94530 31311",
+    email: "nishantravindrashukla@gmail.com",
+    location: "झांसी, उत्तर प्रदेश"
   },
   {
     id: "7",
-    name: "श्री राजेश खन्ना",
+    name: "श्री योगेन्द्र शर्मा",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=RK&background=FF8C00&color=fff&size=200"
+    bio: "अंतरराष्ट्रीय कवि एवं साहित्यकार, भीलवाड़ा, राजस्थान",
+    photo_url: "/founder/founder7.jpeg",
+    phone: "+91 63506 22742",
+    email: "textileworld.tw@gmail.com",
+    location: "भीलवाड़ा, राजस्थान"
   },
   {
     id: "8",
-    name: "डॉ. कविता सिंह",
+    name: "डॉ. अनिल शर्मा",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=KS&background=FF8C00&color=fff&size=200"
+    bio: "प्रवक्ता हिन्दी, बी.एस.एम. इंटर कॉलेज रुड़की (उत्तराखण्ड)",
+    photo_url: "/founder/founder8.jpeg",
+    phone: "+91 97588 12188",
+    email: "dranilsharmarke@gmail.com",
+    location: "रुड़की, उत्तराखण्ड"
   },
   {
     id: "9",
-    name: "श्री आलोक रंजन",
+    name: "श्री वैभव वैद्य",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=AR&background=FF8C00&color=fff&size=200"
+    bio: "सॉफ्टवेयर इंजीनियर, चिंतक, विचारक, कनाडा",
+    photo_url: "/founder/founder9.jpeg",
+    phone: "+1 416 779 5148",
+    email: "vaibhav.vaidya7@gmail.com",
+    location: "कनाडा"
   },
   {
     id: "10",
-    name: "डॉ. सुनीता भारती",
+    name: "डॉ. प्रियंका कौशिक",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=SB&background=FF8C00&color=fff&size=200"
+    bio: "एमडी यूथ एंड आर सॉल्यूशंस, जयपुर",
+    photo_url: "/founder/founder10.jpeg",
+    phone: "+91  97997 14222",
+    email: "priyankakaushik29@gmail.com",
+    location: "राजस्थान"
   },
   {
     id: "11",
-    name: "श्री मनोज तिवारी",
+    name: "डॉ. ओमप्रकाश द्विवेदी",
     designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=MT&background=FF8C00&color=fff&size=200"
+    bio: " पूर्व संयुक्त निदेशक, माध्यमिक शिक्षा, उ.प्र.",
+    photo_url: "/founder/founder11.jpeg",
+    phone: "+91 94153 74968",
+    email: "omrajanidwivedi@gmail.com",
+    location: "काशी, उत्तर प्रदेश"
   },
-  {
-    id: "12",
-    name: "डॉ. दीपक शर्मा",
-    designation: "संस्थापक सदस्य",
-    bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
-    photo_url: "https://ui-avatars.com/api/?name=DS&background=FF8C00&color=fff&size=200"
-  }
+  // {
+  //   id: "12",
+  //   name: "डॉ. दीपक शर्मा",
+  //   designation: "संस्थापक सदस्य",
+  //   bio: "हिंदी साहित्य भारती के विकास एवं प्रचार-प्रसार में महत्वपूर्ण योगदान।",
+  //   photo_url: "https://ui-avatars.com/api/?name=DS&background=FF8C00&color=fff&size=200",
+  //   phone: "+91 98765 43221",
+  //   email: "deepak.sharma@example.com",
+  //   location: "शिमला, हिमाचल प्रदेश"
+  // }
 ]
 
 export function FoundersSection() {
@@ -114,11 +153,11 @@ export function FoundersSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
+        <div className="flex flex-wrap justify-center gap-6 lg:gap-8">
           {founders.map((founder) => (
             <div 
               key={founder.id}
-              className="w-full group relative bg-white rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-orange-50 hover:border-orange-200 flex flex-col items-center text-center overflow-hidden h-full"
+              className="w-full sm:w-[320px] lg:w-[300px] xl:w-[280px] group relative bg-white rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 border border-orange-50 hover:border-orange-200 flex flex-col items-center text-center overflow-hidden h-full"
             >
               {/* Floating Background Accent */}
               <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-orange-50/50 to-transparent -z-10 group-hover:h-full group-hover:bg-orange-50/20 transition-all duration-700" />
@@ -135,7 +174,7 @@ export function FoundersSection() {
 
               {/* Information Area */}
               <div className="flex-1 flex flex-col items-center w-full">
-                <div className="space-y-2 mb-4 w-full">
+                <div className="space-y-2 mb-4 w-full text-center">
                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">
                     {founder.designation}
                   </p>
@@ -145,6 +184,25 @@ export function FoundersSection() {
                   <p className="text-xs text-stone-500 line-clamp-2 mt-2 font-medium">
                     {founder.bio}
                   </p>
+                </div>
+
+                <div className="w-full mt-auto pt-4 border-t border-orange-50/50 flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5 text-xs text-stone-600">
+                    <MapPin className="w-4 h-4 text-orange-400 shrink-0" />
+                    <span className="truncate">{founder.location}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-600">
+                    <Phone className="w-4 h-4 text-orange-400 shrink-0" />
+                    <a href={`tel:${founder.phone.replace(/\s+/g, '')}`} className="hover:text-orange-600 transition-colors">
+                      {founder.phone}
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-600">
+                    <Mail className="w-4 h-4 text-orange-400 shrink-0" />
+                    <a href={`mailto:${founder.email}`} className="hover:text-orange-600 transition-colors truncate">
+                      {founder.email}
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

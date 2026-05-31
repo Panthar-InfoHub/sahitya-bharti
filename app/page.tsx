@@ -68,9 +68,9 @@ export default async function Home() {
         <DirectorProfile/>
 
         {/* 3. Founders Section */}
-        {/* <section id="founders">
+        <section id="founders">
           <FoundersSection />
-        </section> */}
+        </section>
 
         {/* 4. Trustees Section */}
         <section id="trustees">
