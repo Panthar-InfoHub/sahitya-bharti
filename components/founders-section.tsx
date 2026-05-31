@@ -233,7 +233,7 @@ export function FoundersSection() {
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-amber-100" />
                 <img
                   src={founder.photo_url}
-                  alt={founder.name}
+                  alt={language === 'en' ? founder.nameEn : founder.nameHi}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>

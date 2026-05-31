@@ -104,7 +104,7 @@ export function EventPopupClient({ events }: EventPopupClientProps) {
                         </div>
                     </div>
                     
-                    <Link href={`/events/${event.id || ''}`}>
+                    <Link href={`/events?id=${event.id}`}>
                         <Button 
                             variant="outline" 
                             size="sm" 

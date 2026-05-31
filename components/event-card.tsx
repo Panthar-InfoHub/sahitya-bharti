@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { EventDetailsModal } from "@/components/event-details-modal"
 import { RefundRequestModal } from "@/components/refund-request-modal"
 import { EventModal } from "@/components/event-modal"
@@ -41,6 +41,22 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [showParticipants, setShowParticipants] = useState(false)
   const [showRevenue, setShowRevenue] = useState(false)
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      const eventIdFromQuery = params.get("id")
+      if (eventIdFromQuery === event.id) {
+        setShowDetails(true)
+        setTimeout(() => {
+          const element = document.getElementById(`event-${event.id}`)
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" })
+          }
+        }, 100)
+      }
+    }
+  }, [event.id])
   
   const isJoined = event.event_participants?.some((p: any) => p.user_id === currentUserId)
   const participantsCount = event.event_participants?.length || 0
@@ -214,6 +230,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   return (
     <>
     <div 
+      id={`event-${event.id}`}
       className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group cursor-pointer"
       onClick={() => setShowDetails(true)}
     >
