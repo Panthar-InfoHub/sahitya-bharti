@@ -30,7 +30,6 @@ export function AuthForm() {
   // Credentials States
   const [phoneCountry, setPhoneCountry] = useState("+91")
   const [phoneLocal, setPhoneLocal] = useState("")
-  const [name, setName] = useState("")
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -56,20 +55,15 @@ export function AuthForm() {
       toast.error("कृपया एक मान्य मोबाइल नंबर दर्ज करें (न्यूनतम 7 अंक)")
       return
     }
-    if (!name.trim()) {
-      toast.error("कृपया अपना नाम दर्ज करें")
-      return
-    }
 
     setLoading(true)
     const fullPhone = formatFullPhone(phoneCountry, phoneLocal)
     const supabase = createClient()
 
-    console.log("CLIENT: Custom Phone & Name Login Attempt", {
+    console.log("CLIENT: Phone Login Attempt", {
       phoneCountry,
       phoneLocal,
-      fullPhone,
-      nameInput: name.trim()
+      fullPhone
     })
 
     try {
@@ -87,18 +81,8 @@ export function AuthForm() {
         return
       }
 
-      // 2. Case-insensitive name match on the trimmed input name
-      const matchedUser = users.find(u => {
-        const dbName = (u.full_name || u.name || "").trim().toLowerCase()
-        const inputName = name.trim().toLowerCase()
-        return dbName === inputName
-      })
-
-      if (!matchedUser) {
-        toast.error("लॉगिन विफल! अमान्य फ़ोन नंबर या नाम। (Invalid credentials)")
-        setLoading(false)
-        return
-      }
+      // 2. Just take the first matching user by phone
+      const matchedUser = users[0]
 
       // 3. Save to localStorage
       localStorage.setItem("sb_user", JSON.stringify(matchedUser))
@@ -177,28 +161,6 @@ export function AuthForm() {
                 required
               />
             </div>
-          </div>
-        </div>
-
-        {/* Name Input */}
-        <div className="space-y-2">
-          <label htmlFor="name" className="text-sm font-medium text-slate-600 dark:text-slate-300">
-            नाम / यूज़रनेम (Name / Username)
-          </label>
-          <div className="relative">
-            <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
-              <User className="h-4 w-4" />
-            </span>
-            <Input
-              id="name"
-              type="text"
-              placeholder="पंजीकृत नाम दर्ज करें"
-              value={name}
-              disabled={loading}
-              onChange={(e) => setName(e.target.value)}
-              className="pl-9 h-12 border-slate-200 focus:ring-primary shadow-sm rounded-lg"
-              required
-            />
           </div>
         </div>
 

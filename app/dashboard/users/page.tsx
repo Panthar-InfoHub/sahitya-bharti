@@ -87,7 +87,6 @@ export default function UsersManagementPage() {
   })
   const [addPhoneCountry, setAddPhoneCountry] = useState("+91")
   const [addPhoneLocal, setAddPhoneLocal] = useState("")
-  const [addUserPassword, setAddUserPassword] = useState("")
   const [addingUser, setAddingUser] = useState(false)
 
   useEffect(() => {
@@ -322,8 +321,7 @@ export default function UsersManagementPage() {
             full_name: addUserFormData.full_name.trim(),
             phone_number: fullPhone,
             role: addUserFormData.role,
-            plan: addUserFormData.plan,
-            password: addUserPassword.trim() || undefined
+            plan: addUserFormData.plan
         })
 
         if (result.success) {
@@ -332,7 +330,6 @@ export default function UsersManagementPage() {
             setAddUserFormData({ full_name: "", email: "", phone_number: "", role: "user", plan: plans[0]?.name || "free" })
             setAddPhoneLocal("")
             setAddPhoneCountry("+91")
-            setAddUserPassword("")
             checkAccessAndFetch()
         }
       } catch (error: any) {
@@ -609,17 +606,6 @@ export default function UsersManagementPage() {
                     {plans.length === 0 && <SelectItem value="free">Free</SelectItem>}
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="add_password" className="text-right">पासवर्ड (Password)</Label>
-                <Input 
-                    id="add_password" 
-                    type="text"
-                    placeholder="Set custom password/username"
-                    value={addUserPassword} 
-                    onChange={(e) => setAddUserPassword(e.target.value)}
-                    className="col-span-3" 
-                />
               </div>
           </div>
           

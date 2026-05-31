@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Loader2, User, MapPin, Mail, Phone, Heart, X } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 interface Trustee {
@@ -19,7 +20,9 @@ interface Trustee {
 }
 
 export function TrusteesSection() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const callText = language === 'en' ? 'Call' : 'कॉल करें'
+  const mailText = language === 'en' ? 'Mail' : 'मेल करें'
   const [nationalTrustees, setNationalTrustees] = useState<Trustee[]>([])
   const [internationalTrustees, setInternationalTrustees] = useState<Trustee[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,17 +32,6 @@ export function TrusteesSection() {
   useEffect(() => {
     fetchTrustees()
 
-    const handleOutsideClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.trustee-popup-card') && !target.closest('.trustee-main-card')) {
-        setActiveTrustee(null)
-        setPopupPosition(null)
-      }
-    }
-    document.addEventListener('click', handleOutsideClick)
-    return () => {
-      document.removeEventListener('click', handleOutsideClick)
-    }
   }, [])
 
   const fetchTrustees = async () => {
@@ -61,32 +53,6 @@ export function TrusteesSection() {
 
   const handleCardClick = (e: React.MouseEvent, trustee: Trustee) => {
     e.stopPropagation()
-    const rect = e.currentTarget.getBoundingClientRect()
-    const windowWidth = window.innerWidth
-    const sectionElement = document.getElementById('trustees-section')
-
-    if (sectionElement) {
-      const sectionRect = sectionElement.getBoundingClientRect()
-      const cardTopRelativeToSection = rect.top - sectionRect.top
-      const cardLeftRelativeToSection = rect.left - sectionRect.left
-      const cardRightRelativeToSection = rect.right - sectionRect.left
-
-      if (windowWidth < 768) {
-        // Center-align below the card on mobile
-        setPopupPosition({
-          top: cardTopRelativeToSection + rect.height + 12,
-          left: Math.max(10, cardLeftRelativeToSection + (rect.width / 2) - 180), // Center 360px width popup
-          align: 'center'
-        })
-      } else {
-        const showOnRight = rect.right + 380 < windowWidth
-        setPopupPosition({
-          top: cardTopRelativeToSection,
-          left: showOnRight ? cardRightRelativeToSection + 16 : cardLeftRelativeToSection - 376,
-          align: showOnRight ? 'right' : 'left'
-        })
-      }
-    }
     setActiveTrustee(trustee)
   }
 
@@ -239,92 +205,86 @@ export function TrusteesSection() {
       </div>
 
 
-      {/* Floating Rolling Details Card - Roll Down Beside the Card (Bigger Size!) */}
-      {activeTrustee && popupPosition && (
-        <div 
-          style={{ 
-            position: 'absolute', 
-            top: `${popupPosition.top}px`, 
-            left: `${popupPosition.left}px`,
-            width: '360px',
-          }}
-          className="trustee-popup-card z-50 bg-slate-900 text-white rounded-[2.5rem] p-6 shadow-[0_20px_50px_rgba(15,23,42,0.35)] border border-slate-800 flex flex-col justify-between max-h-[640px] animate-in slide-in-from-top-8 fade-in duration-500 ease-out origin-top"
-        >
-          {/* Close Button */}
-          <button 
-            onClick={() => { setActiveTrustee(null); setPopupPosition(null); }}
-            className="absolute top-5 right-5 p-1.5 rounded-full bg-white/10 hover:bg-red-500 hover:text-white text-stone-300 transition-colors z-50 cursor-pointer shadow-md"
-            title={t('trustee.close')}
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          {/* Roll Down Picture Header */}
-          <div className="space-y-4">
-            <div className="relative w-full h-52 rounded-3xl overflow-hidden shadow-inner border border-white/5">
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-850 to-slate-950" />
-              {activeTrustee.photo_url ? (
-                <img
-                  src={activeTrustee.photo_url}
-                  alt={activeTrustee.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl font-black text-cyan-500/20">{activeTrustee.name.charAt(0)}</span>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-400 leading-none">
-                {activeTrustee.type === 'national' ? t('trustee.badge_national') : t('trustee.badge_international')}
-              </p>
-              <h3 className="text-xl font-black text-white mt-1.5 leading-tight tracking-tight pr-6">{activeTrustee.name}</h3>
-              {activeTrustee.address && (
-                <p className="flex items-center gap-1.5 text-[10px] font-bold text-stone-300 uppercase mt-2 leading-none">
-                  <MapPin className="w-3.5 h-3.5 text-orange-400 shrink-0" /> 
-                  <span className="truncate max-w-[240px]">{activeTrustee.address}</span>
-                </p>
-              )}
-            </div>
-
-            {/* Description Scroll area */}
-            <div className="border-t border-white/10 pt-3">
-              <h4 className="text-[9px] font-black uppercase tracking-widest text-stone-400 mb-2 leading-none">
-                {t('trustee.details_title')}
-              </h4>
-              <div className="max-h-[220px] overflow-y-auto pr-1 text-stone-300 text-xs leading-relaxed font-medium scrollbar-thin scrollbar-thumb-slate-800">
-                {activeTrustee.description || t('trustee.no_record')}
+      {/* Fixed Detail Popup Modal */}
+      <Dialog open={!!activeTrustee} onOpenChange={(open) => !open && setActiveTrustee(null)}>
+        <DialogContent className="sm:max-w-[600px] w-[90vw] sm:w-[600px] h-[90vw] sm:h-[600px] max-h-[90vh] p-0 bg-white border-orange-100 text-stone-900 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden gap-0">
+          {activeTrustee && (
+            <>
+              {/* Photo with close button layered on top */}
+              <div className="relative w-full h-[45%] shrink-0 min-h-[200px]">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-amber-50" />
+                {activeTrustee.photo_url ? (
+                  <img
+                    src={activeTrustee.photo_url}
+                    alt={activeTrustee.name}
+                    className="absolute inset-0 w-full h-full object-contain bg-white/40 backdrop-blur-sm"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl font-black text-cyan-500/20">{activeTrustee.name.charAt(0)}</span>
+                  </div>
+                )}
+                <button
+                  onClick={() => setActiveTrustee(null)}
+                  className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 hover:bg-red-500 text-stone-600 hover:text-white transition-colors cursor-pointer backdrop-blur-sm shadow-md border border-white"
+                  title={t('trustee.close')}
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            </div>
-          </div>
 
-          {/* Social and Call Buttons Section (No Donation Button!) */}
-          <div className="pt-4 border-t border-white/10 mt-4 space-y-3 shrink-0">
-            <div className="grid grid-cols-2 gap-2.5">
-              {activeTrustee.phone && (
-                <a
-                  href={`tel:${activeTrustee.phone}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center gap-2 p-3 bg-green-500/10 hover:bg-green-600 hover:text-white rounded-[1.25rem] text-[11px] font-bold text-green-400 border border-green-500/20 transition-all duration-300 group/btn"
-                >
-                  <Phone className="w-3.5 h-3.5 group-hover/btn:animate-bounce" /> Call
-                </a>
-              )}
-              {activeTrustee.email && (
-                <a
-                  href={`mailto:${activeTrustee.email}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center justify-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-600 hover:text-white rounded-[1.25rem] text-[11px] font-bold text-blue-400 border border-blue-500/20 transition-all duration-300 group/btn"
-                >
-                  <Mail className="w-3.5 h-3.5 group-hover/btn:animate-pulse" /> Mail
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+              {/* Content — scrollable */}
+              <div className="flex flex-col gap-3 p-6 overflow-y-auto flex-1">
+                {/* Category badge */}
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-orange-600 leading-none">
+                    {activeTrustee.type === 'national' ? t('trustee.badge_national') : t('trustee.badge_international')}
+                  </p>
+                  <h3 className="text-3xl font-black text-stone-900 mt-2 leading-tight tracking-tight pr-6">{activeTrustee.name}</h3>
+                  {activeTrustee.address && (
+                    <p className="flex items-center gap-1.5 text-sm font-bold text-stone-600 uppercase mt-2 leading-none">
+                      <MapPin className="w-4 h-4 text-orange-400 shrink-0" /> 
+                      <span className="truncate max-w-[340px]">{activeTrustee.address}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Description Scroll area */}
+                <div className="border-t border-orange-100 pt-4">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-stone-500 mb-3 leading-none">
+                    {t('trustee.details_title')}
+                  </h4>
+                  <div className="pr-2 text-stone-600 text-base leading-relaxed font-medium">
+                    {activeTrustee.description || t('trustee.no_record')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Social and Call Buttons Section */}
+              <div className="border-t border-orange-100 p-4 grid grid-cols-2 gap-4 shrink-0 bg-orange-50/50">
+                {activeTrustee.phone && (
+                  <a
+                    href={`tel:${activeTrustee.phone}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center justify-center gap-2 p-4 bg-green-50 hover:bg-green-500 text-green-600 hover:text-white rounded-[1.25rem] text-sm font-bold border border-green-200 transition-all duration-300 group/btn"
+                  >
+                    <Phone className="w-5 h-5 group-hover/btn:animate-bounce" /> {callText}
+                  </a>
+                )}
+                {activeTrustee.email && (
+                  <a
+                    href={`mailto:${activeTrustee.email}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center justify-center gap-2 p-4 bg-blue-50 hover:bg-blue-500 text-blue-600 hover:text-white rounded-[1.25rem] text-sm font-bold border border-blue-200 transition-all duration-300 group/btn"
+                  >
+                    <Mail className="w-5 h-5 group-hover/btn:animate-pulse" /> {mailText}
+                  </a>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }
