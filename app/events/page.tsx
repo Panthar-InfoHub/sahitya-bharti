@@ -54,7 +54,7 @@ export default async function EventsPage() {
                 key={event.id} 
                 event={event} 
                 currentUserId={user?.id}
-                isAdmin={isAdmin}
+                isAdmin={false}
               />
             ))}
           </div>
