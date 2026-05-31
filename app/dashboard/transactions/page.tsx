@@ -75,7 +75,11 @@ export default function TransactionsPage() {
       .order("created_at", { ascending: false })
 
     // Apply filters  
-    if (typeFilter !== "all") {
+    if (typeFilter === "donation") {
+      query = query.eq("plan", "donation")
+    } else if (typeFilter === "membership") {
+      query = query.eq("type", "membership").neq("plan", "donation")
+    } else if (typeFilter !== "all") {
       query = query.eq("type", typeFilter)
     }
     if (statusFilter !== "all") {
@@ -108,14 +112,18 @@ export default function TransactionsPage() {
     .filter(tx => tx.status === 'success')
     .reduce((sum, tx) => sum + Number(tx.amount), 0)
 
+  const totalDonations = filteredTransactions
+    .filter(tx => tx.status === 'success' && tx.plan === 'donation')
+    .reduce((sum, tx) => sum + Number(tx.amount), 0)
+
   const exportToCSV = () => {
     const headers = ["Date", "User", "Email", "Type", "Description", "Amount", "Status", "Payment ID"]
     const rows = filteredTransactions.map(tx => [
       format(new Date(tx.created_at), "yyyy-MM-dd HH:mm"),
       tx.users?.full_name || "N/A",
       tx.users?.email || "N/A",
-      tx.type,
-      tx.type === 'event' ? tx.events?.title || 'Event' : `${tx.plan} Plan`,
+      tx.plan === 'donation' ? 'Donation' : tx.type,
+      tx.plan === 'donation' ? 'General Contribution' : tx.type === 'event' ? tx.events?.title || 'Event' : `${tx.plan || 'Premium'} Plan`,
       tx.amount,
       tx.status,
       tx.razorpay_payment_id
@@ -157,7 +165,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Transactions</CardTitle>
@@ -182,6 +190,14 @@ export default function TransactionsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₹{totalAmount.toFixed(2)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-amber-600">Total Donations</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">₹{totalDonations.toFixed(2)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -215,7 +231,8 @@ export default function TransactionsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="membership">Membership</SelectItem>
+                <SelectItem value="membership">Membership Upgrades</SelectItem>
+                <SelectItem value="donation">Donations</SelectItem>
                 <SelectItem value="event">Event Registration</SelectItem>
               </SelectContent>
             </Select>
@@ -272,12 +289,22 @@ export default function TransactionsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={tx.type === 'membership' ? 'default' : 'secondary'}>
-                          {tx.type === 'membership' ? 'Membership' : 'Event'}
+                        <Badge 
+                          variant={
+                            tx.plan === 'donation' ? 'outline' :
+                            tx.type === 'membership' ? 'default' : 
+                            'secondary'
+                          } 
+                          className={tx.plan === 'donation' ? 'border-amber-500 text-amber-600 font-bold' : ''}
+                        >
+                          {tx.plan === 'donation' ? 'Donation' :
+                           tx.type === 'membership' ? 'Membership' : 
+                           'Event'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {tx.type === 'event' 
+                        {tx.plan === 'donation' ? 'General Contribution' :
+                         tx.type === 'event' 
                           ? tx.events?.title || 'Event Registration'
                           : `${tx.plan || 'Premium'} Plan`
                         }

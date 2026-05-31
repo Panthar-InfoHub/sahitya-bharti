@@ -34,6 +34,7 @@ interface Participant {
     phone_number: string
   }
   joined_at: string
+  added_via: 'website' | 'manual'
 }
 
 interface User {
@@ -68,19 +69,24 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
 
   const fetchParticipants = async () => {
     setLoading(true)
+    
     const { data: participantsData, error } = await supabase
       .from("event_participants")
       .select(`
         id,
         user_id,
         joined_at,
+        added_via,
         users (full_name, email, role, phone_number)
       `)
       .eq("event_id", event.id)
       .order("joined_at", { ascending: false })
 
+    console.log("[Participants] event_id:", event.id, "data:", participantsData, "error:", error)
+
     if (error) {
-      toast.error("Failed to load participants")
+      console.error("[Participants] Query error:", JSON.stringify(error))
+      toast.error("Failed to load participants: " + error.message)
     } else {
       setParticipants(participantsData as any || [])
     }
@@ -93,8 +99,8 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
     // Get all users matching search
     const { data: users, error } = await supabase
         .from('users')
-        .select('id, full_name, email, role')
-        .or(`full_name.ilike.%${userSearchQuery}%,email.ilike.%${userSearchQuery}%`)
+        .select('id, full_name, email, role, phone_number')
+        .or(`full_name.ilike.%${userSearchQuery}%,email.ilike.%${userSearchQuery}%,phone_number.ilike.%${userSearchQuery}%`)
         .limit(10)
 
     if (error) {
@@ -123,7 +129,8 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
       .from("event_participants")
       .insert({
         event_id: event.id,
-        user_id: userId
+        user_id: userId,
+        added_via: 'manual'
       })
 
     if (error) {
@@ -202,7 +209,7 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
                             <div key={user.id} className="flex items-center justify-between p-3 hover:bg-blue-50 border-b last:border-0 transition-colors">
                                 <div>
                                     <p className="font-medium text-slate-900">{user.full_name}</p>
-                                    <p className="text-xs text-slate-500 italic">{user.email}</p>
+                                    <p className="text-xs text-slate-500 italic">{user.email}{(user as any).phone_number ? ` • ${(user as any).phone_number}` : ''}</p>
                                 </div>
                                 <Button 
                                     size="sm" 
@@ -241,6 +248,7 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
                   <TableHead className="font-bold">नाम (Name)</TableHead>
                   <TableHead className="font-bold">ईमेल (Email)</TableHead>
                   <TableHead className="font-bold">फ़ोन (Phone)</TableHead>
+                  <TableHead className="font-bold">स्रोत (Source)</TableHead>
                   <TableHead className="font-bold">भूमिका (Role)</TableHead>
                   <TableHead className="text-right font-bold pr-6">Action</TableHead>
                 </TableRow>
@@ -248,7 +256,7 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
                     </TableCell>
                   </TableRow>
@@ -258,6 +266,15 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
                       <TableCell className="font-medium">{p.users?.full_name}</TableCell>
                       <TableCell className="text-slate-600">{p.users?.email}</TableCell>
                       <TableCell className="text-slate-600">{p.users?.phone_number || "-"}</TableCell>
+                      <TableCell>
+                        <Badge className={`text-xs font-semibold ${
+                          p.added_via === 'manual'
+                            ? 'bg-amber-100 text-amber-700 border-amber-200'
+                            : 'bg-green-100 text-green-700 border-green-200'
+                        }`}>
+                          {p.added_via === 'manual' ? 'Manual' : 'Website'}
+                        </Badge>
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="capitalize text-xs font-normal">
                           {p.users?.role}
@@ -278,7 +295,7 @@ export function EventParticipantsModal({ event, open, onOpenChange }: EventParti
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                    <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                        कोई प्रतिभागी नहीं मिला (No participants found)
                     </TableCell>
                   </TableRow>

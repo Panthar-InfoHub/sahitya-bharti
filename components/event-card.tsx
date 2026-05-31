@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { Calendar, MapPin, Trophy, Users, Trash2, Pencil, Loader2 } from "lucide-react"
+import { Calendar, MapPin, Trophy, Users, Trash2, Pencil, Loader2, IndianRupee } from "lucide-react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -14,6 +14,7 @@ import { RefundRequestModal } from "@/components/refund-request-modal"
 import { EventModal } from "@/components/event-modal"
 import { EventParticipantsModal } from "@/components/event-participants-modal"
 import { EventRegistrationModal } from "@/components/event-registration-modal"
+import { EventRevenueModal } from "@/components/event-revenue-modal"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +40,7 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
   const [showRefundModal, setShowRefundModal] = useState(false)
   const [showRegistrationModal, setShowRegistrationModal] = useState(false)
   const [showParticipants, setShowParticipants] = useState(false)
+  const [showRevenue, setShowRevenue] = useState(false)
   
   const isJoined = event.event_participants?.some((p: any) => p.user_id === currentUserId)
   const participantsCount = event.event_participants?.length || 0
@@ -306,46 +308,41 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
         <div className="pt-2 flex items-center justify-between gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
              {isAdmin ? (
                  <div className="flex flex-col w-full gap-2">
-                     <div className="flex gap-2">
+                     {/* Row 1: Participants + Revenue */}
+                     <div className="grid grid-cols-2 gap-2">
                         <Button 
                             variant="outline" 
                             size="sm" 
-                            className="flex-1 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                            className="bg-blue-600 text-white border-blue-700 hover:bg-blue-700 hover:text-white"
                             onClick={() => setShowParticipants(true)}
                         >
-                            <Users className="h-4 w-4 mr-2" />
-                            प्रतिभागी (Participants)
+                            <Users className="h-4 w-4 mr-1.5" />
+                            प्रतिभागी
                         </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700 hover:text-white"
+                            onClick={() => setShowRevenue(true)}
+                        >
+                            <IndianRupee className="h-4 w-4 mr-1.5" />
+                            राजस्व
+                        </Button>
+                     </div>
+                     {/* Row 2: Edit + Delete */}
+                     <div className="grid grid-cols-[1fr_auto] gap-2">
                         <EventModal 
                             eventToEdit={event} 
                             trigger={
-                                <Button variant="outline" size="sm" className="flex-1">
-                                    <Pencil className="h-4 w-4 mr-2" /> 
+                                <Button variant="outline" size="sm" className="w-full bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 hover:text-slate-900">
+                                    <Pencil className="h-4 w-4 mr-1.5" /> 
                                     संपादित करें (Edit)
                                 </Button>
                             } 
                         />
-                     </div>
-                     <div className="flex gap-2">
-                        <Button 
-                            variant={isJoined ? "outline" : "default"} 
-                            size="sm"
-                            className="flex-1"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (isJoined) handleJoin();
-                                else setShowDetails(true);
-                            }}
-                            disabled={joining || (isFull && !isJoined)}
-                        >
-                            {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 
-                            isJoined ? "नाम वापस लें (Leave)" : 
-                            isFull ? "जगह नहीं (Full)" : 
-                            event.fee > 0 ? "स्वयं पंजीकरण (Register)" : "शामिल हों (Join)"}
-                        </Button>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="destructive" size="sm" className="px-3">
+                                <Button variant="destructive" size="sm" className="px-3 bg-red-600 hover:bg-red-700">
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </AlertDialogTrigger>
@@ -365,6 +362,23 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
                             </AlertDialogContent>
                         </AlertDialog>
                      </div>
+                     {/* Row 3: Register/Join */}
+                     <Button 
+                         variant={isJoined ? "outline" : "default"} 
+                         size="sm"
+                         className="w-full"
+                         onClick={(e) => {
+                             e.stopPropagation();
+                             if (isJoined) handleJoin();
+                             else setShowDetails(true);
+                         }}
+                         disabled={joining || (isFull && !isJoined)}
+                     >
+                         {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 
+                         isJoined ? "नाम वापस लें (Leave)" : 
+                         isFull ? "जगह नहीं (Full)" : 
+                         event.fee > 0 ? "स्वयं पंजीकरण (Register)" : "शामिल हों (Join)"}
+                     </Button>
                  </div>
              ) : (
                 <Button 
@@ -436,6 +450,11 @@ export function EventCard({ event, currentUserId, isAdmin }: EventCardProps) {
         event={event}
         open={showParticipants}
         onOpenChange={setShowParticipants}
+    />
+    <EventRevenueModal
+        event={event}
+        open={showRevenue}
+        onOpenChange={setShowRevenue}
     />
     </>
   )

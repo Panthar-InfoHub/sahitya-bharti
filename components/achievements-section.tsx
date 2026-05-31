@@ -1,43 +1,55 @@
+"use client"
+
 import { Trophy, Globe, BookMarked, Users2 } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 export function AchievementsSection() {
+  const { t } = useLanguage()
+
   const achievements = [
     {
       icon: Trophy,
-      title: "राष्ट्रीय सम्मान",
+      title: t('ach.cat1_title'),
       items: [
-        "हिंदी सेवा सम्मान - राष्ट्रपति द्वारा (2020)",
-        "साहित्य रत्न पुरस्कार (2018)",
-        "भाषा भूषण सम्मान (2015)",
+        t('ach.cat1_item1'),
+        t('ach.cat1_item2'),
+        t('ach.cat1_item3'),
       ],
     },
     {
       icon: Globe,
-      title: "अंतरराष्ट्रीय सहभागिता",
+      title: t('ach.cat2_title'),
       items: [
-        "विश्व हिंदी सम्मेलन में प्रतिनिधित्व (2019, 2022)",
-        "अंतरराष्ट्रीय साहित्य महोत्सव आयोजन",
-        "20+ देशों में साहित्यिक कार्यक्रम",
+        t('ach.cat2_item1'),
+        t('ach.cat2_item2'),
+        t('ach.cat2_item3'),
       ],
     },
     {
       icon: BookMarked,
-      title: "प्रकाशन उपलब्धियाँ",
+      title: t('ach.cat3_title'),
       items: [
-        "200+ पुस्तकों का प्रकाशन",
-        "त्रैमासिक साहित्यिक पत्रिका 'साहित्य दर्पण'",
-        "50+ शोध पत्रों का प्रकाशन",
+        t('ach.cat3_item1'),
+        t('ach.cat3_item2'),
+        t('ach.cat3_item3'),
       ],
     },
     {
       icon: Users2,
-      title: "सामाजिक योगदान",
+      title: t('ach.cat4_title'),
       items: [
-        "100+ ग्रामीण पुस्तकालयों की स्थापना",
-        "10,000+ छात्रों को छात्रवृत्ति",
-        "साक्षरता अभियान में योगदान",
+        t('ach.cat4_item1'),
+        t('ach.cat4_item2'),
+        t('ach.cat4_item3'),
       ],
     },
+  ]
+
+  const stats = [
+    { number: t('ach.stat1_num'), label: t('ach.stat1_lbl') },
+    { number: t('ach.stat2_num'), label: t('ach.stat2_lbl') },
+    { number: t('ach.stat3_num'), label: t('ach.stat3_lbl') },
+    { number: t('ach.stat4_num'), label: t('ach.stat4_lbl') },
   ]
 
   return (
@@ -46,12 +58,12 @@ export function AchievementsSection() {
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
-              उपलब्धियाँ एवं मान्यता
+            <h2 className="text-4xl font-bold text-foreground mb-4 font-serif">
+              {t('ach.title')}
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto rounded-full"></div>
-            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-              चार दशकों की निरंतर सेवा में प्राप्त सम्मान और उपलब्धियाँ
+            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto font-medium">
+              {t('ach.desc')}
             </p>
           </div>
 
@@ -69,7 +81,7 @@ export function AchievementsSection() {
                     <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Icon className="w-7 h-7 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-foreground">
+                    <h3 className="text-xl font-bold text-foreground font-serif">
                       {achievement.title}
                     </h3>
                   </div>
@@ -79,7 +91,7 @@ export function AchievementsSection() {
                     {achievement.items.map((item, itemIndex) => (
                       <li key={itemIndex} className="flex items-start gap-3">
                         <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-muted-foreground leading-relaxed">
+                        <span className="text-muted-foreground leading-relaxed font-medium">
                           {item}
                         </span>
                       </li>
@@ -92,20 +104,15 @@ export function AchievementsSection() {
 
           {/* Stats Section */}
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { number: "40+", label: "वर्षों का अनुभव" },
-              { number: "500+", label: "कार्यक्रम आयोजित" },
-              { number: "10,000+", label: "सदस्य" },
-              { number: "20+", label: "राज्यों में उपस्थिति" },
-            ].map((stat, index) => (
+            {stats.map((stat, index) => (
               <div
                 key={index}
-                className="text-center p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100"
+                className="text-center p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100 shadow-sm"
               >
-                <div className="text-3xl font-bold text-primary mb-2">
+                <div className="text-3xl font-bold text-primary mb-2 font-serif">
                   {stat.number}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground font-medium">
                   {stat.label}
                 </div>
               </div>

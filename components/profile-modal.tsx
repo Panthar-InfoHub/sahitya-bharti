@@ -61,8 +61,20 @@ export function ProfileModal({ open, onOpenChange, onOpenMembership, user }: Pro
         console.log('Fetching plan details for:', cleanPlanName)
         const { data, error } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlanName).limit(1).maybeSingle()
         console.log('Fetched plan details:', data, error)
-        if (data) setPlanDetails(data)
-        else console.error('No plan found in DB matching ilike:', cleanPlanName)
+        if (error) {
+            console.error('Error fetching plan details from Supabase:', {
+                code: error.code,
+                message: error.message,
+                details: error.details,
+                hint: error.hint
+            })
+            toast.error(`Plan fetch error: ${error.message || JSON.stringify(error)}`)
+        }
+        if (data) {
+            setPlanDetails(data)
+        } else {
+            console.error('No plan found in DB matching ilike:', cleanPlanName)
+        }
     }
 
     const fetchUserEvents = async (userId: string) => {

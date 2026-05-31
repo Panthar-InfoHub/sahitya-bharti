@@ -1,7 +1,34 @@
+"use client"
+
 import Image from "next/image"
-import { Sparkles, Globe, Heart, Users, BookOpen, PenTool, Search, School, Mic2, Network, Wind, Megaphone, Trophy, Library, Presentation, Building2, History, ChevronDown } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { Sparkles, Globe, Heart, Users, BookOpen, PenTool, Search, School, Mic2, Network, Wind, Megaphone, Trophy, Library, Presentation, Building2, History } from "lucide-react"
 
 export function OrganizationHero() {
+  const { t, language } = useLanguage()
+
+  const objectives = Array.from({ length: 16 }, (_, i) => ({
+    title: t(`obj.t${i + 1}` as any),
+    desc: t(`obj.d${i + 1}` as any),
+    icon: i === 0 ? <Globe className="w-5 h-5" /> 
+          : i === 1 ? <Sparkles className="w-5 h-5" />
+          : i === 2 ? <BookOpen className="w-5 h-5" />
+          : i === 3 ? <Heart className="w-5 h-5" />
+          : i === 4 ? <Users className="w-5 h-5" />
+          : i === 5 ? <PenTool className="w-5 h-5" />
+          : i === 6 ? <Search className="w-5 h-5" />
+          : i === 7 ? <School className="w-5 h-5" />
+          : i === 8 ? <Mic2 className="w-5 h-5" />
+          : i === 9 ? <Network className="w-5 h-5" />
+          : i === 10 ? <Wind className="w-5 h-5" />
+          : i === 11 ? <Megaphone className="w-5 h-5" />
+          : i === 12 ? <Trophy className="w-5 h-5" />
+          : i === 13 ? <Library className="w-5 h-5" />
+          : i === 14 ? <Presentation className="w-5 h-5" />
+          : <Building2 className="w-5 h-5" />,
+    color: i % 3 === 0 ? "bg-orange-600" : i % 3 === 1 ? "bg-amber-600" : "bg-stone-900"
+  }))
+
   return (
     <section className="relative w-full overflow-hidden bg-stone-50">
       {/* Background Ornaments - Global */}
@@ -22,7 +49,7 @@ export function OrganizationHero() {
             <div className="relative w-40 h-40 md:w-56 md:h-56 animate-in zoom-in duration-1000 ease-out">
               <Image
                 src="/logo.jpg"
-                alt="हिंदी साहित्य भारती"
+                alt={t('org.name')}
                 fill
                 className="object-contain drop-shadow-2xl"
                 priority
@@ -32,15 +59,15 @@ export function OrganizationHero() {
 
           <div className="space-y-6 max-w-5xl">
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-stone-950 leading-[1.2] py-2">
-              हिंदी साहित्य भारती
+              {t('org.name')}
             </h1>
             <p className="text-lg md:text-2xl lg:text-3xl font-serif italic text-orange-900 tracking-normal opacity-90 animate-in slide-in-from-bottom duration-1000 delay-300">
-              &quot;मानव बन जाए जग सारा, यह पावन संकल्प हमारा।&quot;
+              {t('hero.pledge')}
             </p>
           </div>
 
           <div className="animate-bounce flex flex-col items-center gap-2">
-            <span className="text-[10px] md:text-xs font-bold tracking-widest text-stone-400 uppercase">हमारी यात्रा</span>
+            <span className="text-[10px] md:text-xs font-bold tracking-widest text-stone-400 uppercase">{t('hero.journey')}</span>
             <div className="w-5 h-8 border-2 border-stone-200 rounded-full flex justify-center p-0.5">
               <div className="w-1 h-1.5 bg-orange-500 rounded-full" />
             </div>
@@ -53,7 +80,7 @@ export function OrganizationHero() {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 bg-orange-100/50 px-4 py-1.5 rounded-full text-orange-700 text-[10px] md:text-xs font-bold tracking-widest uppercase mb-4">
                 <Sparkles className="w-3.5 h-3.5" />
-                एक परिचय
+                {t('hero.intro_badge')}
               </div>
             </div>
 
@@ -62,13 +89,21 @@ export function OrganizationHero() {
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-linear-to-tr from-amber-50 to-transparent opacity-50" />
 
               <p className="relative text-xl md:text-3xl lg:text-4xl text-stone-900 leading-[1.4] font-bold font-serif italic text-center px-2">
-                &quot;हिंदी साहित्य भारती एक अंतरराष्ट्रीय गैर-सरकारी संगठन है, जो <span className="text-orange-600 decoration-orange-200 underline underline-offset-4">सनातन</span> के संवर्धन और भारतीय सनातन जीवन-मूल्यों की वैश्विक पुनर्स्थापना के लिए समर्पित है।&quot;
+                {language === 'hi' ? (
+                  <>
+                    &quot;हिंदी साहित्य भारती एक अंतरराष्ट्रीय गैर-सरकारी संगठन है, जो <span className="text-orange-600 decoration-orange-200 underline underline-offset-4">सनातन</span> के संवर्धन और भारतीय सनातन जीवन-मूल्यों की वैश्विक पुनर्स्थापना के लिए समर्पित है।&quot;
+                  </>
+                ) : (
+                  <>
+                    &quot;Hindi Sahitya Bharti is an international non-governmental organization dedicated to the promotion of <span className="text-orange-600 decoration-orange-200 underline underline-offset-4">Sanatan</span> and the global re-establishment of Indian Sanatan life-values.&quot;
+                  </>
+                )}
               </p>
 
               <div className="mt-8 md:mt-12 flex flex-col items-center gap-6">
                 <div className="w-10 h-px bg-stone-200" />
                 <p className="text-base md:text-xl text-stone-500 max-w-2xl mx-auto leading-relaxed font-serif text-center">
-                  इसकी स्थापना इस संकल्प के साथ की गई थी कि भाषा केवल संवाद का साधन नहीं, बल्कि संस्कृति की संवाहिका होती है।
+                  {t('hero.intro_subtext')}
                 </p>
               </div>
             </div>
@@ -87,15 +122,24 @@ export function OrganizationHero() {
                   <History className="w-6 h-6 md:w-7 md:h-7" />
                 </div>
                 <h2 className="text-3xl md:text-5xl font-black text-stone-950 leading-tight">
-                  स्थापना और <br />
-                  <span className="text-orange-600">विकास</span>
+                  {language === 'hi' ? (
+                    <>
+                      स्थापना और <br />
+                      <span className="text-orange-600">विकास</span>
+                    </>
+                  ) : (
+                    <>
+                      Establishment & <br />
+                      <span className="text-orange-600">Growth</span>
+                    </>
+                  )}
                 </h2>
                 <div className="w-16 md:w-20 h-1.5 bg-orange-600 rounded-full" />
               </div>
 
               <div className="space-y-6">
                 <p className="text-lg md:text-2xl text-stone-800 leading-relaxed font-serif italic border-l-4 border-orange-200 pl-6">
-                  प्रख्यात साहित्यकार एवं पूर्व शिक्षा मंत्री उ.प्र. <span className="text-orange-700 font-bold not-italic">डॉ. रवीन्द्र शुक्ल</span> तथा देश एवं विदेश के अनेक विद्वानों ने भारतीय संस्कृति की पुनर्प्रतिष्ठा, हिंदी भाषा और हिंदी साहित्य के उत्थान का संकल्प लेकर व्यापक मंथन के बाद <span className="text-stone-950 font-bold not-italic">15 जुलाई 2020</span> को संस्था का गठन किया।
+                  {t('hero.development_text')}
                 </p>
               </div>
             </div>
@@ -104,13 +148,13 @@ export function OrganizationHero() {
               <div className="p-8 rounded-[2rem] md:rounded-[2.5rem] bg-orange-600 text-white shadow-2xl shadow-orange-200 transform lg:translate-y-8">
                 <Globe className="w-8 h-8 md:w-10 md:h-10 mb-6 opacity-50" />
                 <p className="text-base md:text-xl leading-relaxed font-medium">
-                  आज हिंदी साहित्य भारती विश्व के <span className="text-amber-300 font-bold text-2xl">37 देशों</span>, भारत के प्रत्येक प्रदेश, जनपदीय एवं महानगरीय स्तर पर सक्रियता के साथ अपने संकल्प को पूर्ण करने में लगी हुई है। यह विश्व की एक अभिनव और सबसे बड़ी संस्था है।
+                  {t('hero.development_stat')}
                 </p>
               </div>
 
               <div className="p-8 rounded-[2rem] md:rounded-[2.5rem] bg-white border border-stone-100 shadow-xl">
                 <p className="text-base md:text-lg text-stone-700 leading-relaxed">
-                  संस्था से अनेक <span className="text-stone-950 font-bold">पूर्व राज्यपाल, कुलाधिपति, कुलपति, प्राचार्य</span> और ख्यातिलब्ध साहित्यकार जुड़े हैं। नवोदित प्रतिभाशाली साहित्यकारों के साथ-साथ अनेक साहित्यप्रेमी पूर्ण निष्ठा एवं समर्पणभाव से इस अभियान का हिस्सा हैं।
+                  {t('hero.development_members')}
                 </p>
               </div>
             </div>
@@ -141,8 +185,7 @@ export function OrganizationHero() {
                 <div className="flex items-center justify-center gap-4">
                   <div className="h-px w-10 md:w-16 bg-stone-200" />
                   <p className="text-sm md:text-xl text-stone-500 font-medium italic font-serif">
-
-                    महोपनिषद: अध्याय 6, मंत्र 71
+                    {t('hero.shloka_source')}
                   </p>
                   <div className="h-px w-10 md:w-16 bg-stone-200" />
                 </div>
@@ -150,10 +193,10 @@ export function OrganizationHero() {
 
               <div className="bg-stone-950 text-white p-8 md:p-16 rounded-[2.5rem] md:rounded-[3rem] text-center space-y-6 shadow-2xl">
                 <p className="text-lg md:text-2xl leading-relaxed font-serif italic opacity-90">
-                  &quot;यह अपना मित्र है और यह नहीं है, इस तरह की गणना छोटे चित्त वाले लोग करते हैं। उदार हृदय वाले लोगों के लिए तो (सम्पूर्ण) धरती ही परिवार है।&quot;
+                  {t('hero.shloka_explanation')}
                 </p>
                 <p className="text-sm md:text-xl text-stone-400 font-medium max-w-2xl mx-auto leading-relaxed">
-                  हिंदी साहित्य भारती ने <span className="text-orange-400">“मानव बन जाए जग सारा”</span> को अपना ध्येय बनाकर शांति स्थापना के लिए आंदोलन प्रारम्भ किया है।
+                  {t('hero.shloka_subtext')}
                 </p>
               </div>
             </div>
@@ -162,30 +205,13 @@ export function OrganizationHero() {
           {/* Objectives Finale */}
           <div className="space-y-12 md:space-y-24">
             <div className="text-center space-y-4 md:space-y-6">
-              <span className="text-[10px] md:text-xs font-black tracking-widest text-orange-600 uppercase block">उद्देश्यों की सिद्धि</span>
-              <h2 className="text-3xl md:text-6xl lg:text-7xl font-black text-stone-950 leading-tight">संस्था के उद्देश्य</h2>
+              <span className="text-[10px] md:text-xs font-black tracking-widest text-orange-600 uppercase block">{t('hero.objectives_badge')}</span>
+              <h2 className="text-3xl md:text-6xl lg:text-7xl font-black text-stone-950 leading-tight">{t('hero.objectives_title')}</h2>
               <div className="w-20 md:w-32 h-1.5 md:h-2 bg-linear-to-r from-orange-600 to-amber-600 rounded-full mx-auto mt-4 md:mt-8" />
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { title: "विश्व शांति", desc: "सकारात्मक सोच के बुद्धिजीवियों को एक मंच पर लाना।", icon: <Globe className="w-5 h-5" />, color: "bg-orange-600" },
-                { title: "सनातन चेतना", desc: "सांस्कृतिक चेतना को विश्व पटल पर प्रतिष्ठित करना।", icon: <Sparkles className="w-5 h-5" />, color: "bg-amber-600" },
-                { title: "साहित्यिक माध्यम", desc: "सम्पूर्ण साहित्य को माध्यम बनाकर मूल्यों का विकास।", icon: <BookOpen className="w-5 h-5" />, color: "bg-stone-900" },
-                { title: "हिंदी का गौरव", desc: "हिंदी को सम्पर्क और राष्ट्रभाषा की प्रतिष्ठा दिलाना।", icon: <Heart className="w-5 h-5" />, color: "bg-orange-600" },
-                { title: "युवा संस्कार", desc: "युवा पीढ़ी में संस्कार के लिए कार्यक्रमों की रचना।", icon: <Users className="w-5 h-5" />, color: "bg-amber-600" },
-                { title: "लेखक सहयोग", desc: "रचनाकारों को हर प्रकार का साहित्यिक सहयोग देना।", icon: <PenTool className="w-5 h-5" />, color: "bg-stone-900" },
-                { title: "शोध एवं यथार्थ", desc: "साहित्य में भारत की गरिमा के प्रक्षेपणों का शोध।", icon: <Search className="w-5 h-5" />, color: "bg-orange-600" },
-                { title: "शिक्षा समावेशन", desc: "मानव कल्याणकारी साहित्य को पाठ्यक्रमों में जोड़ना।", icon: <School className="w-5 h-5" />, color: "bg-amber-600" },
-                { title: "काव्य मंच", desc: "विश्व स्तर पर काव्य मंचों द्वारा समाज को संस्कार।", icon: <Mic2 className="w-5 h-5" />, color: "bg-stone-900" },
-                { title: "संगठन विस्तार", desc: "शिक्षण संस्थानों में संगठन का अहर्निश विस्तार।", icon: <Network className="w-5 h-5" />, color: "bg-orange-600" },
-                { title: "प्रदूषण मुक्ति", desc: "साहित्य के प्रदूषण को समाप्त कर श्रेष्ठता लाना।", icon: <Wind className="w-5 h-5" />, color: "bg-amber-600" },
-                { title: "मूल्य प्रसार", desc: "आदर्श मानवीय जीवन मूल्यों को जन-जन तक पहुँचाना।", icon: <Megaphone className="w-5 h-5" />, color: "bg-stone-900" },
-                { title: "राष्ट्रार्पण", desc: "साहित्यकारों को राष्ट्रार्पण के भाव से प्रेरित करना।", icon: <Trophy className="w-5 h-5" />, color: "bg-orange-600" },
-                { title: "वैश्विक मंच", desc: "उत्कृष्ट साहित्यकारों को अंतरराष्ट्रीय मंच दिलाना।", icon: <Library className="w-5 h-5" />, color: "bg-amber-600" },
-                { title: "साहित्यिक विकास", desc: "सेमिनार व कार्यशालाओं से साहित्य का उन्नयन।", icon: <Presentation className="w-5 h-5" />, color: "bg-stone-900" },
-                { title: "सम्पन्न संस्था", desc: "अतिथि गृहों का निर्माण व सुदृढ़ आर्थिक व्यवस्था।", icon: <Building2 className="w-5 h-5" />, color: "bg-orange-600" }
-              ].map((obj, i) => (
+              {objectives.map((obj, i) => (
                 <div key={i} className="group p-6 md:p-8 rounded-[2rem] bg-white border border-stone-100 hover:border-orange-200 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-200/20">
                   <div className={`w-10 h-10 rounded-xl mb-5 flex items-center justify-center text-white shadow-lg ${obj.color} group-hover:scale-110 transition-transform`}>
                     {obj.icon}

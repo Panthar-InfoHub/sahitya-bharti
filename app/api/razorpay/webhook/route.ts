@@ -42,19 +42,21 @@ export async function POST(req: NextRequest) {
       let eventId: string | null = null;
       let plan: string | null = null;
 
-      // 1. MEMBERSHIP UPGRADE
+      // 1. MEMBERSHIP UPGRADE / DONATION
       // If notes contain 'plan' or simple login from MembershipModal
-      if (notes.plan === "premium" && notes.userId) {
-         console.log(`Upgrading User ${notes.userId} to Premium`);
+      if (notes.plan && notes.userId) {
          transactionType = 'membership';
-         plan = 'premium';
+         plan = notes.plan;
          
-         const { error } = await supabase
-            .from('users')
-            .update({ plan: 'premium' })
-            .eq('id', notes.userId);
-         
-         if (error) console.error("Failed to upgrade user:", error);
+         if (notes.plan === "premium") {
+            console.log(`Upgrading User ${notes.userId} to Premium`);
+            const { error } = await supabase
+               .from('users')
+               .update({ plan: 'premium' })
+               .eq('id', notes.userId);
+            
+            if (error) console.error("Failed to upgrade user:", error);
+         }
       }
 
       // 2. EVENT REGISTRATION

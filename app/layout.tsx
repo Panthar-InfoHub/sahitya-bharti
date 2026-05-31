@@ -18,23 +18,30 @@ export const metadata: Metadata = {
   },
 }
 
+import { cookies } from "next/headers"
+import { LanguageProvider } from "@/lib/i18n/LanguageContext"
+import { Language } from "@/lib/i18n/translations"
 import { Toaster } from "sonner"
-
 import { BackgroundMusic } from "@/components/background-music"
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const cookieStore = await cookies()
+  const initialLang = (cookieStore.get("sb_lang")?.value || "hi") as Language
+
   return (
-    <html lang="hi">
+    <html lang={initialLang}>
       <body className={`font-serif antialiased bg-background text-foreground`} suppressHydrationWarning>
-        <Preloader />
-        {children}
-        <Analytics />
-        <Toaster />
-        <BackgroundMusic />
+        <LanguageProvider initialLanguage={initialLang}>
+          <Preloader />
+          {children}
+          <Analytics />
+          <Toaster />
+          <BackgroundMusic />
+        </LanguageProvider>
       </body>
     </html>
   )

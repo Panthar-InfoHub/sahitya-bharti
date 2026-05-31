@@ -49,7 +49,15 @@ export function UserNav({ user, onOpenProfile }: UserNavProps) {
     if (user.plan && user.plan !== 'free') {
       const fetchPlan = async () => {
         const cleanPlanName = (user.plan || '').trim()
-        const { data } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlanName).limit(1).maybeSingle()
+        const { data, error } = await supabase.from('membership_plans').select('*').ilike('name', cleanPlanName).limit(1).maybeSingle()
+        if (error) {
+            console.error('Error fetching plan in UserNav:', {
+                code: error.code,
+                message: error.message,
+                details: error.details,
+                hint: error.hint
+            })
+        }
         if (data) setPlanDetails(data)
       }
       fetchPlan()

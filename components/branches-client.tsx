@@ -1,9 +1,9 @@
-
 "use client"
 
 import { useState } from "react"
 import Link from "next/link"
 import { Globe, MapPin } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 interface BranchStat {
   code: string // State Code or Country ISO/Name
@@ -19,6 +19,7 @@ interface BranchesClientProps {
 }
 
 export function BranchesClient({ nationalStats, internationalStats }: BranchesClientProps) {
+  const { t, language } = useLanguage()
   const [activeTab, setActiveTab] = useState<'national' | 'international'>('national')
 
   const currentStats = activeTab === 'national' ? nationalStats : internationalStats
@@ -26,7 +27,6 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
   const displayStats = currentStats.slice(0, 6)
 
   // Don't hide whole section if one is empty, hide if BOTH are empty.
-  // Actually parent might do that. Child render will handle empty tabs.
   if (nationalStats.length === 0 && internationalStats.length === 0) return null
 
   return (
@@ -34,14 +34,14 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-10 space-y-3">
-          <p className="text-sm font-semibold text-primary uppercase tracking-wide">हमारी शाखाएं</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground">
-            {activeTab === 'national' ? 'भारत के राज्य' : 'वैश्विक उपस्थिति'}
+          <p className="text-sm font-semibold text-primary uppercase tracking-wide">{t('br.title')}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-serif">
+            {activeTab === 'national' ? t('br.states') : t('br.global')}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto font-medium">
             {activeTab === 'national'
-              ? "पूरे भारत में हमारी उपस्थिति है। अपने राज्य को खोजें और हमसे जुड़ें।"
-              : "साहित्य भारती का विस्तार विश्व भर में हो रहा है।"}
+              ? t('br.desc_states')
+              : t('br.desc_global')}
           </p>
         </div>
 
@@ -56,7 +56,7 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
                 }`}
             >
               <MapPin className="h-4 w-4" />
-              राष्ट्रीय
+              {t('br.national')}
             </button>
             <button
               onClick={() => setActiveTab('international')}
@@ -66,7 +66,7 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
                 }`}
             >
               <Globe className="h-4 w-4" />
-              अंतर्राष्ट्रीय
+              {t('br.international')}
             </button>
           </div>
         </div>
@@ -92,14 +92,14 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
                   {/* Content */}
                   <div className="relative z-10 space-y-4">
                     {/* Name */}
-                    <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 truncate" title={item.name}>
-                      {item.name}
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300 truncate font-serif" title={language === 'en' ? item.nameEn : item.name}>
+                      {language === 'en' ? item.nameEn : item.name}
                     </h3>
 
                     {/* Cities count */}
                     <div className="flex items-center justify-between pt-2 mt-auto">
                       <span className="text-xs font-semibold text-primary uppercase bg-primary/10 px-2 py-1 rounded">
-                        शहर: {item.count}
+                        {t('br.cities')}: {item.count}
                       </span>
                       <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
                         →
@@ -110,8 +110,8 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
               </Link>
             ))
           ) : (
-            <div className="col-span-full py-12 text-center text-muted-foreground bg-secondary/10 rounded-lg border border-dashed border-secondary">
-              <p>इस श्रेणी में अभी कोई इकाई उपलब्ध नहीं है।</p>
+            <div className="col-span-full py-12 text-center text-muted-foreground bg-secondary/10 rounded-lg border border-dashed border-secondary font-medium">
+              <p>{t('br.empty')}</p>
             </div>
           )}
         </div>
@@ -122,7 +122,7 @@ export function BranchesClient({ nationalStats, internationalStats }: BranchesCl
             href={activeTab === 'national' ? "/states" : "/international"}
             className="inline-block px-8 py-3 bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-secondary/25"
           >
-            {activeTab === 'national' ? "सभी राज्य देखें" : "सभी देश देखें"}
+            {activeTab === 'national' ? t('br.all_states') : t('br.all_countries')}
           </Link>
         </div>
       </div>

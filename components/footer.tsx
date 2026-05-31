@@ -1,33 +1,77 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
-import { Mail, MapPin, Phone, Facebook, Instagram, Youtube, ExternalLink } from "lucide-react"
+import { Mail, MapPin, Phone, Facebook, Instagram, Youtube } from "lucide-react"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
+
+const labels = {
+  hi: {
+    tagline: 'विश्वव्यापी सांस्कृतिक मंच',
+    about: 'हिंदी साहित्य भारती का मुख्य उद्देश्य हिंदी साहित्य, संस्कृति एवं भारतीय जीवन मूल्यों का वैश्विक प्रचार-प्रसार करना है। हम दुनिया भर के हिंदी प्रेमियों को एक साझा मंच प्रदान करते हैं।',
+    quickLinksTitle: 'महत्वपूर्ण लिंक',
+    contactTitle: 'संपर्क सूत्र',
+    socialTitle: 'सामाजिक मंच',
+    emailLabel: 'ईमेल',
+    phoneLabel: 'संपर्क',
+    locationLabel: 'स्थान',
+    location: 'झांसी, भारत',
+    copyright: '© 2026 हिंदी साहित्य भारती। सर्वाधिकार सुरक्षित।',
+    privacy: 'निजता नीति',
+    terms: 'नियम व शर्तें',
+    links: [
+      { name: 'गृह', href: '/' },
+      { name: 'संस्थापक', href: '/#founders' },
+      { name: 'ट्रस्टी', href: '/#trustees' },
+      { name: 'निर्देशक मंडल', href: '/#directors' },
+      { name: 'हमारे बारे में', href: '/#about' },
+      { name: 'कार्यक्रम', href: '/events' },
+    ],
+  },
+  en: {
+    tagline: 'Global Cultural Platform',
+    about: 'The main objective of Hindi Sahitya Bharti is to globally promote Hindi literature, culture and Indian life values. We provide a common platform to Hindi enthusiasts around the world.',
+    quickLinksTitle: 'Quick Links',
+    contactTitle: 'Contact Info',
+    socialTitle: 'Social Media',
+    emailLabel: 'Email',
+    phoneLabel: 'Contact',
+    locationLabel: 'Location',
+    location: 'Jhansi, India',
+    copyright: '© 2026 Hindi Sahitya Bharti. All rights reserved.',
+    privacy: 'Privacy Policy',
+    terms: 'Terms & Conditions',
+    links: [
+      { name: 'Home', href: '/' },
+      { name: 'Founders', href: '/#founders' },
+      { name: 'Trustees', href: '/#trustees' },
+      { name: 'Directors', href: '/#directors' },
+      { name: 'About Us', href: '/#about' },
+      { name: 'Events', href: '/events' },
+    ],
+  },
+}
 
 export function Footer() {
-  const quickLinks = [
-    { name: "गृह", href: "/" },
-    { name: "संस्थापक", href: "/#founders" },
-    { name: "ट्रस्टी", href: "/#trustees" },
-    { name: "निर्देशक मंडल", href: "/#directors" },
-    { name: "हमारे बारे में", href: "/#about" },
-    { name: "कार्यक्रम", href: "/events" },
-  ]
+  const { language } = useLanguage()
+  const L = labels[language] ?? labels.hi
 
   const socialLinks = [
-    { 
-      name: "Facebook", 
-      icon: <Facebook className="w-5 h-5" />, 
+    {
+      name: "Facebook",
+      icon: <Facebook className="w-5 h-5" />,
       href: "https://www.facebook.com/share/186BLqRx4d/?mibextid=wwXIfr",
       hoverClass: "hover:bg-[#1877F2]"
     },
-    { 
-      name: "Instagram", 
-      icon: <Instagram className="w-5 h-5" />, 
+    {
+      name: "Instagram",
+      icon: <Instagram className="w-5 h-5" />,
       href: "https://www.instagram.com/hindisahityabharti?igsh=M3pqOTdqanliZXJp",
       hoverClass: "hover:bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7]"
     },
-    { 
-      name: "YouTube", 
-      icon: <Youtube className="w-5 h-5" />, 
+    {
+      name: "YouTube",
+      icon: <Youtube className="w-5 h-5" />,
       href: "https://youtube.com/channel/UCYdR3PCSoaJwFD5DNG88gcA?si=Z8Q83IeWWm-9NVNz",
       hoverClass: "hover:bg-[#FF0000]"
     },
@@ -41,39 +85,39 @@ export function Footer() {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          
+
           {/* Column 1: Organization Info */}
           <div className="lg:col-span-4 space-y-6">
             <Link href="/" className="flex items-center gap-3">
               <div className="relative w-14 h-14 bg-white rounded-xl p-1 shadow-lg shadow-orange-950/20">
-                <Image 
-                  src="/logo.jpg" 
-                  alt="हिंदी साहित्य भारती" 
-                  width={56} 
-                  height={56} 
+                <Image
+                  src="/logo.jpg"
+                  alt="हिंदी साहित्य भारती"
+                  width={56}
+                  height={56}
                   className="object-contain"
                 />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white tracking-tight">हिंदी साहित्य भारती</h3>
-                <p className="text-orange-500 text-[10px] font-bold uppercase tracking-widest">विश्वव्यापी सांस्कृतिक मंच</p>
+                <p className="text-orange-500 text-[10px] font-bold uppercase tracking-widest">{L.tagline}</p>
               </div>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-              हिंदी साहित्य भारती का मुख्य उद्देश्य हिंदी साहित्य, संस्कृति एवं भारतीय जीवन मूल्यों का वैश्विक प्रचार-प्रसार करना है। हम दुनिया भर के हिंदी प्रेमियों को एक साझा मंच प्रदान करते हैं।
+              {L.about}
             </p>
           </div>
 
           {/* Column 2: Quick Links */}
           <div className="lg:col-span-3 space-y-6">
             <h4 className="text-sm font-bold text-white uppercase tracking-widest border-l-2 border-orange-500 pl-4 py-1">
-              महत्वपूर्ण लिंक
+              {L.quickLinksTitle}
             </h4>
             <ul className="grid grid-cols-2 lg:grid-cols-1 gap-y-3 gap-x-4">
-              {quickLinks.map((link) => (
+              {L.links.map((link) => (
                 <li key={link.name}>
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="text-slate-400 hover:text-orange-400 text-sm transition-colors flex items-center group"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-orange-500/40 group-hover:bg-orange-500 mr-2.5 transition-all" />
@@ -87,7 +131,7 @@ export function Footer() {
           {/* Column 3: Contact Info */}
           <div className="lg:col-span-3 space-y-6">
             <h4 className="text-sm font-bold text-white uppercase tracking-widest border-l-2 border-orange-500 pl-4 py-1">
-              संपर्क सूत्र
+              {L.contactTitle}
             </h4>
             <ul className="space-y-4">
               <li className="flex gap-4">
@@ -95,7 +139,7 @@ export function Footer() {
                   <Mail className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase">ईमेल</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">{L.emailLabel}</p>
                   <a href="mailto:hindisahityabharati@gmail.com" className="text-sm text-slate-300 hover:text-orange-400 transition-colors">
                     hindisahityabharati@gmail.com
                   </a>
@@ -106,7 +150,7 @@ export function Footer() {
                   <Phone className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase">संपर्क</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">{L.phoneLabel}</p>
                   <a href="tel:+919026657244" className="text-sm text-slate-300 hover:text-orange-400 transition-colors">
                     +91 90266 57244
                   </a>
@@ -117,8 +161,8 @@ export function Footer() {
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase">स्थान</p>
-                  <p className="text-sm text-slate-300">झांसी, भारत</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">{L.locationLabel}</p>
+                  <p className="text-sm text-slate-300">{L.location}</p>
                 </div>
               </li>
             </ul>
@@ -127,7 +171,7 @@ export function Footer() {
           {/* Column 4: Social Links */}
           <div className="lg:col-span-2 space-y-6">
             <h4 className="text-sm font-bold text-white uppercase tracking-widest border-l-2 border-orange-500 pl-4 py-1">
-              सामाजिक मंच
+              {L.socialTitle}
             </h4>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
@@ -151,11 +195,11 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-500 text-xs text-center md:text-left">
-            © 2026 <span className="text-slate-300 font-medium">हिंदी साहित्य भारती</span>। सर्वाधिकार सुरक्षित।
+            {L.copyright}
           </p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-slate-500 hover:text-slate-300 text-[11px] transition-colors">निजता नीति</Link>
-            <Link href="/terms" className="text-slate-500 hover:text-slate-300 text-[11px] transition-colors">नियम व शर्तें</Link>
+            <Link href="/privacy" className="text-slate-500 hover:text-slate-300 text-[11px] transition-colors">{L.privacy}</Link>
+            <Link href="/terms" className="text-slate-500 hover:text-slate-300 text-[11px] transition-colors">{L.terms}</Link>
           </div>
         </div>
       </div>

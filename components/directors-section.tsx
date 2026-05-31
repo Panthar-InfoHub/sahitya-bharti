@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DirectorCard } from "./director-card"
-import { Loader2, ArrowRight } from "lucide-react"
+import { Loader2, ArrowRight, X, Phone, Mail } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-
+import { DirectorCard } from "./director-card"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
 
 interface Director {
   id: string
@@ -19,23 +19,66 @@ interface Director {
   email: string | null
   phone: string | null
   linkedin_url: string | null
-  display_order: number // Added display_order
+  display_order: number
+}
+
+// Language-aware labels (no translation key needed — inline)
+const labels = {
+  hi: {
+    national: 'राष्ट्रीय पदाधिकारी',
+    international: 'अंतर्राष्ट्रीय पदाधिकारी',
+    about: 'परिचय',
+    no_bio: 'विवरण उपलब्ध नहीं है।',
+    close: 'बंद करें',
+    call: 'कॉल करें',
+    mail: 'मेल करें',
+    loading: 'जानकारी प्राप्त की जा रही है...',
+    no_national: 'कोई राष्ट्रीय निर्देशक नहीं मिला',
+    no_international: 'कोई अंतर्राष्ट्रीय निर्देशक नहीं मिला',
+    view_all_national: 'सभी राष्ट्रीय निर्देशक देखें',
+    view_all_international: 'सभी अंतर्राष्ट्रीय सदस्य देखें',
+  },
+  en: {
+    national: 'National Official',
+    international: 'International Official',
+    about: 'About',
+    no_bio: 'No details available.',
+    close: 'Close',
+    call: 'Call',
+    mail: 'Mail',
+    loading: 'Fetching information...',
+    no_national: 'No national directors found',
+    no_international: 'No international directors found',
+    view_all_national: 'View All National Directors',
+    view_all_international: 'View All International Members',
+  },
 }
 
 export function DirectorsSection() {
+  const { language } = useLanguage()
+  const L = labels[language] ?? labels.hi
+
   const [nationalMembers, setNationalMembers] = useState<Director[]>([])
   const [internationalMembers, setInternationalMembers] = useState<Director[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeDirector, setActiveDirector] = useState<Director | null>(null)
+  const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({})
 
   useEffect(() => {
     fetchMembers()
+
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('.director-popup-card') && !target.closest('.director-main-card')) {
+        setActiveDirector(null)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [])
 
   const fetchMembers = async () => {
-    setLoading(true)
     const supabase = createClient()
-
-    // Fetch directly from the dedicated directors table
     const { data, error } = await supabase
       .from('directors')
       .select('*')
@@ -43,29 +86,60 @@ export function DirectorsSection() {
       .order('display_order', { ascending: true })
 
     if (!error && data) {
-      // Filter National
-      const national = data.filter((m: any) => m.category === 'national')
-      // Filter International
-      const international = data.filter((m: any) => m.category === 'international')
-
-      setNationalMembers(national)
-      setInternationalMembers(international)
+      setNationalMembers(data.filter((m: any) => m.category === 'national'))
+      setInternationalMembers(data.filter((m: any) => m.category === 'international'))
     }
     setLoading(false)
   }
 
+  const handleCardClick = (e: React.MouseEvent, director: Director) => {
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const POPUP_WIDTH = 360
+    const POPUP_HEIGHT = 560
+    const margin = 14
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+
+    let left: number
+    let top: number
+
+    if (rect.right + POPUP_WIDTH + margin < vw) {
+      left = rect.right + margin
+    } else if (rect.left - POPUP_WIDTH - margin > 0) {
+      left = rect.left - POPUP_WIDTH - margin
+    } else {
+      left = Math.max(8, Math.min(vw - POPUP_WIDTH - 8, rect.left + rect.width / 2 - POPUP_WIDTH / 2))
+    }
+
+    top = rect.top
+    if (top + POPUP_HEIGHT > vh - 8) {
+      top = Math.max(8, vh - POPUP_HEIGHT - 8)
+    }
+
+    setPopupStyle({
+      position: 'fixed',
+      top: `${top}px`,
+      left: `${left}px`,
+      width: `${POPUP_WIDTH}px`,
+      maxHeight: `${POPUP_HEIGHT}px`,
+      zIndex: 9999,
+    })
+
+    setActiveDirector(director)
+  }
+
   return (
-    <section className="py-24 bg-linear-to-b from-white to-orange-50/50 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-linear-to-r from-transparent via-orange-200 to-transparent" />
+    <section id="directors-section" className="py-24 bg-gradient-to-b from-white to-orange-50/50 relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent" />
       <div className="container mx-auto px-4">
+
         <div className="text-center mb-16 space-y-4">
           <div className="inline-block px-4 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold uppercase tracking-widest">
             नेतृत्व मंडल
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-stone-900">
-            निर्देशक मंडल
-          </h2>
-          <div className="w-24 h-1.5 bg-linear-to-r from-orange-400 to-amber-400 mx-auto rounded-full" />
+          <h2 className="text-4xl md:text-5xl font-black text-stone-900">निर्देशक मंडल</h2>
+          <div className="w-24 h-1.5 bg-gradient-to-r from-orange-400 to-amber-400 mx-auto rounded-full" />
           <p className="max-w-2xl mx-auto text-stone-500 font-medium">
             हिंदी साहित्य भारती को वैश्विक ऊंचाइयों तक ले जाने वाले हमारे सम्मानित राष्ट्रीय एवं अंतर्राष्ट्रीय पदाधिकारी
           </p>
@@ -81,60 +155,48 @@ export function DirectorsSection() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="national" className="space-y-8">
+          <TabsContent value="national" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {loading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">जानकारी प्राप्त की जा रही है...</span>
+                <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                <span className="ml-2 text-stone-500 font-medium">{L.loading}</span>
               </div>
             ) : nationalMembers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">
-                कोई राष्ट्रीय निर्देशक नहीं मिला
-              </p>
+              <p className="text-center text-muted-foreground py-12">{L.no_national}</p>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+                <div className="flex flex-wrap justify-center gap-6 lg:gap-8">
                   {nationalMembers.slice(0, 6).map((director) => (
-                    <DirectorCard key={director.id} director={director} />
+                    <DirectorCard key={director.id} director={director} onClick={(e) => handleCardClick(e, director)} />
                   ))}
                 </div>
-
                 <div className="flex justify-center pt-8">
                   <Button asChild variant="outline" className="gap-2">
-                    <Link href="/national-team">
-                      सभी राष्ट्रीय निर्देशक देखें
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
+                    <Link href="/national-team">{L.view_all_national} <ArrowRight className="h-4 w-4" /></Link>
                   </Button>
                 </div>
               </>
             )}
           </TabsContent>
 
-          <TabsContent value="international" className="space-y-8">
+          <TabsContent value="international" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {loading ? (
               <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="ml-2">जानकारी प्राप्त की जा रही है...</span>
+                <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+                <span className="ml-2 text-stone-500 font-medium">{L.loading}</span>
               </div>
             ) : internationalMembers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">
-                कोई अंतर्राष्ट्रीय निर्देशक नहीं मिला
-              </p>
+              <p className="text-center text-muted-foreground py-12">{L.no_international}</p>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+                <div className="flex flex-wrap justify-center gap-6 lg:gap-8">
                   {internationalMembers.slice(0, 6).map((director) => (
-                    <DirectorCard key={director.id} director={director} />
+                    <DirectorCard key={director.id} director={director} onClick={(e) => handleCardClick(e, director)} />
                   ))}
                 </div>
-
                 <div className="flex justify-center pt-8">
                   <Button asChild variant="outline" className="gap-2">
-                    <Link href="/international">
-                      सभी अंतर्राष्ट्रीय सदस्य देखें
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
+                    <Link href="/international">{L.view_all_international} <ArrowRight className="h-4 w-4" /></Link>
                   </Button>
                 </div>
               </>
@@ -142,6 +204,88 @@ export function DirectorsSection() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* ── Fixed Detail Popup ── */}
+      {activeDirector && (
+        <div
+          style={popupStyle}
+          className="director-popup-card bg-slate-900 text-white rounded-[2.5rem] shadow-[0_24px_64px_rgba(15,23,42,0.5)] border border-slate-700 flex flex-col overflow-hidden animate-in slide-in-from-top-6 fade-in duration-300"
+        >
+          {/* Photo with close button layered on top */}
+          <div className="relative w-full h-52 shrink-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-900/30 to-slate-900" />
+            {activeDirector.photo_url ? (
+              <img
+                src={activeDirector.photo_url}
+                alt={activeDirector.name}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-6xl font-black text-orange-400/20">{activeDirector.name.charAt(0)}</span>
+              </div>
+            )}
+            {/* Close button always on top of photo */}
+            <button
+              onClick={() => setActiveDirector(null)}
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/50 hover:bg-red-500 text-white transition-colors cursor-pointer backdrop-blur-sm shadow-lg"
+              title={L.close}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Content — scrollable */}
+          <div className="flex flex-col gap-3 p-5 overflow-y-auto flex-1">
+            {/* Category badge */}
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-orange-400 leading-none">
+              {activeDirector.category === 'national' ? L.national : L.international}
+            </p>
+
+            {/* Name & title */}
+            <div>
+              <h3 className="text-xl font-black text-white leading-tight">{activeDirector.name}</h3>
+              {activeDirector.title && (
+                <p className="text-[10px] font-semibold text-stone-400 uppercase mt-1.5 leading-snug">
+                  {activeDirector.title}
+                </p>
+              )}
+            </div>
+
+            {/* Bio */}
+            <div className="border-t border-white/10 pt-3">
+              <p className="text-[9px] font-black uppercase tracking-widest text-stone-500 mb-2">{L.about}</p>
+              <p className="text-xs text-stone-300 leading-relaxed font-medium">
+                {activeDirector.bio || L.no_bio}
+              </p>
+            </div>
+          </div>
+
+          {/* Action buttons — always at bottom */}
+          {(activeDirector.phone || activeDirector.email) && (
+            <div className="border-t border-white/10 p-4 grid grid-cols-2 gap-2.5 shrink-0 bg-slate-900">
+              {activeDirector.phone && (
+                <a
+                  href={`tel:${activeDirector.phone}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center justify-center gap-2 p-3 bg-green-500/10 hover:bg-green-600 hover:text-white rounded-2xl text-[11px] font-bold text-green-400 border border-green-500/20 transition-all duration-300"
+                >
+                  <Phone className="w-3.5 h-3.5" /> {L.call}
+                </a>
+              )}
+              {activeDirector.email && (
+                <a
+                  href={`mailto:${activeDirector.email}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center justify-center gap-2 p-3 bg-blue-500/10 hover:bg-blue-600 hover:text-white rounded-2xl text-[11px] font-bold text-blue-400 border border-blue-500/20 transition-all duration-300"
+                >
+                  <Mail className="w-3.5 h-3.5" /> {L.mail}
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </section>
   )
 }

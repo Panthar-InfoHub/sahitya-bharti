@@ -41,14 +41,6 @@ export default async function EventsPage() {
             <p className="text-muted-foreground mt-2">हमारे नवीनतम कार्यक्रमों और गतिविधियों में शामिल हों</p>
           </div>
           
-          {isAdmin && (
-            <EventModal trigger={
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                नया कार्यक्रम (Add Event)
-              </Button>
-            } />
-          )}
         </div>
 
         {(!events || events.length === 0) ? (

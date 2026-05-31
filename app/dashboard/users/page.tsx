@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, Search, Pencil } from "lucide-react"
+import { Loader2, Search, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
-import { createManualUser } from "./actions"
+import { createManualUser, updateManualUserPassword, deleteManualUser } from "./actions"
+import { formatFullPhone, parseFullPhone } from "@/lib/utils"
 import {
   Card,
   CardContent,
@@ -22,6 +23,22 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+
+const COUNTRIES = [
+  { code: "+91", flag: "🇮🇳", name: "India (+91)" },
+  { code: "+1", flag: "🇺🇸", name: "USA/Canada (+1)" },
+  { code: "+44", flag: "🇬🇧", name: "UK (+44)" },
+  { code: "+971", flag: "🇦🇪", name: "UAE (+971)" },
+  { code: "+977", flag: "🇳🇵", name: "Nepal (+977)" },
+  { code: "+61", flag: "🇦🇺", name: "Australia (+61)" },
+  { code: "+49", flag: "🇩🇪", name: "Germany (+49)" },
+  { code: "+65", flag: "🇸🇬", name: "Singapore (+65)" },
+  { code: "+81", flag: "🇯🇵", name: "Japan (+81)" },
+  { code: "+33", flag: "🇫🇷", name: "France (+33)" },
+  { code: "+39", flag: "🇮🇹", name: "Italy (+39)" },
+  { code: "+7", flag: "🇷🇺", name: "Russia (+7)" },
+]
+
 
 interface User {
   id: string
@@ -55,6 +72,8 @@ export default function UsersManagementPage() {
     address: "",
     plan: ""
   })
+  const [editPhoneCountry, setEditPhoneCountry] = useState("+91")
+  const [editUserPassword, setEditUserPassword] = useState("")
   const [savingUser, setSavingUser] = useState(false)
 
   // Add User State
@@ -66,6 +85,9 @@ export default function UsersManagementPage() {
     role: "user",
     plan: ""
   })
+  const [addPhoneCountry, setAddPhoneCountry] = useState("+91")
+  const [addPhoneLocal, setAddPhoneLocal] = useState("")
+  const [addUserPassword, setAddUserPassword] = useState("")
   const [addingUser, setAddingUser] = useState(false)
 
   useEffect(() => {
@@ -144,12 +166,14 @@ export default function UsersManagementPage() {
 
   const openEditModal = (u: User) => {
       setEditUser(u)
+      const parsed = parseFullPhone(u.phone_number)
       setEditFormData({
           full_name: u.full_name || "",
-          phone_number: u.phone_number || "",
+          phone_number: parsed.localNumber || "",
           address: u.address || "",
           plan: u.plan || ""
       })
+      setEditPhoneCountry(parsed.countryCode)
   }
 
   const handleSaveUser = async () => {
@@ -160,11 +184,13 @@ export default function UsersManagementPage() {
       
       const planChanged = editFormData.plan !== editUser.plan
       
+      const fullPhone = formatFullPhone(editPhoneCountry, editFormData.phone_number)
+
       const { error } = await supabase
         .from("users")
         .update({
             full_name: editFormData.full_name,
-            phone_number: editFormData.phone_number,
+            phone_number: fullPhone,
             address: editFormData.address,
             plan: editFormData.plan
         })
@@ -173,6 +199,16 @@ export default function UsersManagementPage() {
       if (error) {
           toast.error("Failed to update user details")
       } else {
+          // If password changed, update Auth password
+          if (editUserPassword.trim()) {
+              try {
+                  await updateManualUserPassword(editUser.id, editUserPassword.trim())
+              } catch (pwdError: any) {
+                  console.error(pwdError)
+                  toast.warning("User details updated, but failed to update password in Auth: " + (pwdError.message || "Unknown error"))
+              }
+          }
+
           // If plan changed (upgrade/downgrade), record it in transactions for offline tracking
           if (planChanged) {
               const newPlan = plans.find(p => p.name === editFormData.plan)
@@ -203,35 +239,100 @@ export default function UsersManagementPage() {
             toast.success("User details updated successfully")
           }
           
+          setEditUserPassword("")
           setEditUser(null)
           checkAccessAndFetch()
       }
       setSavingUser(false)
   }
 
+  const handleDeleteUser = async (userId: string, userName: string) => {
+      if (!isSuperAdmin) return toast.error("Only Super Admins can delete users")
+      
+      const confirmDelete = window.confirm(`क्या आप सचमुच ${userName || "इस उपयोगकर्ता"} को हटाना चाहते हैं? (Are you sure you want to delete this user?)`)
+      if (!confirmDelete) return
+
+      setProcessingId(userId)
+      try {
+          const result = await deleteManualUser(userId)
+          if (result.success) {
+              toast.success("उपयोगकर्ता सफलतापूर्वक हटा दिया गया है (User deleted successfully)")
+              checkAccessAndFetch()
+          }
+      } catch (err: any) {
+          console.error(err)
+          toast.error("Failed to delete user: " + (err.message || "Unknown error"))
+      } finally {
+          setProcessingId(null)
+      }
+  }
+
 
 
   const handleAddUser = async () => {
       if (!isSuperAdmin) return toast.error("Only Super Admins can add users manually")
-      if (!addUserFormData.email || !addUserFormData.full_name) {
-          return toast.error("Username and Email are required")
+      
+      if (!addUserFormData.full_name.trim()) {
+          return toast.error("नाम आवश्यक है (Name is required)")
+      }
+
+      const emailTrimmed = addUserFormData.email.trim()
+      const localPhoneTrimmed = addPhoneLocal.trim()
+
+      if (!emailTrimmed && !localPhoneTrimmed) {
+          return toast.error("ईमेल या फ़ोन नंबर में से कम से कम एक प्रदान करना आवश्यक है (At least Email or Phone is required)")
       }
       
       setAddingUser(true)
 
+      const supabase = createClient()
+      const fullPhone = formatFullPhone(addPhoneCountry, localPhoneTrimmed)
+
       try {
+        // 1. Check DB for duplicate Email
+        if (emailTrimmed) {
+            const { data: existingEmailUser } = await supabase
+                .from('users')
+                .select('id')
+                .eq('email', emailTrimmed)
+                .maybeSingle()
+
+            if (existingEmailUser) {
+                setAddingUser(false)
+                return toast.error("इस ईमेल के साथ उपयोगकर्ता पहले से मौजूद है (A user with this email already exists)")
+            }
+        }
+
+        // 2. Check DB for duplicate Phone Number
+        if (localPhoneTrimmed) {
+            const { data: existingPhoneUser } = await supabase
+                .from('users')
+                .select('id')
+                .eq('phone_number', fullPhone)
+                .maybeSingle()
+
+            if (existingPhoneUser) {
+                setAddingUser(false)
+                return toast.error("इस फ़ोन नंबर के साथ उपयोगकर्ता पहले से मौजूद है (A user with this phone number already exists)")
+            }
+        }
+
         const result = await createManualUser({
-            email: addUserFormData.email,
-            full_name: addUserFormData.full_name,
-            phone_number: addUserFormData.phone_number,
+            email: emailTrimmed,
+            full_name: addUserFormData.full_name.trim(),
+            phone_number: fullPhone,
             role: addUserFormData.role,
-            plan: addUserFormData.plan
+            plan: addUserFormData.plan,
+            password: addUserPassword.trim() || undefined
         })
 
         if (result.success) {
             toast.success("User added successfully through Auth Admin API.")
             setIsAddingUser(false)
-            setAddUserFormData({ full_name: "", email: "", phone_number: "", role: "user", plan: plans[0] || "" })
+            setAddUserFormData({ full_name: "", email: "", phone_number: "", role: "user", plan: plans[0]?.name || "free" })
+            setAddPhoneLocal("")
+            setAddPhoneCountry("+91")
+            setAddUserPassword("")
             checkAccessAndFetch()
         }
       } catch (error: any) {
@@ -377,6 +478,19 @@ export default function UsersManagementPage() {
                                   <Pencil className="h-4 w-4" />
                               </Button>
 
+                              {/* Delete user button - only available to super_admin and not for self */}
+                              {isSuperAdmin && u.id !== currentUserId && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-100"
+                                    onClick={() => handleDeleteUser(u.id, u.full_name)}
+                                    disabled={processingId === u.id}
+                                  >
+                                      <Trash2 className="h-4 w-4" />
+                                  </Button>
+                              )}
+
                               {/* Role Select - only editable for super_admin */}
                               {u.id === currentUserId ? (
                                   <span className="text-xs text-muted-foreground italic mr-2">स्वयं (You)</span>
@@ -441,13 +555,27 @@ export default function UsersManagementPage() {
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="add_phone" className="text-right">फ़ोन (Phone)</Label>
-                <Input 
-                    id="add_phone" 
-                    placeholder="Enter phone number" 
-                    value={addUserFormData.phone_number} 
-                    onChange={(e) => setAddUserFormData({...addUserFormData, phone_number: e.target.value})}
-                    className="col-span-3" 
-                />
+                <div className="col-span-3 flex gap-2">
+                  <Select value={addPhoneCountry} onValueChange={setAddPhoneCountry}>
+                    <SelectTrigger className="w-[110px] shrink-0">
+                      <SelectValue placeholder="Code" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COUNTRIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          <span className="mr-1">{c.flag}</span> {c.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input 
+                      id="add_phone" 
+                      placeholder="Mobile number" 
+                      value={addPhoneLocal} 
+                      onChange={(e) => setAddPhoneLocal(e.target.value)}
+                      className="flex-1" 
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">भूमिका (Role)</Label>
@@ -481,6 +609,17 @@ export default function UsersManagementPage() {
                     {plans.length === 0 && <SelectItem value="free">Free</SelectItem>}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="add_password" className="text-right">पासवर्ड (Password)</Label>
+                <Input 
+                    id="add_password" 
+                    type="text"
+                    placeholder="Set custom password/username"
+                    value={addUserPassword} 
+                    onChange={(e) => setAddUserPassword(e.target.value)}
+                    className="col-span-3" 
+                />
               </div>
           </div>
           
@@ -539,12 +678,27 @@ export default function UsersManagementPage() {
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="phone_number" className="text-right">फ़ोन (Phone)</Label>
-                    <Input 
-                        id="phone_number" 
-                        value={editFormData.phone_number} 
-                        onChange={(e) => setEditFormData({...editFormData, phone_number: e.target.value})}
-                        className="col-span-3" 
-                    />
+                    <div className="col-span-3 flex gap-2">
+                      <Select value={editPhoneCountry} onValueChange={setEditPhoneCountry}>
+                        <SelectTrigger className="w-[110px] shrink-0">
+                          <SelectValue placeholder="Code" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {COUNTRIES.map((c) => (
+                            <SelectItem key={c.code} value={c.code}>
+                              <span className="mr-1">{c.flag}</span> {c.code}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input 
+                          id="phone_number" 
+                          placeholder="Mobile number"
+                          value={editFormData.phone_number} 
+                          onChange={(e) => setEditFormData({...editFormData, phone_number: e.target.value})}
+                          className="flex-1" 
+                      />
+                    </div>
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="address" className="text-right">पता (Address)</Label>
@@ -552,6 +706,17 @@ export default function UsersManagementPage() {
                         id="address" 
                         value={editFormData.address} 
                         onChange={(e) => setEditFormData({...editFormData, address: e.target.value})}
+                        className="col-span-3" 
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="edit_password" className="text-right">नया पासवर्ड (New Pwd)</Label>
+                    <Input 
+                        id="edit_password" 
+                        type="text"
+                        placeholder="Leave blank to keep unchanged"
+                        value={editUserPassword} 
+                        onChange={(e) => setEditUserPassword(e.target.value)}
                         className="col-span-3" 
                     />
                   </div>
